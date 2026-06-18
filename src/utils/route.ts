@@ -15,6 +15,10 @@ export type AppRoute =
   | "/accounts/self"
   | "/accounts/energy";
 
+export type RouteState = {
+  quickRecordPrefill?: import("../domain/types").QuickRecordPrefill;
+};
+
 export function normalizeRoute(pathname: string): AppRoute {
   if (pathname.startsWith("/accounts/connection")) return "/accounts/connection";
   if (pathname.startsWith("/accounts/self")) return "/accounts/self";

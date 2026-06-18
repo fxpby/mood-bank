@@ -25,7 +25,6 @@ const actions: Array<{
     label: "回到自己",
     subtitle: "取一个小动作",
     route: "/return-to-self",
-    badge: "稍后",
     tone: "return",
     icon: HeartHandshake,
   },

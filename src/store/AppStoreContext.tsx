@@ -28,6 +28,7 @@ import {
   type LoadResult,
   type StorageAdapter,
 } from "../storage/storageAdapter";
+import { buildQuickRecordImpacts, buildReturnToSelfImpacts } from "../domain/accounts";
 
 export type AppStoreStatus =
   | "loading"
@@ -133,6 +134,90 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [commitState, state],
   );
 
+  const saveReturnToSelfPractice = useCallback(
+    (input: ReturnToSelfInput): StoreWriteResult<ReturnToSelfPractice> => {
+      const timestamp = nowIso();
+      const practiceId = createId("return_to_self");
+      const accountImpacts = buildReturnToSelfImpacts(input, {
+        sourceId: practiceId,
+        createdAt: timestamp,
+      });
+      const practice: ReturnToSelfPractice = {
+        id: practiceId,
+        spaceId: input.spaceId,
+        source: "return_to_self",
+        completion: input.completion,
+        accountImpacts,
+        bodyAction: input.bodyAction,
+        anchor: input.anchor,
+        anchorSaved: input.anchorSaved,
+        returnToLifeAction: input.returnToLifeAction,
+        energyEffect: input.energyEffect,
+        completedAt: timestamp,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
+      const savedAnchor =
+        input.anchorSaved && input.anchor?.trim()
+          ? {
+              id: createId("anchor"),
+              spaceId: input.spaceId,
+              text: input.anchor.trim(),
+              sourceType: "return_to_self" as const,
+              sourceId: practiceId,
+              createdAt: timestamp,
+              updatedAt: timestamp,
+            }
+          : null;
+      const nextState: AppState = {
+        ...state,
+        returnToSelfPractices: [...state.returnToSelfPractices, practice],
+        anchors: savedAnchor ? [savedAnchor, ...state.anchors] : state.anchors,
+      };
+      const result = commitState(nextState);
+
+      return result.ok ? { ...result, value: practice } : result;
+    },
+    [commitState, state],
+  );
+
+  const saveQuickRecord = useCallback(
+    (input: QuickRecordInput): StoreWriteResult<Episode> => {
+      const timestamp = nowIso();
+      const episodeId = createId("episode");
+      const accountImpacts = buildQuickRecordImpacts(input, {
+        sourceId: episodeId,
+        createdAt: timestamp,
+      });
+      const facts = input.facts.trim();
+      const title = input.title?.trim() || "一次互动";
+      const episode: Episode = {
+        id: episodeId,
+        spaceId: input.spaceId,
+        source: input.source ?? "quick_record",
+        title,
+        facts,
+        interpretation: input.interpretation?.trim() ?? "",
+        emotions: input.emotions?.length ? input.emotions : ["not_sure"],
+        bodySensations: input.bodySensations?.length ? input.bodySensations : ["not_sure"],
+        connectionLevel: input.connectionLevel ?? "not_sure",
+        activationLevel: input.activationLevel ?? "not_sure",
+        nextAction: input.nextAction ?? "not_now",
+        accountImpacts,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
+      const nextState: AppState = {
+        ...state,
+        episodes: [episode, ...state.episodes],
+      };
+      const result = commitState(nextState);
+
+      return result.ok ? { ...result, value: episode } : result;
+    },
+    [commitState, state],
+  );
+
   const resetLocalData = useCallback((): StoreWriteResult => {
     setStatus("resetting");
     const resetResult = adapterRef.current.reset();
@@ -163,8 +248,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     () => ({
       completeSetup,
       updateDailyMarket,
-      saveQuickRecord: unimplementedWrite,
-      saveReturnToSelfPractice: unimplementedWrite,
+      saveQuickRecord,
+      saveReturnToSelfPractice,
       saveTriggerCompletion(input: TriggerCompletionInput): StoreNoWriteResult {
         return {
           ok: true,
@@ -177,7 +262,14 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       resetLocalData,
       acknowledgeStorageWarning,
     }),
-    [acknowledgeStorageWarning, completeSetup, resetLocalData, updateDailyMarket],
+    [
+      acknowledgeStorageWarning,
+      completeSetup,
+      resetLocalData,
+      saveQuickRecord,
+      saveReturnToSelfPractice,
+      updateDailyMarket,
+    ],
   );
 
   const store = useMemo<AppStore>(

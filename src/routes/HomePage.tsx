@@ -5,6 +5,7 @@ import { PrimaryActionPanel } from "../components/PrimaryActionPanel";
 import {
   selectAccountSummaries,
   selectActiveSpace,
+  selectLatestEpisode,
   selectTodayMarketLabel,
   selectTodayMarketNote,
 } from "../domain/selectors";
@@ -21,6 +22,7 @@ export function HomePage({ navigate }: HomePageProps) {
   const marketLabel = selectTodayMarketLabel(state);
   const marketNote = selectTodayMarketNote(state);
   const summaries = selectAccountSummaries(state);
+  const latestEpisode = selectLatestEpisode(state);
   const latestAnchor = state.anchors[0]?.text ?? "事实可以很小，结论可以慢一点。";
 
   return (
@@ -44,7 +46,7 @@ export function HomePage({ navigate }: HomePageProps) {
 
       <PrimaryActionPanel navigate={navigate} />
 
-      <button className="record-action" type="button" onClick={() => navigate("/record")}>
+      <button className="record-action" type="button" onClick={() => navigate("/record/new")}>
         <NotebookPen size={19} strokeWidth={1.8} />
         <span>
           <strong>记录互动</strong>
@@ -63,6 +65,14 @@ export function HomePage({ navigate }: HomePageProps) {
           ))}
         </div>
       </section>
+
+      {latestEpisode ? (
+        <section className="latest-record">
+          <span>最近存下</span>
+          <h2>{latestEpisode.title}</h2>
+          <p>{latestEpisode.facts}</p>
+        </section>
+      ) : null}
 
       <section className="anchor-preview">
         <span>今天的锚点</span>

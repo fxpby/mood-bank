@@ -175,9 +175,50 @@ export type DailyMarketInput = {
   market: DailyMarket;
 };
 
-export type QuickRecordInput = never;
-export type ReturnToSelfInput = never;
-export type TriggerCompletionInput = { reason?: "closed" | "placeholder" | "not_saved" | "skipped" };
+export type QuickRecordInput = {
+  spaceId: string;
+  spaceType: SpaceType;
+  source?: EpisodeSource;
+  title?: string;
+  facts: string;
+  interpretation?: string;
+  interpretationSkipped?: boolean;
+  emotions?: string[];
+  bodySensations?: string[];
+  connectionLevel?: ConnectionLevel;
+  activationLevel?: ActivationLevel;
+  nextAction?: string;
+  connectionEvidence?: string;
+  selfContactEvidence?: string;
+  energyEffect?: EnergyEffect;
+};
+
+export type QuickRecordPrefill = {
+  source: EpisodeSource;
+  title?: string;
+  facts?: string;
+  emotions?: string[];
+  bodySensations?: string[];
+  activationLevel?: ActivationLevel;
+  nextAction?: string;
+};
+
+export type ReturnToSelfInput = {
+  spaceId: string;
+  completion: ReturnToSelfCompletion;
+  bodyAction?: string;
+  anchor?: string;
+  anchorSaved?: boolean;
+  returnToLifeAction?: string;
+  energyEffect?: EnergyEffect;
+};
+
+export type TriggerCompletionInput = {
+  reason?: "closed" | "placeholder" | "not_saved" | "skipped";
+  completed?: boolean;
+  nextAction?: string;
+  savedAsQuickRecord?: boolean;
+};
 export type DraftInput = never;
 
 export type StoreWriteResult<T = void> =

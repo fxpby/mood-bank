@@ -3,9 +3,12 @@ import { AppShell } from "./components/AppShell";
 import { useAppStore } from "./store/AppStoreContext";
 import { HomePage } from "./routes/HomePage";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
+import { QuickRecordPage } from "./routes/QuickRecordPage";
+import { ReturnToSelfPage } from "./routes/ReturnToSelfPage";
 import { SettingsPage } from "./routes/SettingsPage";
 import { SetupPage } from "./routes/SetupPage";
-import { isSetupRoute, normalizeRoute, type AppRoute } from "./utils/route";
+import { TriggerPage } from "./routes/TriggerPage";
+import { isSetupRoute, normalizeRoute, type AppRoute, type RouteState } from "./utils/route";
 
 export function App() {
   const { state } = useAppStore();
@@ -38,8 +41,8 @@ export function App() {
     window.scrollTo({ left: 0, top: 0 });
   }, [effectiveRoute]);
 
-  function navigate(nextRoute: AppRoute) {
-    window.history.pushState({}, "", nextRoute);
+  function navigate(nextRoute: AppRoute, routeState?: RouteState) {
+    window.history.pushState(routeState ?? {}, "", nextRoute);
     setRoute(nextRoute);
     window.scrollTo({ left: 0, top: 0 });
   }
@@ -53,7 +56,7 @@ export function App() {
   );
 }
 
-function renderRoute(route: AppRoute, navigate: (route: AppRoute) => void) {
+function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteState) => void) {
   if (route === "/setup") {
     return <SetupPage navigate={navigate} />;
   }
@@ -62,8 +65,20 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute) => void) {
     return <HomePage navigate={navigate} />;
   }
 
+  if (route === "/trigger") {
+    return <TriggerPage navigate={navigate} />;
+  }
+
+  if (route === "/record" || route === "/record/new") {
+    return <QuickRecordPage navigate={navigate} />;
+  }
+
   if (route === "/settings") {
     return <SettingsPage navigate={navigate} />;
+  }
+
+  if (route === "/return-to-self") {
+    return <ReturnToSelfPage navigate={navigate} />;
   }
 
   return <PlaceholderPage route={route} navigate={navigate} />;
