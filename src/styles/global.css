@@ -153,6 +153,7 @@ a {
   font-weight: 740;
   line-height: 1.2;
   text-decoration: none;
+  overflow-wrap: anywhere;
   cursor: pointer;
   transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
   -webkit-tap-highlight-color: transparent;
@@ -270,6 +271,7 @@ a {
   color: var(--color-text);
   font-size: var(--text-sm);
   font-weight: 760;
+  overflow-wrap: anywhere;
 }
 
 .field-input,

@@ -47,7 +47,7 @@ function getPlaceholderCopy(route: AppRoute): { title: string; body: string } {
 }
 
 function getActions(route: AppRoute): Array<{ label: string; route: AppRoute; primary?: boolean }> {
-  if (route === "/topics" || route === "/record" || route === "/record/new") {
+  if (route === "/topics") {
     return [
       { label: "回到首页", route: "/home", primary: true },
       { label: "回到自己", route: "/return-to-self" },

@@ -4,6 +4,7 @@ import { useAppStore } from "./store/AppStoreContext";
 import { HomePage } from "./routes/HomePage";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
 import { QuickRecordPage } from "./routes/QuickRecordPage";
+import { RecordPage } from "./routes/RecordPage";
 import { ReturnToSelfPage } from "./routes/ReturnToSelfPage";
 import { SettingsPage } from "./routes/SettingsPage";
 import { SetupPage } from "./routes/SetupPage";
@@ -69,7 +70,11 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
     return <TriggerPage navigate={navigate} />;
   }
 
-  if (route === "/record" || route === "/record/new") {
+  if (route === "/record") {
+    return <RecordPage navigate={navigate} />;
+  }
+
+  if (route === "/record/new") {
     return <QuickRecordPage navigate={navigate} />;
   }
 

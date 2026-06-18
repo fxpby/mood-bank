@@ -17,7 +17,6 @@ const actions: Array<{
     label: "我被触发了",
     subtitle: "先停一下",
     route: "/trigger",
-    badge: "稍后",
     tone: "trigger",
     icon: RotateCcw,
   },
