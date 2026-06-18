@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "./components/AppShell";
 import { useAppStore } from "./store/AppStoreContext";
+import { AccountDetailPage } from "./routes/AccountDetailPage";
 import { HomePage } from "./routes/HomePage";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
 import { QuickRecordPage } from "./routes/QuickRecordPage";
@@ -84,6 +85,18 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/return-to-self") {
     return <ReturnToSelfPage navigate={navigate} />;
+  }
+
+  if (route === "/accounts/connection") {
+    return <AccountDetailPage account="connection" navigate={navigate} />;
+  }
+
+  if (route === "/accounts/self") {
+    return <AccountDetailPage account="self" navigate={navigate} />;
+  }
+
+  if (route === "/accounts/energy") {
+    return <AccountDetailPage account="energy" navigate={navigate} />;
   }
 
   return <PlaceholderPage route={route} navigate={navigate} />;

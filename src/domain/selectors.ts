@@ -3,9 +3,18 @@ import { DEFAULT_MARKET, todayKey } from "./defaults";
 import {
   collectAccountImpacts,
   deriveAllAccountSummaries,
+  deriveAccountSummary,
   type AccountSummary,
 } from "./accounts";
-import type { AccountImpact, AppState, DailyMarket, EmotionalSpace, Episode } from "./types";
+import type {
+  AccountId,
+  AccountImpact,
+  AppState,
+  DailyMarket,
+  EmotionalSpace,
+  Episode,
+  ReturnToSelfPractice,
+} from "./types";
 
 export type { AccountSummary } from "./accounts";
 
@@ -37,6 +46,91 @@ export function selectAccountSummaries(state: AppState): AccountSummary[] {
   return deriveAllAccountSummaries(state);
 }
 
+export type AccountImpactSourceLabel = "互动记录" | "回到自己" | "触发支持";
+
+export type AccountDetailSourceRow = {
+  impact: AccountImpact;
+  sourceLabel: AccountImpactSourceLabel;
+  sourceTitle: string;
+  sourceContext: string;
+  evidence?: string;
+};
+
+export type AccountDetail = {
+  summary: AccountSummary;
+  rows: AccountDetailSourceRow[];
+};
+
+export function selectAccountDetail(state: AppState, account: AccountId): AccountDetail {
+  const impacts = selectAccountImpacts(state).filter((impact) => impact.account === account);
+
+  return {
+    summary: deriveAccountSummary(account, impacts),
+    rows: impacts.map((impact) => buildAccountDetailRow(impact, state)),
+  };
+}
+
 export function selectLatestEpisode(state: AppState): Episode | null {
   return [...state.episodes].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0] ?? null;
+}
+
+function buildAccountDetailRow(impact: AccountImpact, state: AppState): AccountDetailSourceRow {
+  if (impact.sourceType === "episode") {
+    const episode = state.episodes.find((item) => item.id === impact.sourceId);
+    return {
+      impact,
+      sourceLabel: "互动记录",
+      sourceTitle: episode?.title || "一次互动",
+      sourceContext: episode?.facts || "这条来源记录暂时无法读取。",
+      evidence: impact.evidence,
+    };
+  }
+
+  if (impact.sourceType === "return_to_self") {
+    const practice = state.returnToSelfPractices.find((item) => item.id === impact.sourceId);
+    return {
+      impact,
+      sourceLabel: "回到自己",
+      sourceTitle: getReturnToSelfTitle(practice),
+      sourceContext: getReturnToSelfContext(practice),
+      evidence: impact.evidence,
+    };
+  }
+
+  return {
+    impact,
+    sourceLabel: "触发支持",
+    sourceTitle: "一次触发支持",
+    sourceContext: "这次只保存了完成信息，没有单独记录互动内容。",
+    evidence: impact.evidence,
+  };
+}
+
+function getReturnToSelfTitle(practice: ReturnToSelfPractice | undefined): string {
+  if (!practice) {
+    return "一次回到自己";
+  }
+
+  if (practice.completion === "full") {
+    return "完成了一次回到自己";
+  }
+
+  if (practice.completion === "body_only") {
+    return "先照顾了身体";
+  }
+
+  return "看见了一个需要";
+}
+
+function getReturnToSelfContext(practice: ReturnToSelfPractice | undefined): string {
+  if (!practice) {
+    return "这条回到自己的练习暂时无法读取。";
+  }
+
+  return (
+    practice.anchor?.trim() ||
+    practice.bodyAction?.trim() ||
+    practice.returnToLifeAction?.trim() ||
+    "这次练习没有留下更多文字。"
+  );
 }

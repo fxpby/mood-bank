@@ -45,6 +45,14 @@ const summaries = deriveAllAccountSummaries(state);
 
 `deriveAllAccountSummaries` collects account impacts from episodes and return-to-self practices only. Drafts and placeholders must not contribute to summaries.
 
+Account detail screens are also derived read models:
+
+```ts
+const detail = selectAccountDetail(state, "self");
+```
+
+`selectAccountDetail` must derive rows from `AccountImpact[]` plus readable source context from `episodes` and `returnToSelfPractices`. It must not persist detail rows, cached summaries, or route-local action choices. Suggested personal actions on detail pages are transient UI state only unless a future PRD adds an explicit durable action model.
+
 ---
 
 ## Write Contract

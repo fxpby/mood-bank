@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend overview and required checks"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify no-write route and derived summary behavior"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify forbidden copy, network, and placeholder write rules"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify typed route/domain handling"}

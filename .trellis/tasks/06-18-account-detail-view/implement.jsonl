@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend overview and required checks"}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Route/domain/store boundaries for adding account detail"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Component props, navigation, styling, and accessibility conventions"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Derived summary and no-write route state contracts"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Forbidden copy, network, and placeholder write rules"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Typed route/domain contracts and result handling"}
