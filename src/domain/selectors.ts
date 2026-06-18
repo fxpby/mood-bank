@@ -1,4 +1,5 @@
 import { marketCopy } from "../copy/markets";
+import { getAccountEvidenceCopy } from "../copy/accounts";
 import { DEFAULT_MARKET, todayKey } from "./defaults";
 import {
   collectAccountImpacts,
@@ -82,7 +83,7 @@ function buildAccountDetailRow(impact: AccountImpact, state: AppState): AccountD
       sourceLabel: "互动记录",
       sourceTitle: episode?.title || "一次互动",
       sourceContext: episode?.facts || "这条来源记录暂时无法读取。",
-      evidence: impact.evidence,
+      evidence: getReadableEvidence(impact.evidence),
     };
   }
 
@@ -93,7 +94,7 @@ function buildAccountDetailRow(impact: AccountImpact, state: AppState): AccountD
       sourceLabel: "回到自己",
       sourceTitle: getReturnToSelfTitle(practice),
       sourceContext: getReturnToSelfContext(practice),
-      evidence: impact.evidence,
+      evidence: getReadableEvidence(impact.evidence),
     };
   }
 
@@ -102,8 +103,16 @@ function buildAccountDetailRow(impact: AccountImpact, state: AppState): AccountD
     sourceLabel: "触发支持",
     sourceTitle: "一次触发支持",
     sourceContext: "这次只保存了完成信息，没有单独记录互动内容。",
-    evidence: impact.evidence,
+    evidence: getReadableEvidence(impact.evidence),
   };
+}
+
+function getReadableEvidence(evidence: string | undefined): string | undefined {
+  if (!evidence) {
+    return undefined;
+  }
+
+  return getAccountEvidenceCopy(evidence);
 }
 
 function getReturnToSelfTitle(practice: ReturnToSelfPractice | undefined): string {

@@ -37,3 +37,25 @@ export const accountReasonCopy: Record<AccountImpactReasonCode, string> = {
   energy_neutral: "能量变化不明显。",
   no_connection_evidence: "这次还没有单独的连接证据。",
 };
+
+const accountEvidenceCopy = {
+  delay_10_min: "晚点再回",
+  save_draft_do_not_send: "先存下，不发送",
+  record_facts: "记录事实",
+  save_later_topic: "保存一个话题",
+  five_senses: "五感观察",
+  drink_water_wash_hands: "喝水或洗手",
+  reply_one_point: "只回应一个点",
+  no_extra_message: "先不补发",
+  return_to_self: "回到自己",
+  save_quick_record: "存成快速记录",
+  full: "完成整段回到自己",
+  body_only: "先照顾了身体",
+  noticed_need: "看见自己需要停一下",
+  lighter: "轻一点",
+  more_tired: "更重",
+} as const satisfies Record<string, string>;
+
+export function getAccountEvidenceCopy(evidence: string): string {
+  return accountEvidenceCopy[evidence as keyof typeof accountEvidenceCopy] ?? evidence;
+}
