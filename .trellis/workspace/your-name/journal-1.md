@@ -157,3 +157,44 @@ Added a real Topics / discovery-points page with manual capture, filters, lightw
 ### Next Steps
 
 - None - task complete
+
+
+## Session 5: Connect topic capture flows
+
+**Date**: 2026-06-19
+**Task**: Connect topic capture flows
+**Branch**: `main`
+
+### Summary
+
+Connected Trigger and Quick Record save-later choices to durable discovery points, verified topic persistence, and documented the atomic Quick Record topic write contract.
+
+### Main Changes
+
+- Wired Trigger completion's `save_later_topic` action to `saveDiscoveryPoint`, including success/error copy and a route into `/topics`.
+- Extended Quick Record saves so `nextAction === "save_later_topic"` creates one source-linked discovery point in the same store commit as the episode.
+- Exported and tested `buildDiscoveryPoint`, including source-linked topics and no derived account-summary side effects.
+- Documented the atomic Quick Record -> later topic write contract in frontend state-management specs.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `13b0b94` | feat: connect topic capture flows |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] forbidden copy/network scan
+- [OK] browser check: Trigger -> save later topic -> `/topics`
+- [OK] browser check: Quick Record -> save later topic -> refresh-persistent `/topics`
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
