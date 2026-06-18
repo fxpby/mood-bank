@@ -78,3 +78,42 @@ Completed project Trellis guidelines by documenting the no-backend boundary, ref
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: Account detail view
+
+**Date**: 2026-06-18
+**Task**: Account detail view
+**Branch**: `main`
+
+### Summary
+
+Added read-only storage jar detail routes for connection, self, and energy with source rows, explanatory copy, transient personal actions, selector tests, and frontend state spec guidance.
+
+### Main Changes
+
+- Added real `/accounts/connection`, `/accounts/self`, and `/accounts/energy` detail routes.
+- Added derived account detail selector rows with source context from episodes and return-to-self practices.
+- Added local-only personal action selection on account detail pages.
+- Documented account detail as a derived read model in frontend state management spec.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `52a8a3e` | feat: add account detail view |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] redline scan for transactional, diagnostic, network, and debug patterns
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
