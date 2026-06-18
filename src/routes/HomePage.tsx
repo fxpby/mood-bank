@@ -27,9 +27,15 @@ export function HomePage({ navigate }: HomePageProps) {
     <section className="home-page page-stack">
       <PageHeader title="情感储蓄罐" kicker="一个本地保存的关系观察空间。" />
 
-      <section className="home-top-strip" aria-label="当前空间">
-        <span className="home-top-strip__space">{activeSpace?.displayName ?? "某段关系"}</span>
-        <span className="home-top-strip__market">{marketLabel}</span>
+      <section className="home-context" aria-label="当前空间">
+        <div className="home-context__copy">
+          <span>当前空间</span>
+          <strong>{activeSpace?.displayName ?? "某段关系"}</strong>
+        </div>
+        <div className="home-context__market">
+          <span>今日状态</span>
+          <strong>{marketLabel}</strong>
+        </div>
       </section>
 
       <section className="market-note">
