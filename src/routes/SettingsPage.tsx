@@ -38,6 +38,7 @@ export function SettingsPage({ navigate }: SettingsPageProps) {
         </div>
         <ul className="settings-list">
           <li>{privacyCopy.setupDeviceAccessNote}</li>
+          <li>{privacyCopy.browserDataRisk}</li>
           <li>{privacyCopy.noExternalAccess}</li>
           <li>{privacyCopy.notTherapy}</li>
         </ul>

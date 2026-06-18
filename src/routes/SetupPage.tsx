@@ -21,14 +21,14 @@ export function SetupPage({ navigate }: SetupPageProps) {
 
   const isSaving = status === "saving";
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const result = actions.completeSetup({
-      displayName,
-      description,
-      type,
-      dailyMarket,
-    });
+  function saveSetup(input: {
+    displayName: string;
+    description: string;
+    type: SpaceType;
+    dailyMarket: DailyMarket;
+  }) {
+    setError("");
+    const result = actions.completeSetup(input);
 
     if (result.ok) {
       navigate("/home");
@@ -36,6 +36,25 @@ export function SetupPage({ navigate }: SetupPageProps) {
     }
 
     setError("这次还没有保存成功。你可以先检查浏览器是否允许本地存储。");
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    saveSetup({
+      displayName,
+      description,
+      type,
+      dailyMarket,
+    });
+  }
+
+  function useDefaults() {
+    saveSetup({
+      displayName: DEFAULT_SPACE_NAME,
+      description: "",
+      type: "interpersonal",
+      dailyMarket: DEFAULT_MARKET,
+    });
   }
 
   return (
@@ -53,6 +72,7 @@ export function SetupPage({ navigate }: SetupPageProps) {
         <ul>
           <li>{privacyCopy.setupLocalNote}</li>
           <li>{privacyCopy.setupDeviceAccessNote}</li>
+          <li>{privacyCopy.browserDataRisk}</li>
           <li>{privacyCopy.noExternalAccess}</li>
           <li>{privacyCopy.notTherapy}</li>
         </ul>
@@ -123,9 +143,19 @@ export function SetupPage({ navigate }: SetupPageProps) {
 
         {error ? <p className="form-error" role="alert">{error}</p> : null}
 
-        <button className="button button--primary setup-submit" type="submit" disabled={isSaving}>
-          {isSaving ? "正在保存" : "开始使用"}
-        </button>
+        <div className="setup-actions">
+          <button className="button button--primary setup-submit" type="submit" disabled={isSaving}>
+            {isSaving ? "正在保存" : "开始使用"}
+          </button>
+          <button
+            className="button button--secondary setup-submit"
+            type="button"
+            onClick={useDefaults}
+            disabled={isSaving}
+          >
+            先用默认设置
+          </button>
+        </div>
       </form>
     </section>
   );
