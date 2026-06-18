@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="情感储蓄罐图标">
+  <rect width="512" height="512" rx="96" fill="#F4F2ED"/>
+  <path d="M138 200c0-48 43-86 118-86s118 38 118 86v144c0 35-27 62-62 62H200c-35 0-62-27-62-62V200Z" fill="#FFFFFF" stroke="#2F3A32" stroke-width="22"/>
+  <path d="M192 174h128" stroke="#D96F4D" stroke-width="22" stroke-linecap="round"/>
+  <path d="M198 280c27 32 85 32 112 0" stroke="#527064" stroke-width="22" stroke-linecap="round"/>
+</svg>

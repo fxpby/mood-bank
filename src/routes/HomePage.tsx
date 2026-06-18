@@ -1,0 +1,67 @@
+import { NotebookPen } from "lucide-react";
+import { AccountSummaryCard } from "../components/AccountSummaryCard";
+import { PageHeader } from "../components/PageHeader";
+import { PrimaryActionPanel } from "../components/PrimaryActionPanel";
+import {
+  selectAccountSummaries,
+  selectActiveSpace,
+  selectTodayMarketLabel,
+  selectTodayMarketNote,
+} from "../domain/selectors";
+import { useAppStore } from "../store/AppStoreContext";
+import type { AppRoute } from "../utils/route";
+
+type HomePageProps = {
+  navigate: (route: AppRoute) => void;
+};
+
+export function HomePage({ navigate }: HomePageProps) {
+  const { state } = useAppStore();
+  const activeSpace = selectActiveSpace(state);
+  const marketLabel = selectTodayMarketLabel(state);
+  const marketNote = selectTodayMarketNote(state);
+  const summaries = selectAccountSummaries(state);
+  const latestAnchor = state.anchors[0]?.text ?? "事实可以很小，结论可以慢一点。";
+
+  return (
+    <section className="home-page page-stack">
+      <PageHeader title="情感储蓄罐" kicker="一个本地保存的关系观察空间。" />
+
+      <section className="home-top-strip" aria-label="当前空间">
+        <span className="home-top-strip__space">{activeSpace?.displayName ?? "某段关系"}</span>
+        <span className="home-top-strip__market">{marketLabel}</span>
+      </section>
+
+      <section className="market-note">
+        <p>{marketNote}</p>
+      </section>
+
+      <PrimaryActionPanel navigate={navigate} />
+
+      <button className="record-action" type="button" onClick={() => navigate("/record")}>
+        <NotebookPen size={19} strokeWidth={1.8} />
+        <span>
+          <strong>记录互动</strong>
+          <small>先存下一个可确认的事实</small>
+        </span>
+      </button>
+
+      <section className="account-preview" aria-labelledby="account-preview-title">
+        <div className="section-heading">
+          <h2 id="account-preview-title">三个储蓄罐</h2>
+          <p>这里先显示最近原因，不给关系下结论。</p>
+        </div>
+        <div className="account-preview__list">
+          {summaries.map((summary) => (
+            <AccountSummaryCard key={summary.account} summary={summary} navigate={navigate} />
+          ))}
+        </div>
+      </section>
+
+      <section className="anchor-preview">
+        <span>今天的锚点</span>
+        <p>{latestAnchor}</p>
+      </section>
+    </section>
+  );
+}
