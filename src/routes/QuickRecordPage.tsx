@@ -298,6 +298,13 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
       connectionEvidence,
       selfContactEvidence,
       energyEffect,
+      laterTopic:
+        nextAction === "save_later_topic"
+          ? {
+              title: title.trim() || "一个稍后再看的话题",
+              note: "来自这次选择：保存一个话题。",
+            }
+          : undefined,
     });
 
     if (!result.ok) {

@@ -3,6 +3,7 @@ import { CompletionCard } from "../components/CompletionCard";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { StepScreen } from "../components/StepScreen";
 import type { ActivationLevel, QuickRecordPrefill } from "../domain/types";
+import { useAppStore } from "../store/AppStoreContext";
 import type { AppRoute, RouteState } from "../utils/route";
 
 type TriggerPageProps = {
@@ -122,6 +123,7 @@ const actionOptions: ChipOption<OwnedAction>[] = [
 const stepOrder: StepId[] = ["fact", "bodyEmotion", "urge", "nextAction", "completion"];
 
 export function TriggerPage({ navigate }: TriggerPageProps) {
+  const { state, actions, status, lastError } = useAppStore();
   const [step, setStep] = useState<StepId>("fact");
   const [factChip, setFactChip] = useState<FactChip>("not_sure");
   const [factText, setFactText] = useState("");
@@ -130,6 +132,8 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
   const [intensity, setIntensity] = useState<"low" | "medium" | "high">("medium");
   const [urge, setUrge] = useState<UrgeChip>("not_sure");
   const [nextAction, setNextAction] = useState<OwnedAction>("delay_10_min");
+  const [topicSaved, setTopicSaved] = useState(false);
+  const [topicError, setTopicError] = useState<string | null>(null);
 
   function goNext() {
     const currentIndex = stepOrder.indexOf(step);
@@ -148,6 +152,31 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
 
   function openQuickRecord() {
     navigate("/record/new", { quickRecordPrefill: buildPrefill() });
+  }
+
+  function saveLaterTopic() {
+    const activeSpaceId = state.activeSpaceId;
+    if (!activeSpaceId) {
+      setTopicError("还没有可以保存的空间。");
+      return;
+    }
+
+    const result = actions.saveDiscoveryPoint({
+      spaceId: activeSpaceId,
+      title: buildTopicTitle(factChip, factText),
+      kind: "topic",
+      sourceType: "trigger",
+      sourceSnippet: `事实：${buildFactText(factChip, factText)}。冲动：${getUrgeLabel(urge)}。下一步：${getActionLabel(nextAction)}。`,
+      note: "来自触发支持里选择：把话题放进稍后。",
+    });
+
+    if (!result.ok) {
+      setTopicError(result.error ?? "这个话题还没有存下。");
+      return;
+    }
+
+    setTopicSaved(true);
+    setTopicError(null);
   }
 
   if (step === "fact") {
@@ -281,6 +310,20 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
         <button className="button button--secondary" type="button" onClick={openQuickRecord}>
           保存为快速记录
         </button>
+        {nextAction === "save_later_topic" ? (
+          topicSaved ? (
+            <button className="button button--secondary" type="button" onClick={() => navigate("/topics")}>
+              打开稍后
+            </button>
+          ) : (
+            <button className="button button--secondary" type="button" onClick={saveLaterTopic}>
+              {status === "saving" ? "正在存下" : "存入稍后"}
+            </button>
+          )
+        ) : null}
+        {topicSaved ? <p className="helper-text">已存入稍后，可以之后再看。</p> : null}
+        {topicError ? <p className="form-error">{topicError}</p> : null}
+        {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
         <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>
           回到首页
         </button>
@@ -309,6 +352,16 @@ function buildFactText(factChip: FactChip, factText: string): string {
   }
 
   return detail || chipLabel;
+}
+
+function buildTopicTitle(factChip: FactChip, factText: string): string {
+  const detail = factText.trim();
+  if (detail) {
+    return detail.slice(0, 28);
+  }
+
+  const chipLabel = getFactLabel(factChip);
+  return factChip === "not_sure" ? "一个触发后想稍后看的点" : `${chipLabel}里的一个稍后话题`;
 }
 
 function mapIntensity(value: "low" | "medium" | "high"): ActivationLevel {

@@ -237,6 +237,10 @@ export type QuickRecordInput = {
   connectionEvidence?: string;
   selfContactEvidence?: string;
   energyEffect?: EnergyEffect;
+  laterTopic?: {
+    title?: string;
+    note?: string;
+  };
 };
 
 export type QuickRecordDraftData = {

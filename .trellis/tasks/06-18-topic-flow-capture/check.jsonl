@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Required frontend checks and scope overview."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify writes remain behind AppStoreContext and topics do not change accounts."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no network, no direct localStorage, no verdict/transaction copy, and tests."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify typed contracts and validation behavior."}

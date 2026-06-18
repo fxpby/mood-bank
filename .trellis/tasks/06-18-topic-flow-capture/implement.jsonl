@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend task touching routes, store actions, domain helpers, and tests."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Adds atomic topic capture through store write boundary."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Must preserve local-first behavior, no false persistence, and no account impact side effects."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Extends typed store inputs and discovery point source contracts."}

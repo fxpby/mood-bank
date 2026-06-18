@@ -34,6 +34,7 @@ import {
 import { buildQuickRecordImpacts, buildReturnToSelfImpacts } from "../domain/accounts";
 import {
   addDiscoveryPointToState,
+  buildDiscoveryPoint,
   updateDiscoveryPointStatusInState,
 } from "../domain/topics";
 
@@ -217,9 +218,29 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         createdAt: timestamp,
         updatedAt: timestamp,
       };
+      const linkedTopic =
+        input.nextAction === "save_later_topic"
+          ? buildDiscoveryPoint(
+              {
+                spaceId: input.spaceId,
+                title: input.laterTopic?.title ?? title,
+                kind: "topic",
+                sourceType: "episode",
+                sourceId: episodeId,
+                sourceTitle: title,
+                sourceSnippet: facts,
+                note: input.laterTopic?.note ?? "来自这次选择：保存一个话题。",
+              },
+              {
+                id: createId("topic"),
+                timestamp,
+              },
+            )
+          : null;
       const nextState: AppState = {
         ...state,
         episodes: [episode, ...state.episodes],
+        topics: linkedTopic ? [linkedTopic, ...state.topics] : state.topics,
         drafts: input.draftId
           ? state.drafts.filter((draft) => draft.id !== input.draftId)
           : state.drafts,

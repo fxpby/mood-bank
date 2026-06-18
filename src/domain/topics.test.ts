@@ -2,13 +2,42 @@ import { describe, expect, it } from "vitest";
 import { accountReasonCopy } from "../copy/accounts";
 import { buildQuickRecordImpacts, deriveAllAccountSummaries } from "./accounts";
 import { createInitialState } from "./defaults";
-import { addDiscoveryPointToState, updateDiscoveryPointStatusInState } from "./topics";
-import type { AppState } from "./types";
+import {
+  addDiscoveryPointToState,
+  buildDiscoveryPoint,
+  updateDiscoveryPointStatusInState,
+} from "./topics";
+import type { AppState, Episode } from "./types";
 
 const timestamp = "2026-06-18T12:00:00.000Z";
 const spaceId = "space_1";
 
 describe("discovery point state helpers", () => {
+  it("builds source-linked discovery points without mutating state", () => {
+    const point = buildDiscoveryPoint(
+      {
+        spaceId,
+        title: "一次互动里的稍后话题",
+        kind: "topic",
+        sourceType: "episode",
+        sourceId: "episode_1",
+        sourceTitle: "一次互动",
+        sourceSnippet: "对方具体回应了我的勇气",
+        note: "来自这次选择：保存一个话题。",
+      },
+      { id: "topic_1", timestamp },
+    );
+
+    expect(point).toMatchObject({
+      id: "topic_1",
+      kind: "topic",
+      status: "stored_for_later",
+      sourceType: "episode",
+      sourceId: "episode_1",
+      sourceTitle: "一次互动",
+    });
+  });
+
   it("adds new discovery points newest first", () => {
     const first = addDiscoveryPointToState(
       createInitialState(),
@@ -68,48 +97,55 @@ describe("discovery point state helpers", () => {
   });
 
   it("does not affect derived storage jar summaries", () => {
+    const accountImpacts = buildQuickRecordImpacts(
+      {
+        spaceId,
+        spaceType: "interpersonal",
+        facts: "对方具体回应了我的勇气",
+        connectionEvidence: "对方具体回应了我的勇气",
+        nextAction: "record_facts",
+        energyEffect: "lighter",
+      },
+      { sourceId: "episode_1", createdAt: timestamp },
+    );
+    const episode: Episode = {
+      id: "episode_1",
+      spaceId,
+      source: "quick_record",
+      title: "一次互动",
+      facts: "对方具体回应了我的勇气",
+      interpretation: "",
+      emotions: [],
+      bodySensations: [],
+      connectionLevel: "not_sure",
+      activationLevel: "not_sure",
+      nextAction: "record_facts",
+      accountImpacts,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    };
     const stateWithEpisode: AppState = {
       ...createInitialState(),
-      episodes: [
-        {
-          id: "episode_1",
-          spaceId,
-          source: "quick_record",
-          title: "一次互动",
-          facts: "对方具体回应了我的勇气",
-          interpretation: "",
-          emotions: [],
-          bodySensations: [],
-          connectionLevel: "not_sure",
-          activationLevel: "not_sure",
-          nextAction: "record_facts",
-          accountImpacts: buildQuickRecordImpacts(
-            {
-              spaceId,
-              spaceType: "interpersonal",
-              facts: "对方具体回应了我的勇气",
-              connectionEvidence: "对方具体回应了我的勇气",
-              nextAction: "record_facts",
-              energyEffect: "lighter",
-            },
-            { sourceId: "episode_1", createdAt: timestamp },
-          ),
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        },
-      ],
+      episodes: [episode],
     };
     const before = deriveAllAccountSummaries(stateWithEpisode);
 
-    const after = addDiscoveryPointToState(
-      stateWithEpisode,
+    const linkedPoint = buildDiscoveryPoint(
       {
         spaceId,
         title: "完美主义让我停住",
-        kind: "discovery",
+        kind: "topic",
+        sourceType: "episode",
+        sourceId: episode.id,
+        sourceTitle: episode.title,
+        sourceSnippet: episode.facts,
       },
       { id: "topic_1", timestamp },
-    ).state;
+    );
+    const after: AppState = {
+      ...stateWithEpisode,
+      topics: [linkedPoint, ...stateWithEpisode.topics],
+    };
 
     expect(deriveAllAccountSummaries(after)).toEqual(before);
     expect(before[0]?.reason).toBe(accountReasonCopy.observable_connection_evidence);

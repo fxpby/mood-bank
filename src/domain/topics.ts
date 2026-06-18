@@ -15,7 +15,7 @@ export function addDiscoveryPointToState(
   input: DiscoveryPointInput,
   options: DiscoveryPointBuildOptions,
 ): { state: AppState; point: DiscoveryPoint } {
-  const point = createDiscoveryPoint(input, options);
+  const point = buildDiscoveryPoint(input, options);
 
   return {
     point,
@@ -54,7 +54,7 @@ export function updateDiscoveryPointStatusInState(
   };
 }
 
-function createDiscoveryPoint(
+export function buildDiscoveryPoint(
   input: DiscoveryPointInput,
   options: DiscoveryPointBuildOptions,
 ): DiscoveryPoint {
