@@ -46,7 +46,7 @@ export function HomePage({ navigate }: HomePageProps) {
 
       <PrimaryActionPanel navigate={navigate} />
 
-      <button className="record-action" type="button" onClick={() => navigate("/record/new")}>
+      <button className="record-action" type="button" onClick={() => navigate("/record")}>
         <NotebookPen size={19} strokeWidth={1.8} />
         <span>
           <strong>记录互动</strong>
