@@ -1,4 +1,11 @@
-import type { AppState } from "./types";
+import type {
+  AppState,
+  DiscoveryPoint,
+  DiscoveryPointKind,
+  DiscoveryPointSourceType,
+  DiscoveryPointStatus,
+  DiscoveryPointTheme,
+} from "./types";
 import { SCHEMA_VERSION } from "./types";
 
 type MinimumShapeResult =
@@ -33,7 +40,7 @@ export function validateMinimumAppState(value: unknown): MinimumShapeResult {
     returnToSelfPractices: asArray(state.returnToSelfPractices),
     anchors: asArray(state.anchors),
     drafts: asArray(state.drafts),
-    topics: asArray(state.topics),
+    topics: normalizeDiscoveryPoints(state.topics),
     experiments: asArray(state.experiments),
     personalActions: asArray(state.personalActions),
     settings: {
@@ -51,4 +58,96 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function asArray<T>(value: T[] | undefined): T[] {
   return Array.isArray(value) ? value : [];
+}
+
+function normalizeDiscoveryPoints(value: unknown): DiscoveryPoint[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter(isRecord).map((item) => {
+    const createdAt = getString(item.createdAt) ?? new Date(0).toISOString();
+    const updatedAt = getString(item.updatedAt) ?? createdAt;
+
+    return {
+      id: getString(item.id) ?? `topic_${createdAt}`,
+      spaceId: getString(item.spaceId) ?? "",
+      title: getString(item.title) ?? "一个稍后再看的点",
+      kind: asDiscoveryPointKind(item.kind),
+      status: asDiscoveryPointStatus(item.status),
+      sourceType: asDiscoveryPointSourceType(item.sourceType),
+      sourceId: getString(item.sourceId),
+      sourceTitle: getString(item.sourceTitle),
+      sourceSnippet: getString(item.sourceSnippet),
+      theme: asDiscoveryPointTheme(item.theme),
+      note: getString(item.note),
+      exploreQuestion: getString(item.exploreQuestion),
+      createdAt,
+      updatedAt,
+    };
+  });
+}
+
+function getString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function asDiscoveryPointKind(value: unknown): DiscoveryPointKind {
+  if (
+    value === "topic" ||
+    value === "discovery" ||
+    value === "question" ||
+    value === "action_idea"
+  ) {
+    return value;
+  }
+
+  return "discovery";
+}
+
+function asDiscoveryPointStatus(value: unknown): DiscoveryPointStatus {
+  if (
+    value === "stored_for_later" ||
+    value === "want_to_understand" ||
+    value === "want_to_share" ||
+    value === "leave_for_now" ||
+    value === "reviewed" ||
+    value === "naturally_reached" ||
+    value === "no_longer_needed"
+  ) {
+    return value;
+  }
+
+  return "stored_for_later";
+}
+
+function asDiscoveryPointSourceType(value: unknown): DiscoveryPointSourceType {
+  if (
+    value === "manual" ||
+    value === "episode" ||
+    value === "return_to_self" ||
+    value === "trigger" ||
+    value === "draft_check" ||
+    value === "rich_incoming"
+  ) {
+    return value;
+  }
+
+  return "manual";
+}
+
+function asDiscoveryPointTheme(value: unknown): DiscoveryPointTheme | undefined {
+  if (
+    value === "emotion" ||
+    value === "boundary" ||
+    value === "old_echo" ||
+    value === "relationship_learning" ||
+    value === "expression" ||
+    value === "self_care" ||
+    value === "action_experiment"
+  ) {
+    return value;
+  }
+
+  return undefined;
 }

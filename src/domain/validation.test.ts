@@ -29,6 +29,32 @@ describe("validateMinimumAppState", () => {
     }
   });
 
+  it("normalizes legacy reserved topics into readable discovery points", () => {
+    const raw = {
+      ...createInitialState(),
+      topics: [
+        {
+          id: "topic_legacy",
+          createdAt: "2026-06-18T10:00:00.000Z",
+          updatedAt: "2026-06-18T10:00:00.000Z",
+        },
+      ],
+    };
+
+    const result = validateMinimumAppState(raw);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.state.topics[0]).toMatchObject({
+        id: "topic_legacy",
+        title: "一个稍后再看的点",
+        kind: "discovery",
+        status: "stored_for_later",
+        sourceType: "manual",
+      });
+    }
+  });
+
   it("rejects missing schemaVersion as corrupted shape", () => {
     const raw = createInitialState() as Record<string, unknown>;
     delete raw.schemaVersion;

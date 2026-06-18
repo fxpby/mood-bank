@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend task touching routes, store state, domain types, and mobile UI."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Adds durable topic writes and route-local form/filter state."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Adds a new route page and global screen styles."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Must preserve local-first, no verdict, no transactional copy, and test coverage."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Adds typed topic/discovery-point contracts and validation normalization."}

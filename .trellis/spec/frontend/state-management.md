@@ -68,6 +68,8 @@ Required action behavior:
 | `saveQuickRecord` | Yes | Creates an episode and clears a matching draft id after successful state construction. |
 | `saveReturnToSelfPractice` | Yes | Creates a practice and optional anchor. Never creates connection impact. |
 | `saveTriggerCompletion` | No in P0 | Returns no-write result so Trigger -> Quick Record does not double-count Self. |
+| `saveDiscoveryPoint` | Yes | Creates a manual or source-linked discovery point. Must not create account impacts by default. |
+| `updateDiscoveryPointStatus` | Yes | Updates one discovery point status. Unknown ids return no-op success. Must not create account impacts. |
 | `saveDraft` | Yes | Saves route draft data only; drafts never create account impacts. |
 | `deleteDraft` | Yes | No-op success if the draft is already absent. |
 | `resetLocalData` | Yes | Resets storage only after adapter reset succeeds. |
@@ -131,3 +133,14 @@ window.localStorage.setItem("mood-bank:v1:app-state", JSON.stringify(nextState))
 ```ts
 const result = actions.saveQuickRecord(input);
 ```
+
+### Discovery Point Contract
+
+`topics` in `AppState` stores `DiscoveryPoint[]`, not task backlog items. The Topics page may use route-local state for filters and form fields, but durable changes must go through:
+
+```ts
+actions.saveDiscoveryPoint(input);
+actions.updateDiscoveryPointStatus({ id, status });
+```
+
+Saving or reviewing a discovery point must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Tests should assert that topic helpers leave derived storage-jar summaries unchanged.

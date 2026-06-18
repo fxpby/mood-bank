@@ -52,6 +52,34 @@ export type ReturnToSelfCompletion =
 
 export type EnergyEffect = "lighter" | "same" | "more_tired" | "not_sure";
 
+export type DiscoveryPointKind = "topic" | "discovery" | "question" | "action_idea";
+
+export type DiscoveryPointTheme =
+  | "emotion"
+  | "boundary"
+  | "old_echo"
+  | "relationship_learning"
+  | "expression"
+  | "self_care"
+  | "action_experiment";
+
+export type DiscoveryPointStatus =
+  | "stored_for_later"
+  | "want_to_understand"
+  | "want_to_share"
+  | "leave_for_now"
+  | "reviewed"
+  | "naturally_reached"
+  | "no_longer_needed";
+
+export type DiscoveryPointSourceType =
+  | "manual"
+  | "episode"
+  | "return_to_self"
+  | "trigger"
+  | "draft_check"
+  | "rich_incoming";
+
 export type EmotionalSpace = {
   id: string;
   displayName: string;
@@ -149,6 +177,23 @@ export type ReservedItem = {
   updatedAt: string;
 };
 
+export type DiscoveryPoint = {
+  id: string;
+  spaceId: string;
+  title: string;
+  kind: DiscoveryPointKind;
+  status: DiscoveryPointStatus;
+  sourceType: DiscoveryPointSourceType;
+  sourceId?: string;
+  sourceTitle?: string;
+  sourceSnippet?: string;
+  theme?: DiscoveryPointTheme;
+  note?: string;
+  exploreQuestion?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AppState = {
   schemaVersion: typeof SCHEMA_VERSION;
   spaces: EmotionalSpace[];
@@ -158,7 +203,7 @@ export type AppState = {
   returnToSelfPractices: ReturnToSelfPractice[];
   anchors: Anchor[];
   drafts: Draft[];
-  topics: ReservedItem[];
+  topics: DiscoveryPoint[];
   experiments: ReservedItem[];
   personalActions: ReservedItem[];
   settings: AppSettings;
@@ -236,6 +281,25 @@ export type TriggerCompletionInput = {
   nextAction?: string;
   savedAsQuickRecord?: boolean;
 };
+
+export type DiscoveryPointInput = {
+  spaceId: string;
+  title: string;
+  kind: DiscoveryPointKind;
+  theme?: DiscoveryPointTheme;
+  note?: string;
+  exploreQuestion?: string;
+  sourceType?: DiscoveryPointSourceType;
+  sourceId?: string;
+  sourceTitle?: string;
+  sourceSnippet?: string;
+};
+
+export type DiscoveryPointStatusInput = {
+  id: string;
+  status: DiscoveryPointStatus;
+};
+
 export type DraftInput = {
   draftId?: string;
   spaceId: string;

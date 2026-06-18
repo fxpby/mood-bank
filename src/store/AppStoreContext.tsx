@@ -11,6 +11,9 @@ import { createInitialState, createSetupState, createId, nowIso, todayKey } from
 import type {
   AppState,
   DailyMarketInput,
+  DiscoveryPoint,
+  DiscoveryPointInput,
+  DiscoveryPointStatusInput,
   Draft,
   DraftInput,
   Episode,
@@ -29,6 +32,10 @@ import {
   type StorageAdapter,
 } from "../storage/storageAdapter";
 import { buildQuickRecordImpacts, buildReturnToSelfImpacts } from "../domain/accounts";
+import {
+  addDiscoveryPointToState,
+  updateDiscoveryPointStatusInState,
+} from "../domain/topics";
 
 export type AppStoreStatus =
   | "loading"
@@ -45,6 +52,8 @@ export type AppActions = {
   saveQuickRecord(input: QuickRecordInput): StoreWriteResult<Episode>;
   saveReturnToSelfPractice(input: ReturnToSelfInput): StoreWriteResult<ReturnToSelfPractice>;
   saveTriggerCompletion(input: TriggerCompletionInput): StoreWriteResult | StoreNoWriteResult;
+  saveDiscoveryPoint(input: DiscoveryPointInput): StoreWriteResult<DiscoveryPoint>;
+  updateDiscoveryPointStatus(input: DiscoveryPointStatusInput): StoreWriteResult<DiscoveryPoint>;
   saveDraft(input: DraftInput): StoreWriteResult<Draft>;
   deleteDraft(draftId: string): StoreWriteResult;
   resetLocalData(): StoreWriteResult;
@@ -246,6 +255,35 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [commitState, state],
   );
 
+  const saveDiscoveryPoint = useCallback(
+    (input: DiscoveryPointInput): StoreWriteResult<DiscoveryPoint> => {
+      const timestamp = nowIso();
+      const { state: nextState, point } = addDiscoveryPointToState(state, input, {
+        id: createId("topic"),
+        timestamp,
+      });
+      const result = commitState(nextState);
+
+      return result.ok ? { ...result, value: point } : result;
+    },
+    [commitState, state],
+  );
+
+  const updateDiscoveryPointStatus = useCallback(
+    (input: DiscoveryPointStatusInput): StoreWriteResult<DiscoveryPoint> => {
+      const timestamp = nowIso();
+      const { state: nextState, point } = updateDiscoveryPointStatusInState(state, input, timestamp);
+
+      if (!point) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const result = commitState(nextState);
+      return result.ok ? { ...result, value: point } : result;
+    },
+    [commitState, state],
+  );
+
   const deleteDraft = useCallback(
     (draftId: string): StoreWriteResult => {
       if (!state.drafts.some((draft) => draft.id === draftId)) {
@@ -299,6 +337,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           reason: input.reason ?? "not_saved",
         };
       },
+      saveDiscoveryPoint,
+      updateDiscoveryPointStatus,
       saveDraft,
       deleteDraft,
       resetLocalData,
@@ -310,8 +350,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       resetLocalData,
       saveDraft,
       deleteDraft,
+      saveDiscoveryPoint,
       saveQuickRecord,
       saveReturnToSelfPractice,
+      updateDiscoveryPointStatus,
       updateDailyMarket,
     ],
   );

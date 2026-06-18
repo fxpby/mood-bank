@@ -33,8 +33,19 @@ Minimum behavior:
 - valid v1 state loads as `AppState`
 - missing arrays default to empty arrays
 - missing setup completion defaults to false
+- legacy reserved `topics` entries normalize into readable `DiscoveryPoint` records with default kind/status/source
 - unsupported future versions are rejected
 - invalid JSON or invalid minimum shape returns fallback state with corrupted status
+
+Discovery point validation defaults:
+
+| Missing/invalid field | Default |
+|---|---|
+| `title` | `一个稍后再看的点` |
+| `kind` | `discovery` |
+| `status` | `stored_for_later` |
+| `sourceType` | `manual` |
+| `theme` | `undefined` |
 
 ---
 
