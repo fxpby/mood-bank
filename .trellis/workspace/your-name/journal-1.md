@@ -117,3 +117,43 @@ Added read-only storage jar detail routes for connection, self, and energy with 
 ### Next Steps
 
 - None - task complete
+
+
+## Session 4: Topics discovery points
+
+**Date**: 2026-06-18
+**Task**: Topics discovery points
+**Branch**: `main`
+
+### Summary
+
+Added a real Topics / discovery-points page with manual capture, filters, lightweight status updates, typed topic persistence, validation normalization, focused tests, and frontend state/type specs.
+
+### Main Changes
+
+- Added `/topics` as a real "稍后再看" page with manual discovery-point capture.
+- Added filter chips, empty state, topic cards, and lightweight status updates.
+- Added typed `DiscoveryPoint` model, persistence helpers, validation normalization, and store actions.
+- Documented discovery-point write and validation contracts in frontend specs.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `00ac225` | feat: add topics discovery points |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] browser check for `/topics` create, status update, refresh persistence
+- [OK] redline scan for transactional, diagnostic, network, debug, and backlog-pressure copy
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
