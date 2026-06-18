@@ -133,7 +133,7 @@ export type Draft = {
   id: string;
   spaceId: string;
   kind: "quick_record";
-  data: Record<string, unknown>;
+  data: QuickRecordDraftData;
   createdAt: string;
   updatedAt: string;
 };
@@ -178,9 +178,26 @@ export type DailyMarketInput = {
 export type QuickRecordInput = {
   spaceId: string;
   spaceType: SpaceType;
+  draftId?: string;
   source?: EpisodeSource;
   title?: string;
   facts: string;
+  interpretation?: string;
+  interpretationSkipped?: boolean;
+  emotions?: string[];
+  bodySensations?: string[];
+  connectionLevel?: ConnectionLevel;
+  activationLevel?: ActivationLevel;
+  nextAction?: string;
+  connectionEvidence?: string;
+  selfContactEvidence?: string;
+  energyEffect?: EnergyEffect;
+};
+
+export type QuickRecordDraftData = {
+  source?: EpisodeSource;
+  title?: string;
+  facts?: string;
   interpretation?: string;
   interpretationSkipped?: boolean;
   emotions?: string[];
@@ -219,7 +236,12 @@ export type TriggerCompletionInput = {
   nextAction?: string;
   savedAsQuickRecord?: boolean;
 };
-export type DraftInput = never;
+export type DraftInput = {
+  draftId?: string;
+  spaceId: string;
+  kind: "quick_record";
+  data: QuickRecordDraftData;
+};
 
 export type StoreWriteResult<T = void> =
   | { ok: true; value?: T; savedAt: string }

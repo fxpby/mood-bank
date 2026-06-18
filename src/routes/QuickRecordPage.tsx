@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CompletionCard } from "../components/CompletionCard";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { accountReasonCopy } from "../copy/accounts";
@@ -8,6 +8,7 @@ import type {
   ActivationLevel,
   ConnectionLevel,
   EnergyEffect,
+  QuickRecordDraftData,
   QuickRecordPrefill,
 } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
@@ -109,28 +110,55 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
   const { state, actions, status, lastError } = useAppStore();
   const activeSpace = selectActiveSpace(state);
   const prefill = getQuickRecordPrefill();
-  const [title, setTitle] = useState(prefill?.title ?? "收到一段很暖的邮件");
-  const [facts, setFacts] = useState(prefill?.facts ?? "");
-  const [interpretation, setInterpretation] = useState("");
-  const [interpretationSkipped, setInterpretationSkipped] = useState(false);
+  const initialDraft = useMemo(() => getLatestQuickRecordDraft(state.drafts, activeSpace?.id, prefill), [
+    activeSpace?.id,
+    prefill,
+    state.drafts,
+  ]);
+  const [draftId, setDraftId] = useState<string | undefined>(initialDraft?.id);
+  const [title, setTitle] = useState(initialDraft?.data.title ?? prefill?.title ?? "收到一段很暖的邮件");
+  const [facts, setFacts] = useState(initialDraft?.data.facts ?? prefill?.facts ?? "");
+  const [interpretation, setInterpretation] = useState(initialDraft?.data.interpretation ?? "");
+  const [interpretationSkipped, setInterpretationSkipped] = useState(
+    Boolean(initialDraft?.data.interpretationSkipped),
+  );
   const [emotion, setEmotion] = useState<EmotionChip>(
-    (prefill?.emotions?.[0] as EmotionChip | undefined) ?? "说不清",
+    (initialDraft?.data.emotions?.[0] as EmotionChip | undefined) ??
+      (prefill?.emotions?.[0] as EmotionChip | undefined) ??
+      "说不清",
   );
   const [body, setBody] = useState<BodyChip>(
-    (prefill?.bodySensations?.[0] as BodyChip | undefined) ?? "说不清",
+    (initialDraft?.data.bodySensations?.[0] as BodyChip | undefined) ??
+      (prefill?.bodySensations?.[0] as BodyChip | undefined) ??
+      "说不清",
   );
-  const [connectionLevel, setConnectionLevel] = useState<string>("not_sure");
+  const [connectionLevel, setConnectionLevel] = useState<string>(
+    initialDraft?.data.connectionLevel === undefined ? "not_sure" : String(initialDraft.data.connectionLevel),
+  );
   const [activationLevel, setActivationLevel] = useState<string>(
-    prefill?.activationLevel === undefined ? "not_sure" : String(prefill.activationLevel),
+    initialDraft?.data.activationLevel === undefined
+      ? prefill?.activationLevel === undefined
+        ? "not_sure"
+        : String(prefill.activationLevel)
+      : String(initialDraft.data.activationLevel),
   );
   const [nextAction, setNextAction] = useState<NextAction>(
-    normalizeNextAction(prefill?.nextAction),
+    normalizeNextAction(initialDraft?.data.nextAction ?? prefill?.nextAction),
   );
-  const [connectionEvidence, setConnectionEvidence] = useState("");
-  const [selfContactEvidence, setSelfContactEvidence] = useState("");
-  const [energyEffect, setEnergyEffect] = useState<EnergyEffect>("not_sure");
+  const [connectionEvidence, setConnectionEvidence] = useState(initialDraft?.data.connectionEvidence ?? "");
+  const [selfContactEvidence, setSelfContactEvidence] = useState(initialDraft?.data.selfContactEvidence ?? "");
+  const [energyEffect, setEnergyEffect] = useState<EnergyEffect>(
+    initialDraft?.data.energyEffect ?? "not_sure",
+  );
   const [error, setError] = useState<string | null>(null);
+  const [draftStatus, setDraftStatus] = useState<string | null>(
+    initialDraft ? "已恢复一条未完成记录。" : null,
+  );
   const [savedTitle, setSavedTitle] = useState<string | null>(null);
+  const didMountDraftEffect = useRef(false);
+  const lastSavedDraftSignature = useRef(
+    initialDraft ? getDraftSignature(initialDraft.spaceId, initialDraft.data) : "",
+  );
 
   const modeCopy =
     prefill?.source === "trigger_support"
@@ -173,6 +201,75 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
     selfContactEvidence,
   ]);
 
+  const currentDraftData = useMemo<QuickRecordDraftData>(
+    () => ({
+      source: prefill?.source ?? "quick_record",
+      title,
+      facts,
+      interpretation,
+      interpretationSkipped,
+      emotions: [emotion],
+      bodySensations: [body],
+      connectionLevel: parseLevel(connectionLevel) as ConnectionLevel,
+      activationLevel: parseLevel(activationLevel) as ActivationLevel,
+      nextAction,
+      connectionEvidence,
+      selfContactEvidence,
+      energyEffect,
+    }),
+    [
+      activationLevel,
+      body,
+      connectionEvidence,
+      connectionLevel,
+      emotion,
+      energyEffect,
+      facts,
+      interpretation,
+      interpretationSkipped,
+      nextAction,
+      prefill?.source,
+      selfContactEvidence,
+      title,
+    ],
+  );
+
+  useEffect(() => {
+    if (!didMountDraftEffect.current) {
+      didMountDraftEffect.current = true;
+      return;
+    }
+
+    if (!activeSpace || savedTitle || !hasMeaningfulDraftData(currentDraftData)) {
+      return;
+    }
+
+    const signature = getDraftSignature(activeSpace.id, currentDraftData);
+    if (lastSavedDraftSignature.current === signature) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      const result = actions.saveDraft({
+        draftId,
+        spaceId: activeSpace.id,
+        kind: "quick_record",
+        data: currentDraftData,
+      });
+
+      if (result.ok) {
+        setDraftId(result.value?.id);
+        lastSavedDraftSignature.current = signature;
+        setDraftStatus("已保存草稿，只保存在本地。");
+        return;
+      }
+
+      setDraftStatus("草稿暂时没有保存成功。");
+    }, 900);
+
+    return () => window.clearTimeout(timer);
+  }, [actions, activeSpace, currentDraftData, draftId, savedTitle]);
+
   function save() {
     if (!activeSpace) {
       setError("还没有可以保存的空间。");
@@ -187,6 +284,7 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
     const result = actions.saveQuickRecord({
       spaceId: activeSpace.id,
       spaceType: activeSpace.type,
+      draftId,
       source: prefill?.source ?? "quick_record",
       title,
       facts,
@@ -209,6 +307,33 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
 
     setError(null);
     setSavedTitle(result.value?.title ?? title);
+  }
+
+  function saveDraftAndClose() {
+    if (!activeSpace) {
+      navigate("/home");
+      return;
+    }
+
+    if (!hasMeaningfulDraftData(currentDraftData)) {
+      navigate("/home");
+      return;
+    }
+
+    const result = actions.saveDraft({
+      draftId,
+      spaceId: activeSpace.id,
+      kind: "quick_record",
+      data: currentDraftData,
+    });
+
+    if (!result.ok) {
+      setError(result.error ?? "草稿暂时没有保存成功。");
+      return;
+    }
+
+    lastSavedDraftSignature.current = getDraftSignature(activeSpace.id, currentDraftData);
+    navigate("/home");
   }
 
   if (savedTitle) {
@@ -380,6 +505,7 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
           />
         </section>
 
+        {draftStatus ? <p className="helper-text">{draftStatus}</p> : null}
         {error ? <p className="form-error">{error}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
 
@@ -387,8 +513,8 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
           <button className="button button--primary" type="button" onClick={save}>
             {status === "saving" ? "正在存下" : "存下"}
           </button>
-          <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>
-            稍后
+          <button className="button button--ghost" type="button" onClick={saveDraftAndClose}>
+            保存草稿，稍后
           </button>
         </div>
       </section>
@@ -408,6 +534,28 @@ function PreviewRow({ label, reason }: { label: string; reason: string }) {
 function getQuickRecordPrefill(): QuickRecordPrefill | undefined {
   const routeState = window.history.state as { quickRecordPrefill?: QuickRecordPrefill } | null;
   return routeState?.quickRecordPrefill;
+}
+
+function getLatestQuickRecordDraft(
+  drafts: Array<{ id: string; kind: "quick_record"; spaceId: string; data: QuickRecordDraftData; updatedAt: string }>,
+  spaceId: string | undefined,
+  prefill: QuickRecordPrefill | undefined,
+) {
+  if (!spaceId || prefill) {
+    return undefined;
+  }
+
+  return drafts
+    .filter((draft) => draft.kind === "quick_record" && draft.spaceId === spaceId)
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
+}
+
+function hasMeaningfulDraftData(data: QuickRecordDraftData): boolean {
+  return Boolean(data.facts?.trim() || data.interpretation?.trim() || data.connectionEvidence?.trim() || data.selfContactEvidence?.trim());
+}
+
+function getDraftSignature(spaceId: string, data: QuickRecordDraftData): string {
+  return JSON.stringify({ spaceId, data });
 }
 
 function normalizeNextAction(value: string | undefined): NextAction {

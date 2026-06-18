@@ -204,16 +204,58 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         activationLevel: input.activationLevel ?? "not_sure",
         nextAction: input.nextAction ?? "not_now",
         accountImpacts,
+        draftId: input.draftId,
         createdAt: timestamp,
         updatedAt: timestamp,
       };
       const nextState: AppState = {
         ...state,
         episodes: [episode, ...state.episodes],
+        drafts: input.draftId
+          ? state.drafts.filter((draft) => draft.id !== input.draftId)
+          : state.drafts,
       };
       const result = commitState(nextState);
 
       return result.ok ? { ...result, value: episode } : result;
+    },
+    [commitState, state],
+  );
+
+  const saveDraft = useCallback(
+    (input: DraftInput): StoreWriteResult<Draft> => {
+      const timestamp = nowIso();
+      const draftId = input.draftId ?? createId("draft");
+      const existingDraft = state.drafts.find((draft) => draft.id === draftId);
+      const draft: Draft = {
+        id: draftId,
+        spaceId: input.spaceId,
+        kind: input.kind,
+        data: input.data,
+        createdAt: existingDraft?.createdAt ?? timestamp,
+        updatedAt: timestamp,
+      };
+      const nextState: AppState = {
+        ...state,
+        drafts: [draft, ...state.drafts.filter((item) => item.id !== draftId)],
+      };
+      const result = commitState(nextState);
+
+      return result.ok ? { ...result, value: draft } : result;
+    },
+    [commitState, state],
+  );
+
+  const deleteDraft = useCallback(
+    (draftId: string): StoreWriteResult => {
+      if (!state.drafts.some((draft) => draft.id === draftId)) {
+        return { ok: true, savedAt: nowIso() };
+      }
+
+      return commitState({
+        ...state,
+        drafts: state.drafts.filter((draft) => draft.id !== draftId),
+      });
     },
     [commitState, state],
   );
@@ -257,8 +299,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           reason: input.reason ?? "not_saved",
         };
       },
-      saveDraft: unimplementedWrite,
-      deleteDraft: unimplementedWrite,
+      saveDraft,
+      deleteDraft,
       resetLocalData,
       acknowledgeStorageWarning,
     }),
@@ -266,6 +308,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       acknowledgeStorageWarning,
       completeSetup,
       resetLocalData,
+      saveDraft,
+      deleteDraft,
       saveQuickRecord,
       saveReturnToSelfPractice,
       updateDailyMarket,
@@ -299,12 +343,4 @@ export function useAppStore(): AppStore {
 
 function loadState(loadResult: LoadResult): AppState {
   return loadResult.ok ? loadResult.state : loadResult.fallbackState;
-}
-
-function unimplementedWrite(): StoreWriteResult<never> {
-  return {
-    ok: false,
-    status: "unavailable",
-    error: "This route is not implemented yet.",
-  };
 }

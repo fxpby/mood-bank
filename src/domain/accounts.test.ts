@@ -270,4 +270,31 @@ describe("deriveAllAccountSummaries", () => {
     ]);
     expect(summaries[0]?.reason).toBe(accountReasonCopy.observable_connection_evidence);
   });
+
+  it("ignores quick record drafts when deriving account summaries", () => {
+    const state: AppState = {
+      ...createInitialState(),
+      drafts: [
+        {
+          id: "draft_1",
+          spaceId,
+          kind: "quick_record",
+          data: {
+            facts: "还没正式存下的事实",
+            connectionEvidence: "草稿里的连接证据不应进入储蓄罐",
+            nextAction: "delay_10_min",
+            energyEffect: "lighter",
+          },
+          createdAt,
+          updatedAt: createdAt,
+        },
+      ],
+    };
+
+    expect(deriveAllAccountSummaries(state).map((summary) => [summary.account, summary.value])).toEqual([
+      ["connection", 0],
+      ["self", 0],
+      ["energy", 0],
+    ]);
+  });
 });
