@@ -23,6 +23,7 @@ export function validateMinimumAppState(value: unknown): MinimumShapeResult {
   }
 
   const state = value as Partial<AppState>;
+  const settings = value.settings as AppState["settings"];
   const normalized: AppState = {
     schemaVersion: SCHEMA_VERSION,
     spaces: asArray(state.spaces),
@@ -36,8 +37,8 @@ export function validateMinimumAppState(value: unknown): MinimumShapeResult {
     experiments: asArray(state.experiments),
     personalActions: asArray(state.personalActions),
     settings: {
-      hasCompletedSetup: state.settings.hasCompletedSetup,
-      hasAcknowledgedLocalOnly: Boolean(state.settings.hasAcknowledgedLocalOnly),
+      hasCompletedSetup: settings.hasCompletedSetup,
+      hasAcknowledgedLocalOnly: Boolean(settings.hasAcknowledgedLocalOnly),
     },
   };
 

@@ -16,7 +16,7 @@ const actions: Array<{
     label: "我被触发了",
     subtitle: "先停一下",
     route: "/trigger",
-    badge: "P0-B",
+    badge: "稍后",
     icon: RotateCcw,
   },
   {
@@ -37,7 +37,7 @@ const actions: Array<{
     label: "回到自己",
     subtitle: "取一个小动作",
     route: "/return-to-self",
-    badge: "P0-C",
+    badge: "稍后",
     icon: HeartHandshake,
   },
 ];

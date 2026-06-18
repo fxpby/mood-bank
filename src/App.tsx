@@ -35,11 +35,13 @@ export function App() {
       window.history.replaceState({}, "", effectiveRoute);
       setRoute(effectiveRoute);
     }
+    window.scrollTo({ left: 0, top: 0 });
   }, [effectiveRoute]);
 
   function navigate(nextRoute: AppRoute) {
     window.history.pushState({}, "", nextRoute);
     setRoute(nextRoute);
+    window.scrollTo({ left: 0, top: 0 });
   }
 
   const showBottomNav = effectiveRoute !== "/setup";

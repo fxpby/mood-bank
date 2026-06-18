@@ -213,6 +213,6 @@ function unimplementedWrite(): StoreWriteResult<never> {
   return {
     ok: false,
     status: "unavailable",
-    error: "This P0-A route is not implemented yet.",
+    error: "This route is not implemented yet.",
   };
 }
