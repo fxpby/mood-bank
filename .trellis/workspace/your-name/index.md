@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 18
+- **Total Sessions**: 19
 - **Last Active**: 2026-06-19
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~735 | Active |
+| `journal-1.md` | ~775 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 19 | 2026-06-19 | Account source record link | `918fe88`, `74afe1d` | `main` |
 | 18 | 2026-06-19 | Home latest record link | `72e0523`, `74619f3` | `main` |
 | 17 | 2026-06-19 | Home anchor source link | `06d6602`, `19cc5ab` | `main` |
 | 16 | 2026-06-19 | Record detail anchor entry | `80a50ee`, `6b19ca6` | `main` |

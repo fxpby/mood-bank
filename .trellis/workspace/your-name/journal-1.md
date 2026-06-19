@@ -739,3 +739,43 @@ Added a Home latest-record action that opens the latest Record Detail without wr
 ### Next Steps
 
 - None - task complete
+
+
+## Session 19: Account source record link
+
+**Date**: 2026-06-19
+**Task**: Account source record link
+**Branch**: `main`
+
+### Summary
+
+Added a source-record action to episode-sourced account detail rows.
+
+### Main Changes
+
+- Added `打开来源记录` on episode-sourced account detail rows.
+- Reused `buildRecordRoute(row.impact.sourceId)` and passed route navigation into account row components.
+- Kept Return-To-Self and Trigger rows without record-source actions.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `918fe88` | (see git log) |
+| `74afe1d` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden product-copy scan against `src`
+- [OK] Browser check: account source row opens Record Detail
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
