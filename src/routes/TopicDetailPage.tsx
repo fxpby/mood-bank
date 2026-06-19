@@ -100,6 +100,15 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
     );
   }
 
+  function useReviewNoteAsAnchor() {
+    const text = reviewNote.trim();
+    if (!text) return;
+
+    setAnchorText(text);
+    setAnchorError(null);
+    setAnchorMessage("已放到锚点草稿，还没有保存。");
+  }
+
   function saveAnchor() {
     if (!point) return;
 
@@ -237,6 +246,12 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
           存下补记
         </button>
         {reviewMessage ? <p className="helper-text">{reviewMessage}</p> : null}
+        {reviewMessage && reviewNote.trim() ? (
+          <button className="button button--secondary" type="button" onClick={useReviewNoteAsAnchor}>
+            <BookmarkPlus size={16} strokeWidth={1.8} />
+            放到锚点草稿
+          </button>
+        ) : null}
         {reviewError ? <p className="form-error">{reviewError}</p> : null}
       </section>
 
@@ -260,6 +275,12 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
           保存为锚点
         </button>
         {anchorMessage ? <p className="helper-text">{anchorMessage}</p> : null}
+        {anchorMessage ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/home")}>
+            <Sparkles size={16} strokeWidth={1.8} />
+            回到首页看锚点
+          </button>
+        ) : null}
         {anchorError ? <p className="form-error">{anchorError}</p> : null}
       </section>
 
