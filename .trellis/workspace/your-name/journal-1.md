@@ -857,3 +857,42 @@ Added a route-local shortcut to open the discovery point just saved from the Top
 ### Next Steps
 
 - None - task complete
+
+
+## Session 22: Topic Review Anchor Handoff
+
+**Date**: 2026-06-19
+**Task**: Topic Review Anchor Handoff
+**Branch**: `main`
+
+### Summary
+
+Added route-local handoff from a saved topic review note into the anchor draft and a Home shortcut after anchor save.
+
+### Main Changes
+
+- Added a `放到锚点草稿` action after saving a non-empty topic review note.
+- Kept the handoff route-local: it only updates `anchorText` until the user explicitly saves the anchor.
+- Added a `回到首页看锚点` action after a successful topic-detail anchor save.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `70b86bf` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] forbidden product/network scan
+- [OK] browser verified review note -> anchor draft -> save anchor -> Home latest anchor
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
