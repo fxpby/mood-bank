@@ -10,7 +10,7 @@ import {
   selectTodayMarketNote,
 } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute } from "../utils/route";
+import { buildRecordRoute, type AppRoute } from "../utils/route";
 
 type HomePageProps = {
   navigate: (route: AppRoute) => void;
@@ -23,7 +23,12 @@ export function HomePage({ navigate }: HomePageProps) {
   const marketNote = selectTodayMarketNote(state);
   const summaries = selectAccountSummaries(state);
   const latestEpisode = selectLatestEpisode(state);
-  const latestAnchor = state.anchors[0]?.text ?? "事实可以很小，结论可以慢一点。";
+  const latestAnchor = state.anchors[0] ?? null;
+  const latestAnchorText = latestAnchor?.text ?? "事实可以很小，结论可以慢一点。";
+  const latestAnchorSourceRoute =
+    latestAnchor?.sourceType === "episode" && latestAnchor.sourceId
+      ? buildRecordRoute(latestAnchor.sourceId)
+      : null;
 
   return (
     <section className="home-page page-stack">
@@ -88,7 +93,17 @@ export function HomePage({ navigate }: HomePageProps) {
 
       <section className="anchor-preview">
         <span>今天的锚点</span>
-        <p>{latestAnchor}</p>
+        <p>{latestAnchorText}</p>
+        {latestAnchorSourceRoute ? (
+          <button
+            className="button button--secondary anchor-preview__source"
+            type="button"
+            onClick={() => navigate(latestAnchorSourceRoute)}
+          >
+            <NotebookPen size={16} strokeWidth={1.8} />
+            打开来源记录
+          </button>
+        ) : null}
       </section>
     </section>
   );

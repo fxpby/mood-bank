@@ -506,6 +506,10 @@
   line-height: 1.45;
 }
 
+.anchor-preview__source {
+  margin-top: var(--space-3);
+}
+
 .latest-record {
   display: grid;
   gap: var(--space-2);
