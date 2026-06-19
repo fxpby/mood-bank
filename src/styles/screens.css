@@ -1721,6 +1721,10 @@
   overflow-wrap: anywhere;
 }
 
+.account-detail-row__source {
+  justify-self: start;
+}
+
 .account-detail-empty {
   display: grid;
   gap: var(--space-3);

@@ -5,7 +5,7 @@ import { accountCopy } from "../copy/accounts";
 import { selectAccountDetail, type AccountDetailSourceRow } from "../domain/selectors";
 import type { AccountId } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute } from "../utils/route";
+import { buildRecordRoute, type AppRoute } from "../utils/route";
 
 type AccountDetailPageProps = {
   account: AccountId;
@@ -134,7 +134,7 @@ export function AccountDetailPage({ account, navigate }: AccountDetailPageProps)
         {detail.rows.length ? (
           <div className="account-detail-list">
             {detail.rows.map((row) => (
-              <AccountDetailRow key={row.impact.id} row={row} />
+              <AccountDetailRow key={row.impact.id} row={row} navigate={navigate} />
             ))}
           </div>
         ) : (
@@ -202,7 +202,16 @@ export function AccountDetailPage({ account, navigate }: AccountDetailPageProps)
   );
 }
 
-function AccountDetailRow({ row }: { row: AccountDetailSourceRow }) {
+function AccountDetailRow({
+  row,
+  navigate,
+}: {
+  row: AccountDetailSourceRow;
+  navigate: (route: AppRoute) => void;
+}) {
+  const sourceRecordRoute =
+    row.impact.sourceType === "episode" ? buildRecordRoute(row.impact.sourceId) : null;
+
   return (
     <article className="account-detail-row">
       <div className="account-detail-row__top">
@@ -227,6 +236,16 @@ function AccountDetailRow({ row }: { row: AccountDetailSourceRow }) {
           </div>
         ) : null}
       </dl>
+      {sourceRecordRoute ? (
+        <button
+          className="button button--secondary account-detail-row__source"
+          type="button"
+          onClick={() => navigate(sourceRecordRoute)}
+        >
+          打开来源记录
+          <ArrowRight size={16} strokeWidth={1.8} />
+        </button>
+      ) : null}
     </article>
   );
 }
