@@ -342,7 +342,11 @@ Implemented the local draft self-check route with deterministic recommendations,
 
 ### Main Changes
 
-(Add details)
+- Replaced the `/experiments` placeholder with a real route-local personal action menu.
+- Added deterministic `personalActions` domain helpers with one recommended action and two alternatives.
+- Added selection and "完成一点" completion feedback without durable writes or account impacts.
+- Added navigation from completion to Return-To-Self and Quick Record.
+- Recorded the route-local personal action contract in the frontend state-management spec.
 
 ### Git Commits
 
@@ -359,6 +363,45 @@ Implemented the local draft self-check route with deterministic recommendations,
 - [OK] `npm run build`
 - [OK] Forbidden copy/network/debug scan
 - [OK] Browser verified: ready recommendation, save topic, save draft, private record conversion, Return-To-Self, no-save finish, 360px no horizontal overflow, no console warnings/errors
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 10: Personal action menu page
+
+**Date**: 2026-06-19
+**Task**: Personal action menu page
+**Branch**: `main`
+
+### Summary
+
+Implemented the /experiments personal action menu as a route-local three-choice support flow with deterministic action recommendations, completion feedback, no persistent writes, and mobile/browser verification.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `cafdd5a` | feat: add personal action menu page |
+| `cd77015` | chore: record personal action menu task |
+| `599859c` | chore(task): archive personal-action-menu |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden copy/network/debug scan
+- [OK] Browser verified: `/experiments`, choose action, complete action, rotate actions, Return-To-Self route, Quick Record route, 360px no horizontal overflow, no console warnings/errors
 
 ### Status
 
