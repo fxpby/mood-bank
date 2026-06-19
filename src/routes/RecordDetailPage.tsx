@@ -1,5 +1,5 @@
-import { ArrowLeft, NotebookPen, Sparkles } from "lucide-react";
-import { useMemo } from "react";
+import { ArrowLeft, BookmarkPlus, NotebookPen, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import { accountCopy, getAccountEvidenceCopy } from "../copy/accounts";
 import { episodeSourceCopy } from "../copy/episodes";
@@ -18,9 +18,45 @@ type RecordDetailPageProps = {
 };
 
 export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
-  const { state } = useAppStore();
+  const { state, actions } = useAppStore();
   const episodeId = getRecordRouteId(window.location.pathname);
   const detail = useMemo(() => selectEpisodeDetail(state, episodeId), [episodeId, state]);
+  const [anchorText, setAnchorText] = useState("");
+  const [anchorMessage, setAnchorMessage] = useState<string | null>(null);
+  const [anchorError, setAnchorError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAnchorText(detail ? getInitialAnchorText(detail.episode, detail.linkedAnchors[0]) : "");
+    setAnchorMessage(null);
+    setAnchorError(null);
+  }, [detail?.episode.id]);
+
+  function saveRecordAnchor() {
+    if (!detail) return;
+
+    if (!anchorText.trim()) {
+      setAnchorError("先留一句能托住自己的话。");
+      setAnchorMessage(null);
+      return;
+    }
+
+    const result = actions.saveAnchor({
+      spaceId: detail.episode.spaceId,
+      text: anchorText,
+      sourceType: "episode",
+      sourceId: detail.episode.id,
+    });
+
+    if (!result.ok) {
+      setAnchorError(result.error ?? "这次还没有保存成功，锚点还没有写进本机。");
+      setAnchorMessage(null);
+      return;
+    }
+
+    setAnchorText(result.value?.text ?? anchorText.trim());
+    setAnchorError(null);
+    setAnchorMessage("锚点已存下，首页会优先显示这句话。");
+  }
 
   if (!detail) {
     return (
@@ -46,6 +82,8 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
   }
 
   const recordRows = buildRecordRows(detail.episode);
+  const latestAnchor = detail.linkedAnchors[0] ?? null;
+  const savedAnchorText = latestAnchor?.text ?? detail.episode.anchor?.trim() ?? "";
 
   return (
     <section className="record-detail-page page-stack">
@@ -77,6 +115,40 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="panel page-stack">
+        <div className="section-heading">
+          <h2>锚点</h2>
+          <p>把这条记录里能托住自己的话单独放出来，之后需要时可以直接带走。</p>
+        </div>
+        {savedAnchorText ? (
+          <article className="record-anchor-card">
+            <span>{latestAnchor ? `最近存于 ${formatDate(latestAnchor.createdAt)}` : "记录里的一句"}</span>
+            <p>{savedAnchorText}</p>
+          </article>
+        ) : (
+          <p className="helper-text">这条记录还没有单独存过锚点。可以留一句话给之后的自己。</p>
+        )}
+        {detail.linkedAnchors.length > 1 ? (
+          <p className="helper-text">还有 {detail.linkedAnchors.length - 1} 句也和这条记录关联。</p>
+        ) : null}
+        <label className="field">
+          <span className="field-label">一句能托住自己的话</span>
+          <textarea
+            className="field-textarea"
+            value={anchorText}
+            rows={3}
+            onChange={(event) => setAnchorText(event.target.value)}
+            placeholder="例如：我可以先回到事实，再决定下一步。"
+          />
+        </label>
+        <button className="button button--secondary" type="button" onClick={saveRecordAnchor}>
+          <BookmarkPlus size={16} strokeWidth={1.8} />
+          存为锚点
+        </button>
+        {anchorMessage ? <p className="helper-text">{anchorMessage}</p> : null}
+        {anchorError ? <p className="form-error">{anchorError}</p> : null}
       </section>
 
       <section className="panel page-stack">
@@ -129,6 +201,17 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
         )}
       </section>
     </section>
+  );
+}
+
+function getInitialAnchorText(
+  episode: Episode,
+  latestAnchor: { text: string } | undefined,
+): string {
+  return (
+    latestAnchor?.text.trim() ||
+    episode.anchor?.trim() ||
+    "我可以先带着这条记录，不急着把它想完。"
   );
 }
 

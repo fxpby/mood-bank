@@ -11,6 +11,7 @@ import type {
   AccountId,
   AccountImpact,
   AppState,
+  Anchor,
   DailyMarket,
   DiscoveryPoint,
   EmotionalSpace,
@@ -66,6 +67,7 @@ export type AccountDetail = {
 export type EpisodeDetail = {
   episode: Episode;
   accountRows: AccountDetailSourceRow[];
+  linkedAnchors: Anchor[];
   linkedTopics: DiscoveryPoint[];
 };
 
@@ -101,6 +103,9 @@ export function selectEpisodeDetail(state: AppState, episodeId: string | null): 
     accountRows: [...episode.accountImpacts]
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .map((impact) => buildAccountDetailRow(impact, state)),
+    linkedAnchors: state.anchors
+      .filter((anchor) => anchor.sourceType === "episode" && anchor.sourceId === episode.id)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
     linkedTopics: state.topics
       .filter((point) => point.sourceType === "episode" && point.sourceId === episode.id)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),

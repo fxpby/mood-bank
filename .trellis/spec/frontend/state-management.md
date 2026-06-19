@@ -159,6 +159,76 @@ actions.saveAnchor({ spaceId, text });
 
 Saving an anchor must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Anchors are not tasks, experiments, relationship verdicts, or evidence rows.
 
+### Scenario: Record Detail Saves An Episode-Linked Anchor
+
+#### 1. Scope / Trigger
+
+- Trigger: `/record/<episodeId>` lets the user save one stabilizing phrase from a saved episode.
+- Scope: route-local textarea state -> `actions.saveAnchor(...)` with episode source metadata -> one `Anchor`.
+
+#### 2. Signatures
+
+```ts
+type AnchorInput = {
+  spaceId: string;
+  text: string;
+  sourceType?: Anchor["sourceType"];
+  sourceId?: string;
+};
+
+saveAnchor(input: AnchorInput): StoreWriteResult<Anchor>;
+selectEpisodeDetail(state, episodeId): EpisodeDetail & { linkedAnchors: Anchor[] };
+```
+
+#### 3. Contracts
+
+- Record Detail may initialize anchor text from the newest linked anchor, `episode.anchor`, or a gentle route-local default.
+- The durable write must call `actions.saveAnchor({ spaceId, text, sourceType: "episode", sourceId: episode.id })`.
+- `selectEpisodeDetail(...)` derives `linkedAnchors` from `state.anchors` where `sourceType === "episode"` and `sourceId === episode.id`, sorted newest-first.
+- Saving an episode-linked anchor must not update the episode, account impacts, linked topics, derived summaries, or daily market state.
+- UI copy should frame the anchor as memory support, not a contract, proof, reward, or relationship verdict.
+
+#### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| Existing episode + non-empty anchor text | Save one trimmed `Anchor` newest-first with episode source metadata. |
+| Existing episode + blank anchor text | Show validation copy in route; no persisted write. |
+| Missing episode id | Show the existing not-found record state; no write. |
+| Storage save fails | Return/show honest failure copy and do not claim the anchor was saved. |
+
+#### 5. Good/Base/Bad Cases
+
+- Good: user opens a record, saves "我可以先回到事实。", refreshes, sees it on that record and as the newest Home anchor.
+- Base: user only reads the existing record; no state changes.
+- Bad: anchor save rewrites `Episode.anchor`, adds an `AccountImpact`, or loops through multiple writes outside `AppStoreContext`.
+
+#### 6. Tests Required
+
+- Unit test that `selectEpisodeDetail(...)` returns only anchors linked to that episode, newest-first.
+- Unit test that anchor helpers preserve episode source metadata.
+- Regression test that linked-anchor selection and anchor saving do not change derived storage-jar summaries.
+
+#### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+episode.anchor = anchorText;
+actions.saveQuickRecord({ ...episode, anchor: anchorText });
+```
+
+#### Correct
+
+```ts
+const result = actions.saveAnchor({
+  spaceId: episode.spaceId,
+  text: anchorText,
+  sourceType: "episode",
+  sourceId: episode.id,
+});
+```
+
 ### Scenario: Topic Detail Saves A Support Anchor
 
 #### 1. Scope / Trigger

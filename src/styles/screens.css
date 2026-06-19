@@ -678,6 +678,7 @@
 }
 
 .record-detail-facts div,
+.record-anchor-card,
 .record-impact-row,
 .record-topic-card {
   display: grid;
@@ -693,7 +694,15 @@
   gap: var(--space-1);
 }
 
+.record-anchor-card {
+  border-color: rgba(137, 178, 161, 0.52);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(137, 178, 161, 0.18), transparent 34%),
+    rgba(251, 251, 246, 0.72);
+}
+
 .record-detail-facts span,
+.record-anchor-card span,
 .record-impact-row dt,
 .record-impact-row__top span {
   color: var(--color-text-soft);
@@ -706,6 +715,14 @@
   color: var(--color-text-muted);
   font-size: var(--text-sm);
   line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.record-anchor-card p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--text-md);
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 

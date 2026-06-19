@@ -12,6 +12,8 @@ describe("anchor state helpers", () => {
       {
         spaceId,
         text: "  我可以先回到自己。  ",
+        sourceType: "episode",
+        sourceId: "episode_1",
       },
       { id: "anchor_1", timestamp },
     );
@@ -20,6 +22,8 @@ describe("anchor state helpers", () => {
       id: "anchor_1",
       spaceId,
       text: "我可以先回到自己。",
+      sourceType: "episode",
+      sourceId: "episode_1",
       createdAt: timestamp,
       updatedAt: timestamp,
     });

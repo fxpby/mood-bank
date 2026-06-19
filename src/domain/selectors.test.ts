@@ -7,7 +7,7 @@ import {
   selectEpisodeDetail,
   selectEpisodesNewestFirst,
 } from "./selectors";
-import type { AccountImpact, AppState, Episode } from "./types";
+import type { AccountImpact, Anchor, AppState, Episode } from "./types";
 
 const spaceId = "space_1";
 const olderAt = "2026-06-18T08:00:00.000Z";
@@ -45,6 +45,19 @@ function episode(id: string, overrides: Partial<Episode> = {}): Episode {
     activationLevel: "not_sure",
     nextAction: "delay_10_min",
     accountImpacts: [],
+    createdAt: olderAt,
+    updatedAt: olderAt,
+    ...overrides,
+  };
+}
+
+function anchor(id: string, overrides: Partial<Anchor> = {}): Anchor {
+  return {
+    id,
+    spaceId,
+    text: "我可以先回到事实。",
+    sourceType: "episode",
+    sourceId: "episode_1",
     createdAt: olderAt,
     updatedAt: olderAt,
     ...overrides,
@@ -246,6 +259,23 @@ describe("episode selectors", () => {
           updatedAt: newerAt,
         },
       ],
+      anchors: [
+        anchor("anchor_old", { text: "旧一点的锚点", createdAt: olderAt, updatedAt: olderAt }),
+        anchor("anchor_new", { text: "新一点的锚点", createdAt: newerAt, updatedAt: newerAt }),
+        anchor("anchor_other", {
+          text: "其他记录的锚点",
+          sourceId: "episode_other",
+          createdAt: newerAt,
+          updatedAt: newerAt,
+        }),
+        anchor("anchor_return", {
+          text: "回到自己的锚点",
+          sourceType: "return_to_self",
+          sourceId: "practice_1",
+          createdAt: newerAt,
+          updatedAt: newerAt,
+        }),
+      ],
     };
 
     const beforeSummaries = selectAccountSummaries(state);
@@ -255,6 +285,7 @@ describe("episode selectors", () => {
     expect(detail?.episode.id).toBe("episode_1");
     expect(detail?.accountRows.map((row) => row.impact.id)).toEqual(["impact_new", "impact_old"]);
     expect(detail?.accountRows[0]?.evidence).toBe("记录事实");
+    expect(detail?.linkedAnchors.map((item) => item.id)).toEqual(["anchor_new", "anchor_old"]);
     expect(detail?.linkedTopics.map((point) => point.id)).toEqual(["topic_new", "topic_old"]);
     expect(afterSummaries).toEqual(beforeSummaries);
   });
