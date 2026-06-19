@@ -96,6 +96,29 @@ describe("discovery point state helpers", () => {
     expect(updated.state.topics.find((point) => point.id === "topic_2")?.status).toBe("stored_for_later");
   });
 
+  it("status review updates do not affect derived storage jar summaries", () => {
+    const stateWithTopic = addDiscoveryPointToState(
+      createInitialState(),
+      {
+        spaceId,
+        title: "语言切换像缓冲",
+        kind: "discovery",
+        sourceType: "trigger",
+      },
+      { id: "topic_1", timestamp },
+    ).state;
+    const before = deriveAllAccountSummaries(stateWithTopic);
+
+    const updated = updateDiscoveryPointStatusInState(
+      stateWithTopic,
+      { id: "topic_1", status: "reviewed" },
+      "2026-06-18T14:00:00.000Z",
+    );
+
+    expect(updated.point?.status).toBe("reviewed");
+    expect(deriveAllAccountSummaries(updated.state)).toEqual(before);
+  });
+
   it("does not affect derived storage jar summaries", () => {
     const accountImpacts = buildQuickRecordImpacts(
       {

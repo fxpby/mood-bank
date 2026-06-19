@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Required frontend checks and scope overview."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify topic detail writes remain behind AppStoreContext and do not change accounts."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no network, direct localStorage, false save copy, or transactional/diagnostic language."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify route parsing and product data contracts remain typed."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Verify route component and navigation follow local conventions."}

@@ -9,6 +9,7 @@ import { RecordPage } from "./routes/RecordPage";
 import { ReturnToSelfPage } from "./routes/ReturnToSelfPage";
 import { SettingsPage } from "./routes/SettingsPage";
 import { SetupPage } from "./routes/SetupPage";
+import { TopicDetailPage } from "./routes/TopicDetailPage";
 import { TopicsPage } from "./routes/TopicsPage";
 import { TriggerPage } from "./routes/TriggerPage";
 import { isSetupRoute, normalizeRoute, type AppRoute, type RouteState } from "./utils/route";
@@ -90,6 +91,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/topics") {
     return <TopicsPage navigate={navigate} />;
+  }
+
+  if (route.startsWith("/topics/")) {
+    return <TopicDetailPage navigate={navigate} />;
   }
 
   if (route === "/accounts/connection") {

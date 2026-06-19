@@ -67,6 +67,24 @@ Routes must check `result.ok` before showing success copy.
 
 Browser history state can be unknown at runtime. Keep narrowing close to the route that reads it and map it into typed local state before use.
 
+### Dynamic Topic Routes
+
+Topic detail routes are the only dynamic routes currently supported by the app shell:
+
+```ts
+type AppRoute = "/topics" | `/topics/${string}` | ...;
+
+const route = buildTopicRoute(point.id);
+const topicId = getTopicRouteId(window.location.pathname);
+```
+
+Rules:
+
+- Build detail routes with `buildTopicRoute(id)`, not string concatenation in page components.
+- `normalizeRoute("/topics/<id>")` must keep the route URL-safe and return `/topics/${string}`.
+- Detail pages should decode the id with `getTopicRouteId(...)` and handle missing/unknown ids with an honest empty state.
+- Add route helper tests whenever dynamic route behavior changes.
+
 ---
 
 ## Forbidden Patterns

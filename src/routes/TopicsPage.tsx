@@ -16,7 +16,7 @@ import type {
 } from "../domain/types";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute } from "../utils/route";
+import { buildTopicRoute, type AppRoute } from "../utils/route";
 
 type TopicsPageProps = {
   navigate: (route: AppRoute) => void;
@@ -218,6 +218,7 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
                 key={point.id}
                 point={point}
                 onStatusChange={(nextStatus) => updateStatus(point, nextStatus)}
+                onOpen={() => navigate(buildTopicRoute(point.id))}
               />
             ))}
           </div>
@@ -242,9 +243,11 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
 function DiscoveryPointRow({
   point,
   onStatusChange,
+  onOpen,
 }: {
   point: DiscoveryPoint;
   onStatusChange: (status: DiscoveryPointStatus) => void;
+  onOpen: () => void;
 }) {
   const description = point.note || point.exploreQuestion || point.sourceSnippet;
 
@@ -262,6 +265,9 @@ function DiscoveryPointRow({
         <time dateTime={point.createdAt}>{formatDate(point.createdAt)}</time>
       </div>
       <div className="topic-card__actions" aria-label={`${point.title} 状态`}>
+        <button className="topic-status-button" type="button" onClick={onOpen}>
+          打开回看
+        </button>
         {rowStatusActions.map((action) => (
           <button
             className="topic-status-button"

@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend route, component, store-action, and test work."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Topic status updates must go through AppStoreContext and not affect account summaries."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Must preserve local-first behavior, no false persistence, no forbidden copy, and mobile accessibility."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Adds route normalization and topic-detail typing without loose product strings."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Adds a route component and list navigation affordance."}
