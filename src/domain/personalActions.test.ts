@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { deriveAllAccountSummaries } from "./accounts";
 import { createInitialState } from "./defaults";
 import {
+  buildPersonalActionQuickRecordPrefill,
   getNextPersonalActionRotation,
   getPersonalActionSet,
   personalActions,
@@ -59,5 +60,17 @@ describe("getPersonalActionSet", () => {
         expect(copy).not.toContain(term);
       }
     }
+  });
+
+  it("builds a quick record prefill from a completed action without auto-impacting next action", () => {
+    const action = personalActions[0];
+    const prefill = buildPersonalActionQuickRecordPrefill(action);
+
+    expect(prefill).toEqual({
+      source: "quick_record",
+      title: `完成一个小动作：${action.label}`,
+      facts: `我在练习页选择并完成了「${action.label}」。${action.completionMarker}`,
+      nextAction: "not_now",
+    });
   });
 });

@@ -2,6 +2,7 @@ import { ArrowRight, CheckCircle2, HeartHandshake, NotebookPen, RefreshCcw } fro
 import { useMemo, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import {
+  buildPersonalActionQuickRecordPrefill,
   getNextPersonalActionRotation,
   getPersonalActionSet,
   personalActionCategoryCopy,
@@ -14,10 +15,10 @@ import {
   selectTodayMarketNote,
 } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute } from "../utils/route";
+import type { AppRoute, RouteState } from "../utils/route";
 
 type ExperimentsPageProps = {
-  navigate: (route: AppRoute) => void;
+  navigate: (route: AppRoute, state?: RouteState) => void;
 };
 
 type CompletionState = "choosing" | "selected" | "completed";
@@ -50,6 +51,12 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
 
   function completeAction() {
     setCompletionState("completed");
+  }
+
+  function recordSelectedAction(action: PersonalAction) {
+    navigate("/record/new", {
+      quickRecordPrefill: buildPersonalActionQuickRecordPrefill(action),
+    });
   }
 
   return (
@@ -145,7 +152,7 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
               <HeartHandshake size={16} strokeWidth={1.8} />
               回到自己
             </button>
-            <button className="button button--secondary" type="button" onClick={() => navigate("/record/new")}>
+            <button className="button button--secondary" type="button" onClick={() => recordSelectedAction(selectedAction)}>
               <NotebookPen size={16} strokeWidth={1.8} />
               记录一下
             </button>

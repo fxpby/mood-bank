@@ -1,4 +1,4 @@
-import type { DailyMarket } from "./types";
+import type { DailyMarket, QuickRecordPrefill } from "./types";
 
 export type PersonalActionCategory =
   | "lower_activation"
@@ -152,6 +152,17 @@ export function getPersonalActionSet(input: {
 
 export function getNextPersonalActionRotation(currentIndex: number): number {
   return normalizeIndex(currentIndex + 1);
+}
+
+export function buildPersonalActionQuickRecordPrefill(
+  action: PersonalAction,
+): QuickRecordPrefill {
+  return {
+    source: "quick_record",
+    title: `完成一个小动作：${action.label}`,
+    facts: `我在练习页选择并完成了「${action.label}」。${action.completionMarker}`,
+    nextAction: "not_now",
+  };
 }
 
 function getAlternativeCategories(
