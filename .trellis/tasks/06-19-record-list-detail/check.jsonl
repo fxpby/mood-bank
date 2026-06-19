@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Required frontend checks and scope overview."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify record detail remains derived/read-only and account summaries are not persisted or changed."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no network, direct localStorage, false copy, or transactional/diagnostic language."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify dynamic route parsing and selector contracts remain typed."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Verify route components and navigation follow local conventions."}

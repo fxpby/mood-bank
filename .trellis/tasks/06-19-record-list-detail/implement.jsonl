@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend route, selector, page, style, and test work."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Record detail must be read-only/derived and not create account impacts."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Must preserve local-first behavior, no forbidden copy, and no hidden network behavior."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Adds dynamic record route helpers and typed detail selection."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Adds route component and list/detail navigation affordances."}
