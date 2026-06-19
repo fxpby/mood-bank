@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend app constraints and required checks for a new route flow"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Ensure signal-check remains no-write by default and uses store actions for optional saves"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Forbidden network, placeholder write, diagnostic, shame, and transactional-copy rules"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Route typing and product data typing patterns"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Route/component and mobile layout conventions for the new flow"}

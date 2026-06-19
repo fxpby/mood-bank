@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend required checks and app constraints"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify optional signal-check save does not mutate account summaries or bypass store actions"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no network, surveillance, diagnostic copy, shame copy, or placeholder writes"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify route and helper typing"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Verify route component structure, accessibility, and mobile layout"}
