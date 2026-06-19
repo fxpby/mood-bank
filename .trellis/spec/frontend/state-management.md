@@ -69,6 +69,7 @@ Required action behavior:
 | `saveReturnToSelfPractice` | Yes | Creates a practice and optional anchor. Never creates connection impact. |
 | `saveTriggerCompletion` | No in P0 | Returns no-write result so Trigger -> Quick Record does not double-count Self. |
 | `saveDiscoveryPoint` | Yes | Creates a manual or source-linked discovery point. Must not create account impacts by default. |
+| `saveDiscoveryPoints` | Yes | Creates multiple discovery points in one commit. Must not create account impacts by default. |
 | `updateDiscoveryPointStatus` | Yes | Updates one discovery point status. Unknown ids return no-op success. Must not create account impacts. |
 | `saveDraft` | Yes | Saves route draft data only; drafts never create account impacts. |
 | `deleteDraft` | Yes | No-op success if the draft is already absent. |
@@ -396,3 +397,58 @@ getNextPersonalActionRotation(currentIndex: number): number;
 
 - Unit test action-set size, deterministic rotation, and no derived storage-jar changes from helper use.
 - Browser check `/experiments` choose/complete/rotate and 360px layout.
+
+## Scenario: Rich Incoming Review Saves Selected Threads Only
+
+### 1. Scope / Trigger
+
+- Trigger: `/rich-incoming` helps the user receive a long, warm, vulnerable, or dense incoming message without turning every thread into an immediate reply obligation.
+- Scope: route-local message-shape/thread/emotion/handling choices -> `buildRichIncomingDiscoveryPointInputs(...)` -> `actions.saveDiscoveryPoints(...)`.
+
+### 2. Signatures
+
+```ts
+type RichIncomingInput = {
+  spaceId: string;
+  messageNote: string;
+  shapes: RichIncomingShape[];
+  selectedThreads: RichIncomingThread[];
+  emotions: RichIncomingEmotion[];
+  handlingByThread: Partial<Record<RichIncomingThread, RichIncomingHandling>>;
+  direction: RichIncomingDirection;
+};
+
+buildRichIncomingDiscoveryPointInputs(input: RichIncomingInput): DiscoveryPointInput[];
+saveDiscoveryPoints(input: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoint[]>;
+```
+
+### 3. Contracts
+
+- Completing Rich Incoming Review without explicit save is route-local only and must not persist data.
+- Explicit save creates one or more `DiscoveryPoint` records through a single `actions.saveDiscoveryPoints(...)` commit.
+- Saved points use `sourceType: "rich_incoming"` and may use `sourceTitle: "收到很多内容"`.
+- The route may show default handling choices, but save input must include those effective defaults so the persisted result matches the UI.
+- More than three selected threads may be reduced to three active handling cards; overflow threads may be saved as later discovery points.
+- Rich Incoming Review must not create `Episode`, `Draft`, `Anchor`, `AccountImpact`, or a durable review model by default.
+- It must not parse/summarize the incoming text with AI, infer sender psychology, generate replies, optimize for response, or integrate send/copy behavior.
+
+### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| User completes and taps "完成" | No persisted data. |
+| User taps "把发现点存进稍后" with no later threads | No persisted data; copy says there was nothing selected for later. |
+| User taps "把发现点存进稍后" with later/overflow threads | One atomic write creates all selected discovery points. |
+| Storage save fails | Return/show honest failure copy and do not claim the points were saved. |
+
+### 5. Good/Base/Bad Cases
+
+- Good: user selects five received threads, handles three active ones, saves later threads, and sees all saved points in `/topics` without storage-jar movement.
+- Base: user completes the flow and leaves; no state changes.
+- Bad: route loops `saveDiscoveryPoint(...)` for multiple points, causing later writes to overwrite earlier writes from the same render-state snapshot.
+
+### 6. Tests Required
+
+- Unit test active/overflow thread selection and discovery-point payload builders.
+- Regression test that saved rich incoming discovery points leave derived storage-jar summaries unchanged.
+- Browser check `/rich-incoming` direct route, Record entry, Return-To-Self completion entry, save-to-topics, no-save finish, and 360px layout.
