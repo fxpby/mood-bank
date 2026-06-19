@@ -60,7 +60,11 @@ Completed project Trellis guidelines by documenting the no-backend boundary, ref
 
 ### Main Changes
 
-(Add details)
+- Replaced the `/draft-check` placeholder with a real draft input -> six-step self-check -> recommendation flow.
+- Added deterministic draft-check domain rules and focused tests for recommendations, save payloads, and no default account impact.
+- Enabled explicit save actions for discovery points, drafts, private records, Return-To-Self, and no-save completion.
+- Updated Home copy so `草稿自检` no longer appears as a future placeholder.
+- Recorded the Draft Self Check state-management contract in the frontend spec.
 
 ### Git Commits
 
@@ -316,6 +320,45 @@ Added a real Signal Check flow from Home with target/good/absent/action steps, n
 - [OK] `npm run build`
 - [OK] Forbidden copy/network scan
 - [OK] Browser verification for Home entry, non-checking save, checking save, no-save completion, and 360px layout
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 9: Draft self check flow
+
+**Date**: 2026-06-19
+**Task**: Draft self check flow
+**Branch**: `main`
+
+### Summary
+
+Implemented the local draft self-check route with deterministic recommendations, explicit save actions for topics/drafts/private records, no default account impacts, and browser-verified mobile behavior.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `de465d9` | feat: add draft self check flow |
+| `d0d0d9d` | chore: record draft self check task |
+| `8d1868f` | chore(task): archive draft-self-check-flow |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden copy/network/debug scan
+- [OK] Browser verified: ready recommendation, save topic, save draft, private record conversion, Return-To-Self, no-save finish, 360px no horizontal overflow, no console warnings/errors
 
 ### Status
 

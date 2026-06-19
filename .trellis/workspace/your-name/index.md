@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 8
+- **Total Sessions**: 9
 - **Last Active**: 2026-06-19
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~317 | Active |
+| `journal-1.md` | ~361 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 9 | 2026-06-19 | Draft self check flow | `de465d9`, `d0d0d9d`, `8d1868f` | `main` |
 | 8 | 2026-06-19 | Signal check flow | `542f338`, `c04a5c3` | `main` |
 | 7 | 2026-06-19 | Record list detail | `c988b28`, `d1dfd66` | `main` |
 | 6 | 2026-06-19 | Topic detail review | `65e5408` | `main` |
