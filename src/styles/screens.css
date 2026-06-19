@@ -506,8 +506,16 @@
   line-height: 1.45;
 }
 
-.anchor-preview__source {
+.anchor-preview__actions {
+  display: grid;
+  gap: var(--space-2);
   margin-top: var(--space-3);
+}
+
+.anchor-preview__return,
+.anchor-preview__source {
+  justify-content: center;
+  width: 100%;
 }
 
 .latest-record {

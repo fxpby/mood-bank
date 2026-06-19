@@ -1,4 +1,4 @@
-import { Compass, NotebookPen } from "lucide-react";
+import { Compass, HeartHandshake, NotebookPen } from "lucide-react";
 import { AccountSummaryCard } from "../components/AccountSummaryCard";
 import { PageHeader } from "../components/PageHeader";
 import { PrimaryActionPanel } from "../components/PrimaryActionPanel";
@@ -102,16 +102,26 @@ export function HomePage({ navigate }: HomePageProps) {
       <section className="anchor-preview">
         <span>今天的锚点</span>
         <p>{latestAnchorText}</p>
-        {latestAnchorSourceRoute ? (
+        <div className="anchor-preview__actions">
           <button
-            className="button button--secondary anchor-preview__source"
+            className="button button--primary anchor-preview__return"
             type="button"
-            onClick={() => navigate(latestAnchorSourceRoute)}
+            onClick={() => navigate("/return-to-self")}
           >
-            <NotebookPen size={16} strokeWidth={1.8} />
-            打开来源记录
+            <HeartHandshake size={16} strokeWidth={1.8} />
+            带着这句回到自己
           </button>
-        ) : null}
+          {latestAnchorSourceRoute ? (
+            <button
+              className="button button--secondary anchor-preview__source"
+              type="button"
+              onClick={() => navigate(latestAnchorSourceRoute)}
+            >
+              <NotebookPen size={16} strokeWidth={1.8} />
+              打开来源记录
+            </button>
+          ) : null}
+        </div>
       </section>
     </section>
   );
