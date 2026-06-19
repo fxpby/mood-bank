@@ -779,3 +779,42 @@ Added a source-record action to episode-sourced account detail rows.
 ### Next Steps
 
 - None - task complete
+
+
+## Session 20: Personal Action Quick Record Prefill
+
+**Date**: 2026-06-19
+**Task**: Personal Action Quick Record Prefill
+**Branch**: `main`
+
+### Summary
+
+Added route-state Quick Record prefill from completed Personal Action and covered it with a domain regression test.
+
+### Main Changes
+
+- Added `buildPersonalActionQuickRecordPrefill(...)` for completed Personal Actions.
+- Wired `/experiments` `记录一下` to open `/record/new` with route-state prefill.
+- Kept Personal Action completion route-local and avoided automatic account-impacting next actions.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `fa5a240` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] forbidden product/network scan
+- [OK] browser verified `/experiments` -> `记录一下` -> `/record/new` prefill
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
