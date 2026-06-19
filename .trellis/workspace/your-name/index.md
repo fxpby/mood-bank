@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 11
+- **Total Sessions**: 12
 - **Last Active**: 2026-06-19
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~446 | Active |
+| `journal-1.md` | ~488 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 12 | 2026-06-19 | Emotion calibration flow | `7e94e77`, `0106719` | `main` |
 | 11 | 2026-06-19 | Rich incoming review flow | `2bbca1f`, `7d8ffd0` | `main` |
 | 10 | 2026-06-19 | Personal action menu page | `cafdd5a`, `cd77015`, `599859c` | `main` |
 | 9 | 2026-06-19 | Draft self check flow | `de465d9`, `d0d0d9d`, `8d1868f` | `main` |

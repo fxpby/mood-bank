@@ -452,3 +452,46 @@ Added a rich incoming review flow for dense incoming messages, with explicit dis
 ### Next Steps
 
 - None - task complete
+
+
+## Session 12: Emotion calibration flow
+
+**Date**: 2026-06-19
+**Task**: Emotion calibration flow
+**Branch**: `main`
+
+### Summary
+
+Added a P2-light emotion calibration flow that reframes one strong emotion as a signal/protector and optionally saves one discovery point without account impacts.
+
+### Main Changes
+
+- Added `/emotion-calibration` as a compact P2-light local flow.
+- Added domain helpers for emotion, signal/protection, impulse, wise action, summary copy, and discovery-point payloads.
+- Added Home entry "校准一个情绪" without changing trigger-first hierarchy.
+- Added explicit discovery-point save with no account impacts and honest storage-result handling.
+- Documented the Emotion Calibration state contract in frontend state-management spec.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `7e94e77` | feat: add emotion calibration flow |
+| `0106719` | chore: record emotion calibration task |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden copy/network scan had no hits.
+- [OK] `curl -I http://127.0.0.1:5176/emotion-calibration` returned 200 while the temporary dev server was running.
+- [WARN] Full in-app browser click verification was not completed because the browser plugin stalled on external telemetry retries in the prior run; local route availability and automated checks passed.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
