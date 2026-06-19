@@ -88,6 +88,14 @@ export function HomePage({ navigate }: HomePageProps) {
           <span>最近存下</span>
           <h2>{latestEpisode.title}</h2>
           <p>{latestEpisode.facts}</p>
+          <button
+            className="button button--secondary latest-record__open"
+            type="button"
+            onClick={() => navigate(buildRecordRoute(latestEpisode.id))}
+          >
+            <NotebookPen size={16} strokeWidth={1.8} />
+            打开详情
+          </button>
         </section>
       ) : null}
 

@@ -547,6 +547,11 @@
   overflow-wrap: anywhere;
 }
 
+.latest-record__open {
+  justify-self: start;
+  margin-top: var(--space-1);
+}
+
 .record-list,
 .record-empty {
   display: grid;
