@@ -34,6 +34,7 @@ import {
 import { buildQuickRecordImpacts, buildReturnToSelfImpacts } from "../domain/accounts";
 import {
   addDiscoveryPointToState,
+  addDiscoveryPointsToState,
   buildDiscoveryPoint,
   updateDiscoveryPointStatusInState,
 } from "../domain/topics";
@@ -54,6 +55,7 @@ export type AppActions = {
   saveReturnToSelfPractice(input: ReturnToSelfInput): StoreWriteResult<ReturnToSelfPractice>;
   saveTriggerCompletion(input: TriggerCompletionInput): StoreWriteResult | StoreNoWriteResult;
   saveDiscoveryPoint(input: DiscoveryPointInput): StoreWriteResult<DiscoveryPoint>;
+  saveDiscoveryPoints(input: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoint[]>;
   updateDiscoveryPointStatus(input: DiscoveryPointStatusInput): StoreWriteResult<DiscoveryPoint>;
   saveDraft(input: DraftInput): StoreWriteResult<Draft>;
   deleteDraft(draftId: string): StoreWriteResult;
@@ -290,6 +292,25 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [commitState, state],
   );
 
+  const saveDiscoveryPoints = useCallback(
+    (inputs: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoint[]> => {
+      const timestamp = nowIso();
+
+      if (!inputs.length) {
+        return { ok: true, savedAt: timestamp, value: [] };
+      }
+
+      const { state: nextState, points } = addDiscoveryPointsToState(state, inputs, {
+        ids: inputs.map(() => createId("topic")),
+        timestamp,
+      });
+      const result = commitState(nextState);
+
+      return result.ok ? { ...result, value: points } : result;
+    },
+    [commitState, state],
+  );
+
   const updateDiscoveryPointStatus = useCallback(
     (input: DiscoveryPointStatusInput): StoreWriteResult<DiscoveryPoint> => {
       const timestamp = nowIso();
@@ -359,6 +380,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         };
       },
       saveDiscoveryPoint,
+      saveDiscoveryPoints,
       updateDiscoveryPointStatus,
       saveDraft,
       deleteDraft,
@@ -372,6 +394,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveDraft,
       deleteDraft,
       saveDiscoveryPoint,
+      saveDiscoveryPoints,
       saveQuickRecord,
       saveReturnToSelfPractice,
       updateDiscoveryPointStatus,

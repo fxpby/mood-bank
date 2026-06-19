@@ -26,6 +26,27 @@ export function addDiscoveryPointToState(
   };
 }
 
+export function addDiscoveryPointsToState(
+  state: AppState,
+  inputs: DiscoveryPointInput[],
+  options: { ids: string[]; timestamp: string },
+): { state: AppState; points: DiscoveryPoint[] } {
+  const points = inputs.map((input, index) =>
+    buildDiscoveryPoint(input, {
+      id: options.ids[index] ?? `topic_${index + 1}`,
+      timestamp: options.timestamp,
+    }),
+  );
+
+  return {
+    points,
+    state: {
+      ...state,
+      topics: [...points, ...state.topics],
+    },
+  };
+}
+
 export function updateDiscoveryPointStatusInState(
   state: AppState,
   input: DiscoveryPointStatusInput,

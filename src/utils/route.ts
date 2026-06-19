@@ -13,6 +13,7 @@ export type AppRoute =
   | "/experiments"
   | "/signal-check"
   | "/draft-check"
+  | "/rich-incoming"
   | "/accounts/connection"
   | "/accounts/self"
   | "/accounts/energy";
@@ -44,6 +45,7 @@ export function normalizeRoute(pathname: string): AppRoute {
     "/experiments",
     "/signal-check",
     "/draft-check",
+    "/rich-incoming",
   ];
 
   return knownRoutes.includes(cleanPath as AppRoute) ? (cleanPath as AppRoute) : "/";

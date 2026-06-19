@@ -42,6 +42,10 @@ describe("route helpers", () => {
     expect(buildRecordRoute("episode with space")).toBe("/record/episode%20with%20space");
   });
 
+  it("recognizes the rich incoming review route", () => {
+    expect(normalizeRoute("/rich-incoming")).toBe("/rich-incoming");
+  });
+
   it("keeps unknown routes on the home fallback", () => {
     expect(normalizeRoute("/not-real")).toBe("/");
   });

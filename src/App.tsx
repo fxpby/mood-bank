@@ -9,6 +9,7 @@ import { PlaceholderPage } from "./routes/PlaceholderPage";
 import { QuickRecordPage } from "./routes/QuickRecordPage";
 import { RecordDetailPage } from "./routes/RecordDetailPage";
 import { RecordPage } from "./routes/RecordPage";
+import { RichIncomingPage } from "./routes/RichIncomingPage";
 import { ReturnToSelfPage } from "./routes/ReturnToSelfPage";
 import { SettingsPage } from "./routes/SettingsPage";
 import { SignalCheckPage } from "./routes/SignalCheckPage";
@@ -103,6 +104,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/draft-check") {
     return <DraftCheckPage navigate={navigate} />;
+  }
+
+  if (route === "/rich-incoming") {
+    return <RichIncomingPage navigate={navigate} />;
   }
 
   if (route === "/topics") {

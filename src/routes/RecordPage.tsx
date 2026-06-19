@@ -1,4 +1,4 @@
-import { NotebookPen } from "lucide-react";
+import { MessageSquareText, NotebookPen } from "lucide-react";
 import { PageHeader } from "../components/PageHeader";
 import { episodeSourceCopy } from "../copy/episodes";
 import { selectEpisodesNewestFirst } from "../domain/selectors";
@@ -17,6 +17,14 @@ export function RecordPage({ navigate }: RecordPageProps) {
   return (
     <section className="record-page page-stack">
       <PageHeader title="记录" kicker="先存事实和感受，不急着判定关系。" />
+
+      <button className="record-action record-action--soft" type="button" onClick={() => navigate("/rich-incoming")}>
+        <MessageSquareText size={20} strokeWidth={1.8} />
+        <span>
+          <strong>收到一段很长/很暖/信息很多的话</strong>
+          <small>先拆线索，不急着一次回应全部。</small>
+        </span>
+      </button>
 
       {episodes.length ? (
         <section className="record-list panel">

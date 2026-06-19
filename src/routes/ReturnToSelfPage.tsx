@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { MessageSquareText } from "lucide-react";
 import { CompletionCard } from "../components/CompletionCard";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { StepScreen } from "../components/StepScreen";
@@ -254,6 +255,10 @@ export function ReturnToSelfPage({ navigate }: ReturnToSelfPageProps) {
         </button>
         <button className="button button--secondary" type="button" onClick={() => setStep("body")}>
           再做一次
+        </button>
+        <button className="button button--secondary" type="button" onClick={() => navigate("/rich-incoming")}>
+          <MessageSquareText size={16} strokeWidth={1.8} />
+          我收到很多内容，不知道怎么接
         </button>
       </CompletionCard>
     </section>

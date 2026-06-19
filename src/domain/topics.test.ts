@@ -4,6 +4,7 @@ import { buildQuickRecordImpacts, deriveAllAccountSummaries } from "./accounts";
 import { createInitialState } from "./defaults";
 import {
   addDiscoveryPointToState,
+  addDiscoveryPointsToState,
   buildDiscoveryPoint,
   updateDiscoveryPointStatusInState,
 } from "./topics";
@@ -70,6 +71,34 @@ describe("discovery point state helpers", () => {
       status: "stored_for_later",
       sourceType: "manual",
     });
+  });
+
+  it("adds multiple discovery points in one state transition", () => {
+    const state = addDiscoveryPointToState(
+      createInitialState(),
+      { spaceId, title: "已经存在的点", kind: "discovery" },
+      { id: "topic_existing", timestamp },
+    ).state;
+
+    const result = addDiscoveryPointsToState(
+      state,
+      [
+        { spaceId, title: "价值观线索", kind: "discovery", sourceType: "rich_incoming" },
+        { spaceId, title: "稍后话题", kind: "topic", sourceType: "rich_incoming" },
+      ],
+      {
+        ids: ["topic_new_1", "topic_new_2"],
+        timestamp: "2026-06-18T13:00:00.000Z",
+      },
+    );
+
+    expect(result.points.map((point) => point.id)).toEqual(["topic_new_1", "topic_new_2"]);
+    expect(result.state.topics.map((point) => point.title)).toEqual([
+      "价值观线索",
+      "稍后话题",
+      "已经存在的点",
+    ]);
+    expect(result.state.topics.every((point) => point.status === "stored_for_later")).toBe(true);
   });
 
   it("updates only the selected discovery point status", () => {
