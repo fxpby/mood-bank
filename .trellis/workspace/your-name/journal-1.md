@@ -48,6 +48,49 @@ Implemented the trigger-first local PWA, quick record draft recovery, P0 docs, a
 - None - task complete
 
 
+## Session 25: Design system alignment
+
+**Date**: 2026-06-19
+**Task**: Design system alignment
+**Branch**: `main`
+
+### Summary
+
+Aligned the PRD design contract and the mobile PWA styling with the Emotional Ceramic / Functional Calm direction from `DESIGN.md` and the local `figma/v1.fig` preview.
+
+### Main Changes
+
+- Updated the archived main PRD visual token/component contract to Emotional Ceramic.
+- Recorded that the current Return-To-Self implementation remains a 4-step flow plus completion; older 3-step PRD examples are layout sketches only.
+- Reworked global tokens for linen background, ceramic white surfaces, Self green, Connection terracotta, Energy slate blue, Manrope-first typography, 12px cards/inputs, pill controls, 48px touch targets, and shallow ceramic shadows.
+- Updated shared and screen-level CSS across Home, Return-To-Self, Account Detail, Topics, Record, Draft Check, Experiments, and Setup without changing React logic.
+- Documented offline Figma inspection limits and kept any unconfirmed design-logic differences out of implementation.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `c562c25` | feat: align UI with emotional ceramic design |
+| `0d2bc10` | chore: record design system alignment task |
+| `0727931` | chore(task): archive design system alignment |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test` (12 files, 93 tests)
+- [OK] `npm run build`
+- [OK] forbidden product/network pattern scan
+- [OK] browser mobile check at `390x844` for `/home`, `/return-to-self`, `/accounts/self`, `/topics`, `/record`, `/draft-check`, `/experiments`, and `/setup`
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- User-provided `DESIGN.md` and `figma/` remain untracked inputs unless the project decides to track design source assets.
+
+
 ## Session 2: Bootstrap project guidelines
 
 **Date**: 2026-06-18
