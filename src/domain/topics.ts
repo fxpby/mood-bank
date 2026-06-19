@@ -2,6 +2,7 @@ import type {
   AppState,
   DiscoveryPoint,
   DiscoveryPointInput,
+  DiscoveryPointReviewNoteInput,
   DiscoveryPointStatusInput,
 } from "./types";
 
@@ -61,6 +62,34 @@ export function updateDiscoveryPointStatusInState(
     updatedPoint = {
       ...point,
       status: input.status,
+      updatedAt: timestamp,
+    };
+    return updatedPoint;
+  });
+
+  return {
+    point: updatedPoint,
+    state: {
+      ...state,
+      topics,
+    },
+  };
+}
+
+export function updateDiscoveryPointNoteInState(
+  state: AppState,
+  input: DiscoveryPointReviewNoteInput,
+  timestamp: string,
+): { state: AppState; point?: DiscoveryPoint } {
+  let updatedPoint: DiscoveryPoint | undefined;
+  const topics = state.topics.map((point) => {
+    if (point.id !== input.id) {
+      return point;
+    }
+
+    updatedPoint = {
+      ...point,
+      note: cleanOptional(input.note),
       updatedAt: timestamp,
     };
     return updatedPoint;

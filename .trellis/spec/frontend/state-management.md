@@ -71,6 +71,7 @@ Required action behavior:
 | `saveDiscoveryPoint` | Yes | Creates a manual or source-linked discovery point. Must not create account impacts by default. |
 | `saveDiscoveryPoints` | Yes | Creates multiple discovery points in one commit. Must not create account impacts by default. |
 | `updateDiscoveryPointStatus` | Yes | Updates one discovery point status. Unknown ids return no-op success. Must not create account impacts. |
+| `updateDiscoveryPointReviewNote` | Yes | Updates one discovery point note for later review. Unknown ids return no-op success. Must not create account impacts or auto-change status. |
 | `saveDraft` | Yes | Saves route draft data only; drafts never create account impacts. |
 | `deleteDraft` | Yes | No-op success if the draft is already absent. |
 | `resetLocalData` | Yes | Resets storage only after adapter reset succeeds. |
@@ -142,9 +143,75 @@ const result = actions.saveQuickRecord(input);
 ```ts
 actions.saveDiscoveryPoint(input);
 actions.updateDiscoveryPointStatus({ id, status });
+actions.updateDiscoveryPointReviewNote({ id, note });
 ```
 
 Saving or reviewing a discovery point must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Tests should assert that topic helpers leave derived storage-jar summaries unchanged.
+
+### Scenario: Topic Detail Updates A Review Note
+
+#### 1. Scope / Trigger
+
+- Trigger: `/topics/<id>` lets the user return to a discovery point and save a lightweight review note.
+- Scope: route-local textarea state -> `actions.updateDiscoveryPointReviewNote(...)` -> one `DiscoveryPoint.note` update.
+
+#### 2. Signatures
+
+```ts
+type DiscoveryPointReviewNoteInput = {
+  id: string;
+  note: string;
+};
+
+updateDiscoveryPointReviewNote(input: DiscoveryPointReviewNoteInput): StoreWriteResult<DiscoveryPoint>;
+```
+
+#### 3. Contracts
+
+- The route may initialize textarea state from `point.note`, but the durable write must happen through `actions.updateDiscoveryPointReviewNote(...)`.
+- The store action updates only `note` and `updatedAt` on the matched discovery point.
+- Blank or whitespace-only note input clears `point.note`.
+- Saving a review note must not auto-change `status`, create `AccountImpact`, create an episode, or create an experiment/action record.
+- Unknown ids return no-op success, matching discovery-point status update behavior.
+
+#### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| Existing topic id + non-empty note | Update that point's `note` and `updatedAt`. |
+| Existing topic id + blank note | Clear that point's `note` and update `updatedAt`. |
+| Unknown topic id | Return no-op success; do not write storage. |
+| Storage save fails | Return/show honest failure copy and do not claim the note was saved. |
+
+#### 5. Good/Base/Bad Cases
+
+- Good: user opens a saved discovery point, adds one new reflection, saves, and later sees the updated note without account movement.
+- Base: user only changes topic status; review note stays unchanged.
+- Bad: note save also marks the point reviewed, creates an account impact, or persists a separate backlog/history model without an explicit PRD.
+
+#### 6. Tests Required
+
+- Unit test that the helper updates only the selected discovery point note.
+- Unit test that blank input clears the note.
+- Regression test that note updates leave derived storage-jar summaries unchanged.
+
+#### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+actions.updateDiscoveryPointStatus({ id, status: "reviewed" });
+actions.saveDiscoveryPoint({ spaceId, title: note, kind: "discovery" });
+```
+
+#### Correct
+
+```ts
+const result = actions.updateDiscoveryPointReviewNote({ id, note });
+if (result.ok) {
+  setReviewMessage("补记已存下，只更新了这个发现点。");
+}
+```
 
 ## Scenario: Quick Record Captures A Later Topic
 

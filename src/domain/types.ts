@@ -304,6 +304,11 @@ export type DiscoveryPointStatusInput = {
   status: DiscoveryPointStatus;
 };
 
+export type DiscoveryPointReviewNoteInput = {
+  id: string;
+  note: string;
+};
+
 export type DraftInput = {
   draftId?: string;
   spaceId: string;

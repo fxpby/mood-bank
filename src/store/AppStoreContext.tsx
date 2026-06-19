@@ -13,6 +13,7 @@ import type {
   DailyMarketInput,
   DiscoveryPoint,
   DiscoveryPointInput,
+  DiscoveryPointReviewNoteInput,
   DiscoveryPointStatusInput,
   Draft,
   DraftInput,
@@ -36,6 +37,7 @@ import {
   addDiscoveryPointToState,
   addDiscoveryPointsToState,
   buildDiscoveryPoint,
+  updateDiscoveryPointNoteInState,
   updateDiscoveryPointStatusInState,
 } from "../domain/topics";
 
@@ -57,6 +59,7 @@ export type AppActions = {
   saveDiscoveryPoint(input: DiscoveryPointInput): StoreWriteResult<DiscoveryPoint>;
   saveDiscoveryPoints(input: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoint[]>;
   updateDiscoveryPointStatus(input: DiscoveryPointStatusInput): StoreWriteResult<DiscoveryPoint>;
+  updateDiscoveryPointReviewNote(input: DiscoveryPointReviewNoteInput): StoreWriteResult<DiscoveryPoint>;
   saveDraft(input: DraftInput): StoreWriteResult<Draft>;
   deleteDraft(draftId: string): StoreWriteResult;
   resetLocalData(): StoreWriteResult;
@@ -326,6 +329,21 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [commitState, state],
   );
 
+  const updateDiscoveryPointReviewNote = useCallback(
+    (input: DiscoveryPointReviewNoteInput): StoreWriteResult<DiscoveryPoint> => {
+      const timestamp = nowIso();
+      const { state: nextState, point } = updateDiscoveryPointNoteInState(state, input, timestamp);
+
+      if (!point) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const result = commitState(nextState);
+      return result.ok ? { ...result, value: point } : result;
+    },
+    [commitState, state],
+  );
+
   const deleteDraft = useCallback(
     (draftId: string): StoreWriteResult => {
       if (!state.drafts.some((draft) => draft.id === draftId)) {
@@ -382,6 +400,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveDiscoveryPoint,
       saveDiscoveryPoints,
       updateDiscoveryPointStatus,
+      updateDiscoveryPointReviewNote,
       saveDraft,
       deleteDraft,
       resetLocalData,
@@ -398,6 +417,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveQuickRecord,
       saveReturnToSelfPractice,
       updateDiscoveryPointStatus,
+      updateDiscoveryPointReviewNote,
       updateDailyMarket,
     ],
   );

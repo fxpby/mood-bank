@@ -1,5 +1,5 @@
-import { ArrowLeft, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowLeft, Save, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import {
   discoveryPointKindCopy,
@@ -34,14 +34,25 @@ const detailStatusActions: Array<{ status: DiscoveryPointStatus; label: string; 
 ];
 
 export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
-  const { state, actions, status, lastError } = useAppStore();
+  const { state, actions } = useAppStore();
   const topicId = getTopicRouteId(window.location.pathname);
   const point = useMemo(
     () => state.topics.find((item) => item.id === topicId),
     [state.topics, topicId],
   );
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
+  const [reviewMessage, setReviewMessage] = useState<string | null>(null);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [reviewNote, setReviewNote] = useState("");
+
+  useEffect(() => {
+    setReviewNote(point?.note ?? "");
+    setStatusMessage(null);
+    setStatusError(null);
+    setReviewMessage(null);
+    setReviewError(null);
+  }, [point?.id]);
 
   function updateStatus(nextStatus: DiscoveryPointStatus) {
     if (!point) return;
@@ -49,13 +60,37 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
     const result = actions.updateDiscoveryPointStatus({ id: point.id, status: nextStatus });
 
     if (!result.ok) {
-      setError(result.error ?? "这次还没有更新成功。");
-      setMessage(null);
+      setStatusError(result.error ?? "这次还没有更新成功。");
+      setStatusMessage(null);
       return;
     }
 
-    setError(null);
-    setMessage(`已标记为：${discoveryPointStatusCopy[nextStatus]}`);
+    setStatusError(null);
+    setStatusMessage(`已标记为：${discoveryPointStatusCopy[nextStatus]}`);
+  }
+
+  function saveReviewNote() {
+    if (!point) return;
+
+    const result = actions.updateDiscoveryPointReviewNote({
+      id: point.id,
+      note: reviewNote,
+    });
+
+    if (!result.ok) {
+      setReviewError(result.error ?? "这次还没有保存成功，补记还没有写进本机。");
+      setReviewMessage(null);
+      return;
+    }
+
+    const savedNote = result.value?.note ?? "";
+    setReviewNote(savedNote);
+    setReviewError(null);
+    setReviewMessage(
+      savedNote
+        ? "补记已存下，只更新了这个发现点。"
+        : "补记已清空，只更新了这个发现点。",
+    );
   }
 
   if (!point) {
@@ -140,6 +175,29 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
 
       <section className="panel page-stack">
         <div className="section-heading">
+          <h2>回看补记</h2>
+          <p>把这次多看见的一点留在这个点里，不需要写完整。</p>
+        </div>
+        <label className="field">
+          <span className="field-label">一点新的看见，可空着</span>
+          <textarea
+            className="field-textarea"
+            value={reviewNote}
+            rows={4}
+            onChange={(event) => setReviewNote(event.target.value)}
+            placeholder="例如：我现在发现，这个点其实是在提醒我慢一点。"
+          />
+        </label>
+        <button className="button button--primary" type="button" onClick={saveReviewNote}>
+          <Save size={16} strokeWidth={1.8} />
+          存下补记
+        </button>
+        {reviewMessage ? <p className="helper-text">{reviewMessage}</p> : null}
+        {reviewError ? <p className="form-error">{reviewError}</p> : null}
+      </section>
+
+      <section className="panel page-stack">
+        <div className="section-heading">
           <h2>现在怎么放它</h2>
           <p>只改这个点的状态，不会改变任何账户明细。</p>
         </div>
@@ -157,9 +215,8 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
             </button>
           ))}
         </div>
-        {message ? <p className="helper-text">{message}</p> : null}
-        {error ? <p className="form-error">{error}</p> : null}
-        {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
+        {statusMessage ? <p className="helper-text">{statusMessage}</p> : null}
+        {statusError ? <p className="form-error">{statusError}</p> : null}
       </section>
 
       <button className="button button--secondary" type="button" onClick={() => navigate("/topics")}>

@@ -6,6 +6,7 @@ import {
   addDiscoveryPointToState,
   addDiscoveryPointsToState,
   buildDiscoveryPoint,
+  updateDiscoveryPointNoteInState,
   updateDiscoveryPointStatusInState,
 } from "./topics";
 import type { AppState, Episode } from "./types";
@@ -145,6 +146,81 @@ describe("discovery point state helpers", () => {
     );
 
     expect(updated.point?.status).toBe("reviewed");
+    expect(deriveAllAccountSummaries(updated.state)).toEqual(before);
+  });
+
+  it("updates only the selected discovery point note", () => {
+    const withTopics = [
+      ["topic_1", "语言切换像缓冲"],
+      ["topic_2", "失眠里的复盘"],
+    ].reduce(
+      (state, [id, title]) =>
+        addDiscoveryPointToState(
+          state,
+          { spaceId, title, kind: "discovery", note: `${title}的旧备注` },
+          { id, timestamp },
+        ).state,
+      createInitialState(),
+    );
+
+    const updated = updateDiscoveryPointNoteInState(
+      withTopics,
+      { id: "topic_1", note: "回看时发现它也在保护节奏。" },
+      "2026-06-18T14:00:00.000Z",
+    );
+
+    expect(updated.point).toMatchObject({
+      id: "topic_1",
+      note: "回看时发现它也在保护节奏。",
+      updatedAt: "2026-06-18T14:00:00.000Z",
+    });
+    expect(updated.state.topics.find((point) => point.id === "topic_2")?.note).toBe(
+      "失眠里的复盘的旧备注",
+    );
+  });
+
+  it("clears a discovery point note with blank review input", () => {
+    const withTopic = addDiscoveryPointToState(
+      createInitialState(),
+      {
+        spaceId,
+        title: "语言切换像缓冲",
+        kind: "discovery",
+        note: "旧备注",
+      },
+      { id: "topic_1", timestamp },
+    ).state;
+
+    const updated = updateDiscoveryPointNoteInState(
+      withTopic,
+      { id: "topic_1", note: "   " },
+      "2026-06-18T14:00:00.000Z",
+    );
+
+    expect(updated.point?.note).toBeUndefined();
+  });
+
+  it("note review updates do not affect derived storage jar summaries", () => {
+    const stateWithTopic = addDiscoveryPointToState(
+      createInitialState(),
+      {
+        spaceId,
+        title: "语言切换像缓冲",
+        kind: "discovery",
+        sourceType: "trigger",
+        note: "旧备注",
+      },
+      { id: "topic_1", timestamp },
+    ).state;
+    const before = deriveAllAccountSummaries(stateWithTopic);
+
+    const updated = updateDiscoveryPointNoteInState(
+      stateWithTopic,
+      { id: "topic_1", note: "新的看见" },
+      "2026-06-18T14:00:00.000Z",
+    );
+
+    expect(updated.point?.note).toBe("新的看见");
     expect(deriveAllAccountSummaries(updated.state)).toEqual(before);
   });
 
