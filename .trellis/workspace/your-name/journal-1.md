@@ -257,7 +257,9 @@ Added full record archive, record detail route, localized account impact evidenc
 
 ### Main Changes
 
-(Add details)
+- Replaced the latest-record placeholder with a newest-first record archive.
+- Added `/record/:id` with source content, localized account impact reasons/evidence, linked discovery points, and missing-record recovery.
+- Added record route helpers, selector tests, route tests, and dynamic route spec updates.
 
 ### Git Commits
 
@@ -273,6 +275,47 @@ Added full record archive, record detail route, localized account impact evidenc
 - [OK] `npm run build`
 - [OK] Forbidden copy/network scan
 - [OK] Browser verification for list, detail refresh, linked topic, missing id, and 360px layout
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 8: Signal check flow
+
+**Date**: 2026-06-19
+**Task**: Signal check flow
+**Branch**: `main`
+
+### Summary
+
+Added a real Signal Check flow from Home with target/good/absent/action steps, non-shaming checking path, optional discovery-point save, no account impacts, tests, spec contract, and browser verification.
+
+### Main Changes
+
+- Replaced the `/signal-check` placeholder with a four-step buffering flow.
+- Added non-checking and checking-anyway completion paths with non-shaming copy.
+- Added optional save to `/topics` through `DiscoveryPoint`, with no account impacts.
+- Added signal-check domain copy/helpers, focused tests, styles, and state-management spec contract.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `542f338` | feat: add signal check flow |
+| `c04a5c3` | chore: record signal check task |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden copy/network scan
+- [OK] Browser verification for Home entry, non-checking save, checking save, no-save completion, and 360px layout
 
 ### Status
 
