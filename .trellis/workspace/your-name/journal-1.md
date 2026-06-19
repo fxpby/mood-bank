@@ -553,7 +553,9 @@ Added a Topic Detail save-anchor flow, a reusable anchor store action/domain hel
 
 ### Main Changes
 
-(Add details)
+- Added a Topic Detail save-anchor action for preserving review insights.
+- Added reusable anchor persistence through the app store and domain helper.
+- Verified saved anchors appear on Home without changing topic or account summaries.
 
 ### Git Commits
 
@@ -569,6 +571,46 @@ Added a Topic Detail save-anchor flow, a reusable anchor store action/domain hel
 - [OK] `npm run build`
 - [OK] Forbidden product-copy scan against `src`
 - [OK] Browser check on topic detail anchor save and Home anchor display
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 15: Topic source record link
+
+**Date**: 2026-06-19
+**Task**: Topic source record link
+**Branch**: `main`
+
+### Summary
+
+Added a Topic Detail source-record navigation action for episode-linked topics and verified it in browser.
+
+### Main Changes
+
+- Added conditional `打开来源记录` navigation on Topic Detail for episode-linked topics.
+- Reused the existing `buildRecordRoute(...)` helper without changing persistence or topic data.
+- Verified draft-check topics do not show the source-record action, while episode-sourced topics navigate back to Record Detail.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `c147443` | (see git log) |
+| `0396215` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden product-copy scan against `src`
+- [OK] Browser route check for source-record navigation
 
 ### Status
 

@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 14
+- **Total Sessions**: 15
 - **Last Active**: 2026-06-19
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~572 | Active |
+| `journal-1.md` | ~613 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 15 | 2026-06-19 | Topic source record link | `c147443`, `0396215` | `main` |
 | 14 | 2026-06-19 | Topic detail anchor save | `fbf3f41`, `5757cb5` | `main` |
 | 13 | 2026-06-19 | Topic review note | `e90b06b`, `6eededf` | `main` |
 | 12 | 2026-06-19 | Emotion calibration flow | `7e94e77`, `0106719` | `main` |
