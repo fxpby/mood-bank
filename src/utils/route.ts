@@ -6,6 +6,7 @@ export type AppRoute =
   | "/return-to-self"
   | "/record"
   | "/record/new"
+  | `/record/${string}`
   | "/settings"
   | "/topics"
   | `/topics/${string}`
@@ -24,6 +25,8 @@ export function normalizeRoute(pathname: string): AppRoute {
   if (pathname.startsWith("/accounts/connection")) return "/accounts/connection";
   if (pathname.startsWith("/accounts/self")) return "/accounts/self";
   if (pathname.startsWith("/accounts/energy")) return "/accounts/energy";
+  const recordRoute = getNormalizedRecordRoute(pathname);
+  if (recordRoute) return recordRoute;
   const topicRoute = getNormalizedTopicRoute(pathname);
   if (topicRoute) return topicRoute;
 
@@ -57,6 +60,28 @@ export function getTopicRouteId(pathname: string): string | null {
 
 export function buildTopicRoute(id: string): `/topics/${string}` {
   return `/topics/${encodeURIComponent(id)}`;
+}
+
+export function getRecordRouteId(pathname: string): string | null {
+  const match = pathname.match(/^\/record\/([^/]+)\/?$/);
+  if (!match?.[1] || match[1] === "new") {
+    return null;
+  }
+
+  return decodeURIComponent(match[1]);
+}
+
+export function buildRecordRoute(id: string): `/record/${string}` {
+  return `/record/${encodeURIComponent(id)}`;
+}
+
+function getNormalizedRecordRoute(pathname: string): `/record/${string}` | null {
+  const match = pathname.match(/^\/record\/([^/]+)\/?$/);
+  if (!match?.[1] || match[1] === "new") {
+    return null;
+  }
+
+  return `/record/${encodeURIComponent(decodeURIComponent(match[1]))}`;
 }
 
 function getNormalizedTopicRoute(pathname: string): `/topics/${string}` | null {

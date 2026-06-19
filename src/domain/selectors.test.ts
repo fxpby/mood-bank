@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { accountReasonCopy } from "../copy/accounts";
 import { createInitialState } from "./defaults";
-import { selectAccountDetail } from "./selectors";
-import type { AccountImpact, AppState } from "./types";
+import {
+  selectAccountDetail,
+  selectAccountSummaries,
+  selectEpisodeDetail,
+  selectEpisodesNewestFirst,
+} from "./selectors";
+import type { AccountImpact, AppState, Episode } from "./types";
 
 const spaceId = "space_1";
 const olderAt = "2026-06-18T08:00:00.000Z";
@@ -22,6 +27,26 @@ function impact(
     reason: accountReasonCopy.owned_next_action,
     evidence: "delay_10_min",
     createdAt: olderAt,
+    ...overrides,
+  };
+}
+
+function episode(id: string, overrides: Partial<Episode> = {}): Episode {
+  return {
+    id,
+    spaceId,
+    source: "quick_record",
+    title: "收到一封邮件",
+    facts: "对方具体回应了我的勇气",
+    interpretation: "",
+    emotions: ["warm"],
+    bodySensations: [],
+    connectionLevel: "not_sure",
+    activationLevel: "not_sure",
+    nextAction: "delay_10_min",
+    accountImpacts: [],
+    createdAt: olderAt,
+    updatedAt: olderAt,
     ...overrides,
   };
 }
@@ -157,5 +182,87 @@ describe("selectAccountDetail", () => {
 
     expect(detail.summary.value).toBe(0);
     expect(detail.rows).toEqual([]);
+  });
+});
+
+describe("episode selectors", () => {
+  it("lists saved episodes newest first", () => {
+    const state: AppState = {
+      ...createInitialState(),
+      episodes: [
+        episode("episode_old", { createdAt: olderAt, updatedAt: olderAt }),
+        episode("episode_new", { createdAt: newerAt, updatedAt: newerAt }),
+      ],
+    };
+
+    expect(selectEpisodesNewestFirst(state).map((item) => item.id)).toEqual([
+      "episode_new",
+      "episode_old",
+    ]);
+  });
+
+  it("builds episode detail with localized account rows and linked topics", () => {
+    const state: AppState = {
+      ...createInitialState(),
+      episodes: [
+        episode("episode_1", {
+          accountImpacts: [
+            impact("impact_old", { createdAt: olderAt }),
+            impact("impact_new", { createdAt: newerAt, evidence: "record_facts" }),
+          ],
+        }),
+      ],
+      topics: [
+        {
+          id: "topic_old",
+          spaceId,
+          title: "旧一点的发现",
+          kind: "discovery",
+          status: "stored_for_later",
+          sourceType: "episode",
+          sourceId: "episode_1",
+          createdAt: olderAt,
+          updatedAt: olderAt,
+        },
+        {
+          id: "topic_new",
+          spaceId,
+          title: "新一点的发现",
+          kind: "topic",
+          status: "want_to_understand",
+          sourceType: "episode",
+          sourceId: "episode_1",
+          createdAt: newerAt,
+          updatedAt: newerAt,
+        },
+        {
+          id: "manual_topic",
+          spaceId,
+          title: "手动存下",
+          kind: "question",
+          status: "stored_for_later",
+          sourceType: "manual",
+          createdAt: newerAt,
+          updatedAt: newerAt,
+        },
+      ],
+    };
+
+    const beforeSummaries = selectAccountSummaries(state);
+    const detail = selectEpisodeDetail(state, "episode_1");
+    const afterSummaries = selectAccountSummaries(state);
+
+    expect(detail?.episode.id).toBe("episode_1");
+    expect(detail?.accountRows.map((row) => row.impact.id)).toEqual(["impact_new", "impact_old"]);
+    expect(detail?.accountRows[0]?.evidence).toBe("记录事实");
+    expect(detail?.linkedTopics.map((point) => point.id)).toEqual(["topic_new", "topic_old"]);
+    expect(afterSummaries).toEqual(beforeSummaries);
+  });
+
+  it("returns null for missing episode detail ids", () => {
+    const state = createInitialState();
+
+    expect(selectEpisodeDetail(state, null)).toBeNull();
+    expect(selectEpisodeDetail(state, "missing")).toBeNull();
   });
 });

@@ -5,6 +5,7 @@ import { AccountDetailPage } from "./routes/AccountDetailPage";
 import { HomePage } from "./routes/HomePage";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
 import { QuickRecordPage } from "./routes/QuickRecordPage";
+import { RecordDetailPage } from "./routes/RecordDetailPage";
 import { RecordPage } from "./routes/RecordPage";
 import { ReturnToSelfPage } from "./routes/ReturnToSelfPage";
 import { SettingsPage } from "./routes/SettingsPage";
@@ -79,6 +80,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/record/new") {
     return <QuickRecordPage navigate={navigate} />;
+  }
+
+  if (route.startsWith("/record/")) {
+    return <RecordDetailPage navigate={navigate} />;
   }
 
   if (route === "/settings") {

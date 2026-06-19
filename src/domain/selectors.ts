@@ -12,6 +12,7 @@ import type {
   AccountImpact,
   AppState,
   DailyMarket,
+  DiscoveryPoint,
   EmotionalSpace,
   Episode,
   ReturnToSelfPractice,
@@ -62,6 +63,12 @@ export type AccountDetail = {
   rows: AccountDetailSourceRow[];
 };
 
+export type EpisodeDetail = {
+  episode: Episode;
+  accountRows: AccountDetailSourceRow[];
+  linkedTopics: DiscoveryPoint[];
+};
+
 export function selectAccountDetail(state: AppState, account: AccountId): AccountDetail {
   const impacts = selectAccountImpacts(state).filter((impact) => impact.account === account);
 
@@ -72,7 +79,32 @@ export function selectAccountDetail(state: AppState, account: AccountId): Accoun
 }
 
 export function selectLatestEpisode(state: AppState): Episode | null {
-  return [...state.episodes].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0] ?? null;
+  return selectEpisodesNewestFirst(state)[0] ?? null;
+}
+
+export function selectEpisodesNewestFirst(state: AppState): Episode[] {
+  return [...state.episodes].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export function selectEpisodeDetail(state: AppState, episodeId: string | null): EpisodeDetail | null {
+  if (!episodeId) {
+    return null;
+  }
+
+  const episode = state.episodes.find((item) => item.id === episodeId);
+  if (!episode) {
+    return null;
+  }
+
+  return {
+    episode,
+    accountRows: [...episode.accountImpacts]
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .map((impact) => buildAccountDetailRow(impact, state)),
+    linkedTopics: state.topics
+      .filter((point) => point.sourceType === "episode" && point.sourceId === episode.id)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+  };
 }
 
 function buildAccountDetailRow(impact: AccountImpact, state: AppState): AccountDetailSourceRow {
