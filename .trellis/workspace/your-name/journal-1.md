@@ -619,3 +619,43 @@ Added a Topic Detail source-record navigation action for episode-linked topics a
 ### Next Steps
 
 - None - task complete
+
+
+## Session 16: Record detail anchor entry
+
+**Date**: 2026-06-19
+**Task**: Record detail anchor entry
+**Branch**: `main`
+
+### Summary
+
+Added a Record Detail anchor panel that can show and save episode-linked anchors without changing account movement.
+
+### Main Changes
+
+- Added a Record Detail anchor panel that shows the newest anchor linked to the current episode.
+- Saved record anchors through `actions.saveAnchor(...)` with `sourceType: "episode"` and the current episode id.
+- Added selector and helper tests for episode-linked anchors, plus a state-management spec contract for the pattern.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `80a50ee` | (see git log) |
+| `6b19ca6` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden product-copy scan against `src`
+- [OK] Browser check: save anchor on Record Detail, refresh record, and confirm Home shows the newest anchor
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
