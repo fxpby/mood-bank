@@ -699,3 +699,43 @@ Added a Home anchor source action that opens the source record for episode-linke
 ### Next Steps
 
 - None - task complete
+
+
+## Session 18: Home latest record link
+
+**Date**: 2026-06-19
+**Task**: Home latest record link
+**Branch**: `main`
+
+### Summary
+
+Added a Home latest-record action that opens the latest Record Detail without writing state.
+
+### Main Changes
+
+- Added an `打开详情` action to the Home latest-record preview.
+- Reused `buildRecordRoute(latestEpisode.id)` for typed navigation.
+- Kept the change read-only with no state writes or account-summary changes.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `72e0523` | (see git log) |
+| `74619f3` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden product-copy scan against `src`
+- [OK] Browser check: Home latest-record action opens Record Detail
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
