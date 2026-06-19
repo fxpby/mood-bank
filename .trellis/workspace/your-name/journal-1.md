@@ -512,7 +512,10 @@ Added a topic detail review-note save flow, updated the store/domain contract, v
 
 ### Main Changes
 
-(Add details)
+- Added a Topic Detail "保存为锚点" section with editable anchor text.
+- Added `saveAnchor(...)` to the store boundary and pure anchor state helpers.
+- Added anchor helper tests for trimming, blank no-op behavior, newest-first order, and no storage-jar movement.
+- Documented the anchor write contract in frontend state-management specs.
 
 ### Git Commits
 
@@ -528,6 +531,44 @@ Added a topic detail review-note save flow, updated the store/domain contract, v
 - [OK] `npm run build`
 - [OK] Forbidden product-copy scan against `src`
 - [OK] Browser check on `http://127.0.0.1:5174/topics` and a topic detail route
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 14: Topic detail anchor save
+
+**Date**: 2026-06-19
+**Task**: Topic detail anchor save
+**Branch**: `main`
+
+### Summary
+
+Added a Topic Detail save-anchor flow, a reusable anchor store action/domain helper, tests, spec contract, and browser verification.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `fbf3f41` | (see git log) |
+| `5757cb5` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden product-copy scan against `src`
+- [OK] Browser check on topic detail anchor save and Home anchor display
 
 ### Status
 
