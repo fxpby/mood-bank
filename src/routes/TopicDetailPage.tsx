@@ -1,4 +1,4 @@
-import { ArrowLeft, BookmarkPlus, Save, Sparkles } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, NotebookPen, Save, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import {
@@ -9,7 +9,7 @@ import {
 } from "../copy/topics";
 import type { DiscoveryPoint, DiscoveryPointStatus } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
-import { getTopicRouteId, type AppRoute } from "../utils/route";
+import { buildRecordRoute, getTopicRouteId, type AppRoute } from "../utils/route";
 
 type TopicDetailPageProps = {
   navigate: (route: AppRoute) => void;
@@ -147,6 +147,8 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
 
   const sourceRows = buildSourceRows(point);
   const detailRows = buildDetailRows(point);
+  const sourceRecordRoute =
+    point.sourceType === "episode" && point.sourceId ? buildRecordRoute(point.sourceId) : null;
 
   return (
     <section className="topic-detail-page page-stack">
@@ -183,6 +185,16 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
               </div>
             ))}
           </div>
+          {sourceRecordRoute ? (
+            <button
+              className="button button--secondary"
+              type="button"
+              onClick={() => navigate(sourceRecordRoute)}
+            >
+              <NotebookPen size={16} strokeWidth={1.8} />
+              打开来源记录
+            </button>
+          ) : null}
         </section>
       ) : null}
 
