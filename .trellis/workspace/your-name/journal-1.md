@@ -818,3 +818,42 @@ Added route-state Quick Record prefill from completed Personal Action and covere
 ### Next Steps
 
 - None - task complete
+
+
+## Session 21: Topics Open Saved Point
+
+**Date**: 2026-06-19
+**Task**: Topics Open Saved Point
+**Branch**: `main`
+
+### Summary
+
+Added a route-local shortcut to open the discovery point just saved from the Topics page, with styling and browser verification.
+
+### Main Changes
+
+- Stored the most recently created manual discovery point in route-local state.
+- Added an `打开刚存的点` action after successful Topics creation.
+- Added compact feedback styling so the success message and action wrap cleanly on mobile.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b6dc26a` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] forbidden product/network scan
+- [OK] browser verified `/topics` create -> `打开刚存的点` -> `/topics/:id`
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
