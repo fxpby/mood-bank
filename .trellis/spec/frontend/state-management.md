@@ -452,3 +452,54 @@ saveDiscoveryPoints(input: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoi
 - Unit test active/overflow thread selection and discovery-point payload builders.
 - Regression test that saved rich incoming discovery points leave derived storage-jar summaries unchanged.
 - Browser check `/rich-incoming` direct route, Record entry, Return-To-Self completion entry, save-to-topics, no-save finish, and 360px layout.
+
+## Scenario: Emotion Calibration Saves One Discovery Point Only
+
+### 1. Scope / Trigger
+
+- Trigger: `/emotion-calibration` lets the user reframe one strong emotion as a signal, protector, or care cue before choosing a wiser action.
+- Scope: route-local emotion/signal/impulse/wise-action choices -> `buildEmotionCalibrationDiscoveryPointInput(...)` -> `actions.saveDiscoveryPoint(...)`.
+
+### 2. Signatures
+
+```ts
+type EmotionCalibrationInput = {
+  spaceId: string;
+  emotion: CalibrationEmotion;
+  signal: EmotionSignal;
+  impulse: EmotionImpulse;
+  wiseAction: WiseAction;
+};
+
+buildEmotionCalibrationDiscoveryPointInput(input: EmotionCalibrationInput): DiscoveryPointInput;
+```
+
+### 3. Contracts
+
+- Completing Emotion Calibration without explicit save is route-local only and must not persist data.
+- Explicit save creates exactly one `DiscoveryPoint` through `actions.saveDiscoveryPoint(...)`.
+- Saved points use `sourceType: "manual"` unless a future durable emotion-calibration source model is added.
+- Saved point theme is derived from the selected signal, such as `emotion`, `boundary`, `old_echo`, `self_care`, or `relationship_learning`.
+- Emotion Calibration must not create `Episode`, `Draft`, `Anchor`, `AccountImpact`, or a durable calibration model by default.
+- It must not diagnose trauma, attachment style, pathology, or the true source of an emotion; copy should frame emotion as allowed information and constrain only the emotion-driven action.
+
+### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| User completes and taps "完成" | No persisted data. |
+| User taps "存为发现点" | One manual discovery point is saved. |
+| User taps "存为发现点" again | Route copy says it was already saved; no duplicate write. |
+| Storage save fails | Return/show honest failure copy and do not claim the point was saved. |
+
+### 5. Good/Base/Bad Cases
+
+- Good: user names fear, sees it as care/loss signal, notices a control impulse, chooses to name/allow it, and optionally saves one discovery point without storage-jar movement.
+- Base: user completes the flow and leaves; no state changes.
+- Bad: route claims to identify a childhood wound, creates account impacts for insight, or tells the user to control another person to reduce fear.
+
+### 6. Tests Required
+
+- Unit test summary copy and discovery-point payload builder.
+- Regression test that adding the resulting discovery point leaves derived storage-jar summaries unchanged.
+- Browser check `/emotion-calibration` direct route, Home entry, save-to-topics, no-save finish, and 360px layout.
