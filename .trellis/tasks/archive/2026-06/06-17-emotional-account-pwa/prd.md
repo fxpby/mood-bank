@@ -5237,7 +5237,11 @@ Storage-jar metaphor in UI:
 
 #### P0 Visual Tokens And Component Contracts
 
-This section turns the visual direction above into implementation contracts. P0 should feel designed, but the first implementation should stay small: shared tokens, reusable primitives, explicit states, and no bespoke styling per screen.
+This section turns the visual direction above into implementation contracts. P0 should feel designed, but the implementation should stay small: shared tokens, reusable primitives, explicit states, and no bespoke styling per screen.
+
+Current design system target: **Emotional Ceramic / Functional Calm**.
+
+The UI should feel like a quiet, tactile, private holding space: closer to a high-quality personal notebook or a small ceramic object than a dashboard, social app, therapy portal, or fintech account. It should reduce cognitive load while the user is emotionally activated.
 
 Token principles:
 
@@ -5249,12 +5253,13 @@ Token principles:
 * Component-level CSS can compose tokens, but should not create new color systems.
 * P0 can ship light-first, but token naming should allow later dark/system theme without rewriting component APIs.
 * Account colors are semantic accents, not a multi-accent marketing palette. They should appear as small surfaces, borders, icons, and labels, not as large saturated blocks.
+* Visual density should stay mobile-tool appropriate: enough structure to scan, enough whitespace to avoid pressure.
 
 Required color tokens:
 
 | Token group | Required tokens | Usage |
 |---|---|---|
-| Base surfaces | `--color-bg`, `--color-surface`, `--color-surface-raised`, `--color-surface-subtle` | Page background, panels, cards, quiet bands. |
+| Base surfaces | `--color-bg`, `--color-bg-depth`, `--color-surface`, `--color-surface-raised`, `--color-surface-subtle`, `--color-surface-glass` | Linen page background, ceramic cards, quiet bands. `--color-surface-glass` may remain as a compatibility alias, but should render as a solid/near-solid ceramic surface rather than heavy glassmorphism. |
 | Text | `--color-text`, `--color-text-muted`, `--color-text-soft`, `--color-text-inverse` | Primary text, helper copy, metadata, text on filled buttons. |
 | Borders | `--color-border`, `--color-border-strong`, `--color-divider` | Cards, chips, inputs, list separation. |
 | Action | `--color-action`, `--color-action-text`, `--color-action-soft`, `--color-action-border` | Primary button, selected chips, focus anchors. |
@@ -5263,6 +5268,18 @@ Required color tokens:
 | Account: Self | `--account-self`, `--account-self-bg`, `--account-self-border` | Self card, Return-To-Self completion, owned action markers. |
 | Account: Energy | `--account-energy`, `--account-energy-bg`, `--account-energy-border` | Energy card, energy effect rows, recovery/depletion markers. |
 | State | `--state-activation`, `--state-activation-bg`, `--state-warning`, `--state-danger`, `--state-success` | High activation note, storage warning, destructive reset, saved state. |
+
+Emotional Ceramic color target:
+
+| Meaning | Target direction |
+|---|---|
+| Background / linen | `#fbf9f4`, warm off-white rather than pure white or green-grey. |
+| Raised surface | `#ffffff` with subtle `#E5E1D8`-family border. |
+| Text | deep charcoal such as `#1b1c19` / `#2D2D2D`, with muted copy around `#6B6B6B`. |
+| Self / agency | sage or moss green, e.g. `#4e614b` token core with soft sage tint. |
+| Connection | muted terracotta, e.g. `#8a4f37` token core with warm tint. |
+| Energy | soft slate blue, e.g. `#476066` token core with blue-grey tint. |
+| Activation | steady clay/coral such as `#C97B6D`; never alarm red. |
 
 Color application rules:
 
@@ -5277,31 +5294,41 @@ Required size and rhythm tokens:
 
 | Token group | Required tokens | Default direction |
 |---|---|---|
-| Spacing | `--space-1` through `--space-8` | 4px base scale; page padding starts at 16px. |
-| Radius | `--radius-sm`, `--radius-md`, `--radius-pill` | 4px, 8px, 999px. Cards/panels use `md`; chips use `pill`. |
-| Shadow | `--shadow-soft`, `--shadow-panel` | Very subtle, tinted to surface. No heavy black shadow. |
+| Spacing | `--space-1` through `--space-8` | 4px base scale; mobile container margin should be 20px where the layout can afford it. Form/flow vertical gaps usually use 24px. |
+| Radius | `--radius-sm`, `--radius-md`, `--radius-lg`, `--radius-pill` | 4px, 12px, 16px, 999px. Cards and inputs use `md`; larger floating drawers/dialogs can use `lg`; chips/buttons use `pill`. |
+| Shadow | `--shadow-soft`, `--shadow-panel`, `--shadow-inset` | Very subtle, tinted to surface. Ceramic cards use shallow shadows such as `0 4px 12px rgba(45, 45, 45, 0.05)`. No heavy black shadow. |
 | Type | `--font-sans`, `--text-xs`, `--text-sm`, `--text-md`, `--text-lg`, `--text-xl` | Fixed type scale. No viewport-width font scaling. |
-| Touch | `--touch-min`, `--touch-comfortable` | 44px minimum, 48px or more for primary actions. |
+| Touch | `--touch-min`, `--touch-comfortable` | 48px minimum for buttons, chips, inputs, and icon controls. |
 | Layout | `--app-max-width`, `--bottom-nav-height`, `--safe-bottom` | Mobile frame, bottom nav, PWA safe area. |
 
 Shape contract:
 
 * Page sections are unframed unless they need interaction or repeated-item grouping.
-* Cards and panels use 8px radius maximum in P0.
+* Cards and panels use 12px radius in P0.
+* Inputs use 12px radius and a clear focus border.
+* Buttons and chips use pill shapes to read as tactile, touchable pebbles.
 * Chips, segmented controls, and small choice buttons can use pill radius.
 * Do not put cards inside cards on Home or flow screens.
 * Completion cards can be framed, but should not contain additional nested cards unless the nested item is a source row.
 
 Typography contract:
 
-* Use a plain, highly readable sans-serif stack unless the implementation scaffold already provides a better local font.
-* Do not use display-serif styling, decorative typography, negative letter spacing, or viewport-scaled type.
-* Headings should be compact because this is a tool surface:
-  * Home page title/top context: 18-22px.
-  * Flow prompt title: 20-24px.
-  * Section title: 16-18px.
-  * Body/helper copy: 13-16px.
+* Use a Manrope-first, highly readable sans-serif stack with system fallback. Do not network-load fonts in P0 unless explicitly approved; the token stack can name Manrope even when the runtime falls back locally.
+* Do not use display-serif styling, decorative typography, viewport-scaled type, or negative letter spacing beyond subtle token-level headline tracking.
+* Typography should be spacious, not oversized:
+  * Home page title/top context: 22-24px.
+  * Flow prompt title: 22-24px on mobile, around 28-32px line-height.
+  * Section title: 17px / 24px / 600.
+  * Body/helper copy: 14-16px with generous 1.5-1.6 line-height.
+  * Metadata: 12px / 16px, slight positive tracking is acceptable.
 * Helper copy should be short enough to scan while activated. If a helper sentence needs two lines on 360px width, it should still not push primary actions out of reach.
+
+Surface contract:
+
+* Prefer solid or near-solid ceramic surfaces over heavy blur/glass.
+* `panel`, `card`, flow bodies, account rows, and topic rows should feel like physical objects resting on linen: subtle border, white or low container tint, and shallow shadow.
+* Decorative gradients should be restrained. Avoid obvious gradient-orb, bokeh, or AI-purple/blue-glow treatment.
+* Bottom navigation can be a raised ceramic tray with blur as progressive enhancement, but it should still work as an opaque surface.
 
 Motion contract:
 
@@ -5773,6 +5800,12 @@ Completion:
 #### P0 "回到自己" Screen Layout
 
 This section refines the existing "回到自己" blueprint into implementable screen layouts.
+
+Implementation baseline note:
+
+* The current PWA implementation uses a 4-step Return-To-Self flow: body landing, anchor, return-to-life action, energy effect, then completion.
+* Older 3-step progress examples in this section are layout sketches, not permission to remove the separate energy-effect step.
+* Design-system implementation may adjust surfaces, spacing, typography, and controls, but must not change the step count, saved payload, or account-impact behavior without a separate product decision.
 
 Step 0 optional source-aware entry:
 
