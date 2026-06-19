@@ -346,3 +346,53 @@ buildDraftCheckPrivateRecordInput(input): QuickRecordInput;
 - Unit test deterministic recommendation rules and payload builders.
 - Regression test that saved discovery points and private-record conversion do not change derived storage-jar summaries by default.
 - Browser check Home -> Draft Self Check -> recommendation, save draft, save topic, private record conversion, Return-To-Self, and no-save finish.
+
+## Scenario: Personal Action Menu Is Route-Local Until A Durable Model Exists
+
+### 1. Scope / Trigger
+
+- Trigger: `/experiments` or account detail surfaces let the user pick a small self-owned action for today.
+- Scope: deterministic action recommendation helpers -> route-local selection/completion UI.
+
+### 2. Signatures
+
+```ts
+type PersonalAction = {
+  id: string;
+  category: PersonalActionCategory;
+  label: string;
+  helper: string;
+  completionMarker: string;
+};
+
+getPersonalActionSet(input: { market: DailyMarket; rotationIndex?: number }): PersonalActionSet;
+getNextPersonalActionRotation(currentIndex: number): number;
+```
+
+### 3. Contracts
+
+- Choosing a personal action is route-local only unless a future PRD introduces a durable `PersonalAction` / `PersonalExperiment` model.
+- Completing a lightweight personal action in the menu must not call `AppActions`, persist `personalActions`, persist `experiments`, or create account impacts.
+- The menu should show one recommended action and at most two alternatives to reduce choice load.
+- Copy must avoid streaks, missed-day pressure, scores, due dates, relationship tests, or rewards that imply partner behavior.
+- Completion copy can affirm a small self-owned action, but must not claim anything was saved unless a store action actually succeeded.
+
+### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| User opens `/experiments` | No persisted write. |
+| User chooses an action | Route-local selected state only. |
+| User taps "完成一点" | Route-local completion state only; no account impacts. |
+| User rotates actions | Deterministic local selection changes; no persisted write. |
+
+### 5. Good/Base/Bad Cases
+
+- Good: user chooses "喝水或洗手", sees completion copy, and leaves without storage changes.
+- Base: user taps "稍后" and returns home; no state changes.
+- Bad: choosing an action creates a durable backlog item, streak, score, or Self impact without an explicit future contract.
+
+### 6. Tests Required
+
+- Unit test action-set size, deterministic rotation, and no derived storage-jar changes from helper use.
+- Browser check `/experiments` choose/complete/rotate and 360px layout.
