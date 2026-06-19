@@ -1015,6 +1015,16 @@
   gap: var(--space-3);
 }
 
+.topic-feedback {
+  display: grid;
+  gap: var(--space-2);
+  align-items: start;
+}
+
+.topic-feedback .button {
+  justify-self: start;
+}
+
 .topic-card {
   display: grid;
   gap: var(--space-3);

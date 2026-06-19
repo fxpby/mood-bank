@@ -78,6 +78,7 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
   const [exploreQuestion, setExploreQuestion] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [latestCreatedPoint, setLatestCreatedPoint] = useState<DiscoveryPoint | null>(null);
 
   const filteredTopics = useMemo(
     () => state.topics.filter((point) => matchesFilter(point, filter)),
@@ -107,6 +108,7 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
     if (!result.ok) {
       setError(result.error ?? "这次还没有存下。");
       setMessage(null);
+      setLatestCreatedPoint(null);
       return;
     }
 
@@ -117,6 +119,7 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
     setExploreQuestion("");
     setError(null);
     setMessage("已存入稍后，可以之后再看。");
+    setLatestCreatedPoint(result.value ?? null);
     setIsCreating(false);
   }
 
@@ -149,6 +152,7 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
             setIsCreating((value) => !value);
             setError(null);
             setMessage(null);
+            setLatestCreatedPoint(null);
           }}
         >
           {isCreating ? <RotateCcw size={17} strokeWidth={1.8} /> : <Plus size={17} strokeWidth={1.8} />}
@@ -207,7 +211,20 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
       <section className="panel page-stack">
         <ChipGroup label="筛选" options={filterOptions} value={filter} onChange={setFilter} />
 
-        {message ? <p className="helper-text">{message}</p> : null}
+        {message ? (
+          <div className="topic-feedback">
+            <p className="helper-text">{message}</p>
+            {latestCreatedPoint ? (
+              <button
+                className="button button--secondary"
+                type="button"
+                onClick={() => navigate(buildTopicRoute(latestCreatedPoint.id))}
+              >
+                打开刚存的点
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         {error ? <p className="form-error">{error}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
 
