@@ -68,6 +68,7 @@ Required action behavior:
 | `saveQuickRecord` | Yes | Creates an episode and clears a matching draft id after successful state construction. May also create one source-linked discovery point when `nextAction === "save_later_topic"`; this must happen in the same `commitState` call. |
 | `saveReturnToSelfPractice` | Yes | Creates a practice and optional anchor. Never creates connection impact. |
 | `saveTriggerCompletion` | No in P0 | Returns no-write result so Trigger -> Quick Record does not double-count Self. |
+| `saveAnchor` | Yes | Creates one standalone support anchor. Blank text returns no-op success. Must not create account impacts. |
 | `saveDiscoveryPoint` | Yes | Creates a manual or source-linked discovery point. Must not create account impacts by default. |
 | `saveDiscoveryPoints` | Yes | Creates multiple discovery points in one commit. Must not create account impacts by default. |
 | `updateDiscoveryPointStatus` | Yes | Updates one discovery point status. Unknown ids return no-op success. Must not create account impacts. |
@@ -147,6 +148,82 @@ actions.updateDiscoveryPointReviewNote({ id, note });
 ```
 
 Saving or reviewing a discovery point must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Tests should assert that topic helpers leave derived storage-jar summaries unchanged.
+
+### Anchor Contract
+
+`anchors` in `AppState` stores short support phrases that can be reused on Home and Return-To-Self. Durable anchor creation must go through:
+
+```ts
+actions.saveAnchor({ spaceId, text });
+```
+
+Saving an anchor must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Anchors are not tasks, experiments, relationship verdicts, or evidence rows.
+
+### Scenario: Topic Detail Saves A Support Anchor
+
+#### 1. Scope / Trigger
+
+- Trigger: `/topics/<id>` lets the user turn one phrase from a review into a reusable anchor.
+- Scope: route-local textarea state -> `actions.saveAnchor(...)` -> one `Anchor`.
+
+#### 2. Signatures
+
+```ts
+type AnchorInput = {
+  spaceId: string;
+  text: string;
+  sourceType?: Anchor["sourceType"];
+  sourceId?: string;
+};
+
+saveAnchor(input: AnchorInput): StoreWriteResult<Anchor>;
+```
+
+#### 3. Contracts
+
+- The route may initialize anchor text from `point.note` or `point.title`, but the durable write must happen through `actions.saveAnchor(...)`.
+- The store action creates a trimmed `Anchor` and prepends it to `state.anchors`.
+- Blank or whitespace-only anchor text returns no-op success from the store; routes should validate first if they need user-facing copy.
+- Topic Detail anchor saves should use standalone anchors unless a future PRD widens `Anchor.sourceType` and adds linked-anchor UI.
+- Saving an anchor must not update topic `status`, topic `note`, create `AccountImpact`, create an episode, or create an experiment/action record.
+
+#### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| Existing topic + non-empty anchor text | Save one trimmed `Anchor` newest-first. |
+| Existing topic + blank anchor text | Show validation copy in route; no persisted write. |
+| Storage save fails | Return/show honest failure copy and do not claim the anchor was saved. |
+
+#### 5. Good/Base/Bad Cases
+
+- Good: user reviews a topic, saves "我可以先回到自己，再决定下一步。", then sees it as the newest Home anchor.
+- Base: user saves a review note only; no anchor is created.
+- Bad: anchor save marks the topic reviewed, changes a storage jar, or stores a source type unsupported by persisted validation.
+
+#### 6. Tests Required
+
+- Unit test that the helper trims and prepends anchors.
+- Unit test that blank anchor text does not create an anchor.
+- Regression test that anchor saves leave derived storage-jar summaries unchanged.
+
+#### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+actions.updateDiscoveryPointStatus({ id, status: "reviewed" });
+actions.saveReturnToSelfPractice({ spaceId, completion: "full", anchor, anchorSaved: true });
+```
+
+#### Correct
+
+```ts
+const result = actions.saveAnchor({ spaceId: point.spaceId, text: anchorText });
+if (result.ok) {
+  setAnchorMessage("锚点已存下，首页会优先显示这句话。");
+}
+```
 
 ### Scenario: Topic Detail Updates A Review Note
 

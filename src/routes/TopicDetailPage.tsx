@@ -1,4 +1,4 @@
-import { ArrowLeft, Save, Sparkles } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, Save, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import {
@@ -45,13 +45,20 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
   const [reviewMessage, setReviewMessage] = useState<string | null>(null);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewNote, setReviewNote] = useState("");
+  const [anchorText, setAnchorText] = useState("");
+  const [anchorMessage, setAnchorMessage] = useState<string | null>(null);
+  const [anchorError, setAnchorError] = useState<string | null>(null);
 
   useEffect(() => {
-    setReviewNote(point?.note ?? "");
+    const nextReviewNote = point?.note ?? "";
+    setReviewNote(nextReviewNote);
+    setAnchorText(nextReviewNote || point?.title || "");
     setStatusMessage(null);
     setStatusError(null);
     setReviewMessage(null);
     setReviewError(null);
+    setAnchorMessage(null);
+    setAnchorError(null);
   }, [point?.id]);
 
   function updateStatus(nextStatus: DiscoveryPointStatus) {
@@ -91,6 +98,31 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
         ? "补记已存下，只更新了这个发现点。"
         : "补记已清空，只更新了这个发现点。",
     );
+  }
+
+  function saveAnchor() {
+    if (!point) return;
+
+    if (!anchorText.trim()) {
+      setAnchorError("先留一句能托住自己的话。");
+      setAnchorMessage(null);
+      return;
+    }
+
+    const result = actions.saveAnchor({
+      spaceId: point.spaceId,
+      text: anchorText,
+    });
+
+    if (!result.ok) {
+      setAnchorError(result.error ?? "这次还没有保存成功，锚点还没有写进本机。");
+      setAnchorMessage(null);
+      return;
+    }
+
+    setAnchorText(result.value?.text ?? anchorText.trim());
+    setAnchorError(null);
+    setAnchorMessage("锚点已存下，首页会优先显示这句话。");
   }
 
   if (!point) {
@@ -194,6 +226,29 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
         </button>
         {reviewMessage ? <p className="helper-text">{reviewMessage}</p> : null}
         {reviewError ? <p className="form-error">{reviewError}</p> : null}
+      </section>
+
+      <section className="panel page-stack">
+        <div className="section-heading">
+          <h2>保存为锚点</h2>
+          <p>如果有一句话想之后带在身边，可以单独存成锚点。</p>
+        </div>
+        <label className="field">
+          <span className="field-label">一句能托住自己的话</span>
+          <textarea
+            className="field-textarea"
+            value={anchorText}
+            rows={3}
+            onChange={(event) => setAnchorText(event.target.value)}
+            placeholder="例如：我可以先回到自己，再决定下一步。"
+          />
+        </label>
+        <button className="button button--secondary" type="button" onClick={saveAnchor}>
+          <BookmarkPlus size={16} strokeWidth={1.8} />
+          保存为锚点
+        </button>
+        {anchorMessage ? <p className="helper-text">{anchorMessage}</p> : null}
+        {anchorError ? <p className="form-error">{anchorError}</p> : null}
       </section>
 
       <section className="panel page-stack">

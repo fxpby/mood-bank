@@ -309,6 +309,13 @@ export type DiscoveryPointReviewNoteInput = {
   note: string;
 };
 
+export type AnchorInput = {
+  spaceId: string;
+  text: string;
+  sourceType?: Anchor["sourceType"];
+  sourceId?: string;
+};
+
 export type DraftInput = {
   draftId?: string;
   spaceId: string;

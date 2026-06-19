@@ -9,6 +9,8 @@ import {
 } from "react";
 import { createInitialState, createSetupState, createId, nowIso, todayKey } from "../domain/defaults";
 import type {
+  Anchor,
+  AnchorInput,
   AppState,
   DailyMarketInput,
   DiscoveryPoint,
@@ -33,6 +35,7 @@ import {
   type StorageAdapter,
 } from "../storage/storageAdapter";
 import { buildQuickRecordImpacts, buildReturnToSelfImpacts } from "../domain/accounts";
+import { addAnchorToState } from "../domain/anchors";
 import {
   addDiscoveryPointToState,
   addDiscoveryPointsToState,
@@ -56,6 +59,7 @@ export type AppActions = {
   saveQuickRecord(input: QuickRecordInput): StoreWriteResult<Episode>;
   saveReturnToSelfPractice(input: ReturnToSelfInput): StoreWriteResult<ReturnToSelfPractice>;
   saveTriggerCompletion(input: TriggerCompletionInput): StoreWriteResult | StoreNoWriteResult;
+  saveAnchor(input: AnchorInput): StoreWriteResult<Anchor>;
   saveDiscoveryPoint(input: DiscoveryPointInput): StoreWriteResult<DiscoveryPoint>;
   saveDiscoveryPoints(input: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoint[]>;
   updateDiscoveryPointStatus(input: DiscoveryPointStatusInput): StoreWriteResult<DiscoveryPoint>;
@@ -295,6 +299,24 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [commitState, state],
   );
 
+  const saveAnchor = useCallback(
+    (input: AnchorInput): StoreWriteResult<Anchor> => {
+      const timestamp = nowIso();
+      const { state: nextState, anchor } = addAnchorToState(state, input, {
+        id: createId("anchor"),
+        timestamp,
+      });
+
+      if (!anchor) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const result = commitState(nextState);
+      return result.ok ? { ...result, value: anchor } : result;
+    },
+    [commitState, state],
+  );
+
   const saveDiscoveryPoints = useCallback(
     (inputs: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoint[]> => {
       const timestamp = nowIso();
@@ -397,6 +419,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           reason: input.reason ?? "not_saved",
         };
       },
+      saveAnchor,
       saveDiscoveryPoint,
       saveDiscoveryPoints,
       updateDiscoveryPointStatus,
@@ -410,6 +433,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       acknowledgeStorageWarning,
       completeSetup,
       resetLocalData,
+      saveAnchor,
       saveDraft,
       deleteDraft,
       saveDiscoveryPoint,
