@@ -22,6 +22,8 @@
   --color-action-soft: #d3e9cc;
   --color-action-border: #b7ccb1;
   --color-action-pressed: #394b37;
+  --color-nav-active-bg: #ffb193;
+  --color-nav-active-text: #6e3822;
 
   --color-focus-ring: #c97b6d;
   --focus-ring: 0 0 0 3px rgba(201, 123, 109, 0.3);
@@ -75,6 +77,6 @@
   --touch-min: 48px;
   --touch-comfortable: 52px;
   --app-max-width: 440px;
-  --bottom-nav-height: 78px;
+  --bottom-nav-height: 88px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }

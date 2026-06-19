@@ -3,3 +3,7 @@ node_modules/
 dist/
 .vite/
 coverage/
+
+# Figma 源文件与导出的屏幕图（本地参考资源）
+figma/*.fig
+figma/screens/
