@@ -10,10 +10,10 @@ import {
   selectTodayMarketNote,
 } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
-import { buildRecordRoute, type AppRoute } from "../utils/route";
+import { buildRecordRoute, type AppRoute, type RouteState } from "../utils/route";
 
 type HomePageProps = {
-  navigate: (route: AppRoute) => void;
+  navigate: (route: AppRoute, state?: RouteState) => void;
 };
 
 export function HomePage({ navigate }: HomePageProps) {
@@ -106,7 +106,7 @@ export function HomePage({ navigate }: HomePageProps) {
           <button
             className="button button--primary anchor-preview__return"
             type="button"
-            onClick={() => navigate("/return-to-self")}
+            onClick={() => navigate("/return-to-self", { returnToSelfAnchor: latestAnchorText })}
           >
             <HeartHandshake size={16} strokeWidth={1.8} />
             带着这句回到自己

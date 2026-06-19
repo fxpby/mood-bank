@@ -21,6 +21,7 @@ export type AppRoute =
 
 export type RouteState = {
   quickRecordPrefill?: import("../domain/types").QuickRecordPrefill;
+  returnToSelfAnchor?: string;
 };
 
 export function normalizeRoute(pathname: string): AppRoute {

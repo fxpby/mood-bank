@@ -67,6 +67,18 @@ Routes must check `result.ok` before showing success copy.
 
 Browser history state can be unknown at runtime. Keep narrowing close to the route that reads it and map it into typed local state before use.
 
+Route-state fields are transient handoffs, not durable data. When a route consumes a one-time field such as `returnToSelfAnchor`, initialize route-local state from the narrowed value, then remove that field from the current history entry so direct re-entry or refresh does not reuse stale intent:
+
+```ts
+const [routeAnchor] = useState(() => getReturnToSelfAnchor());
+
+useEffect(() => {
+  if (routeAnchor) {
+    clearReturnToSelfAnchorState();
+  }
+}, [routeAnchor]);
+```
+
 ### Dynamic Detail Routes
 
 Dynamic detail routes supported by the app shell:

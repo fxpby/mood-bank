@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MessageSquareText } from "lucide-react";
 import { CompletionCard } from "../components/CompletionCard";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
@@ -51,26 +51,34 @@ const stepOrder: StepId[] = ["body", "anchor", "life", "energy", "completion"];
 export function ReturnToSelfPage({ navigate }: ReturnToSelfPageProps) {
   const { state, actions, status, lastError } = useAppStore();
   const activeSpace = selectActiveSpace(state);
+  const [routeAnchor] = useState(() => getReturnToSelfAnchor());
   const [step, setStep] = useState<StepId>("body");
   const [bodyAction, setBodyAction] = useState<BodyAction | undefined>();
-  const [anchor, setAnchor] = useState(anchorsCopy.return_then_decide);
+  const [anchor, setAnchor] = useState(routeAnchor ?? anchorsCopy.return_then_decide);
   const [anchorSaved, setAnchorSaved] = useState(false);
   const [returnToLifeAction, setReturnToLifeAction] = useState<ReturnToLifeAction | undefined>();
   const [energyEffect, setEnergyEffect] = useState<EnergyEffect>("not_sure");
   const [completion, setCompletion] = useState<ReturnToSelfCompletion | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (routeAnchor) {
+      clearReturnToSelfAnchorState();
+    }
+  }, [routeAnchor]);
+
   const anchorOptions = useMemo(() => {
     const savedAnchors = state.anchors.slice(0, 3).map((item) => item.text);
     return Array.from(
       new Set([
+        ...(routeAnchor ? [routeAnchor] : []),
         ...savedAnchors,
         anchorsCopy.return_then_decide,
         anchorsCopy.facts_slow_conclusion,
         "少加重一点，也是一种回到自己。",
       ]),
     );
-  }, [state.anchors]);
+  }, [routeAnchor, state.anchors]);
 
   function goNext() {
     const currentIndex = stepOrder.indexOf(step);
@@ -296,4 +304,26 @@ function getEnergyReason(
   }
 
   return accountReasonCopy.energy_neutral;
+}
+
+function getReturnToSelfAnchor(): string | undefined {
+  const routeState = window.history.state as { returnToSelfAnchor?: unknown } | null;
+  const anchor = routeState?.returnToSelfAnchor;
+  if (typeof anchor !== "string") {
+    return undefined;
+  }
+
+  const trimmedAnchor = anchor.trim();
+  return trimmedAnchor.length > 0 ? trimmedAnchor : undefined;
+}
+
+function clearReturnToSelfAnchorState() {
+  const routeState = window.history.state as Record<string, unknown> | null;
+  if (!routeState || typeof routeState !== "object") {
+    return;
+  }
+
+  const nextState = { ...routeState };
+  delete nextState.returnToSelfAnchor;
+  window.history.replaceState(nextState, "", window.location.href);
 }
