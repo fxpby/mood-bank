@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 23
+- **Total Sessions**: 24
 - **Last Active**: 2026-06-19
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~931 | Active |
+| `journal-1.md` | ~969 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 24 | 2026-06-19 | Return-To-Self anchor prefill | `bc38288` | `main` |
 | 23 | 2026-06-19 | Home anchor return action | `fa30214` | `main` |
 | 22 | 2026-06-19 | Topic Review Anchor Handoff | `70b86bf` | `main` |
 | 21 | 2026-06-19 | Topics Open Saved Point | `b6dc26a` | `main` |

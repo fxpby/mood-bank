@@ -934,3 +934,44 @@ Added a Home anchor action that opens Return-To-Self from the visible support ph
 ### Next Steps
 
 - None - task complete
+
+
+## Session 24: Return-To-Self anchor prefill
+
+**Date**: 2026-06-19
+**Task**: Return-To-Self anchor prefill
+**Branch**: `main`
+
+### Summary
+
+Passed the Home anchor phrase into Return-To-Self as a one-time route-state prefill.
+
+### Main Changes
+
+- Extended `RouteState` with a transient `returnToSelfAnchor` field.
+- Passed the visible Home anchor into `/return-to-self` from the Home anchor action.
+- Initialized Return-To-Self's anchor step from that route-state value and cleared the one-time handoff after initialization.
+- Documented the one-time route-state pattern in the frontend type-safety spec.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `bc38288` | feat: prefill return-to-self anchor |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test` (12 files, 93 tests)
+- [OK] `npm run build`
+- [OK] forbidden product/network pattern scan
+- [OK] browser check: Home anchor prefilled Return-To-Self anchor step
+- [OK] browser check: direct `/return-to-self` fell back to the default anchor
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
