@@ -19,7 +19,9 @@ Implemented the trigger-first local PWA, quick record draft recovery, P0 docs, a
 
 ### Main Changes
 
-(Add details)
+- Replaced the latest-record placeholder with a newest-first record archive.
+- Added `/record/:id` with source content, localized account impact reasons/evidence, linked discovery points, and missing-record recovery.
+- Added record route helpers, selector tests, route tests, and dynamic route spec updates.
 
 ### Git Commits
 
@@ -233,6 +235,44 @@ Added a low-pressure topic detail route with source context, status review actio
 - [OK] browser check: list -> detail -> status update -> refresh persistence
 - [OK] browser check: unknown topic id empty state
 - [OK] browser console check
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 7: Record list detail
+
+**Date**: 2026-06-19
+**Task**: Record list detail
+**Branch**: `main`
+
+### Summary
+
+Added full record archive, record detail route, localized account impact evidence, linked discovery points, route helper tests, selector tests, and browser verification.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `c988b28` | feat: add record list detail |
+| `d1dfd66` | chore: record record detail task |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden copy/network scan
+- [OK] Browser verification for list, detail refresh, linked topic, missing id, and 360px layout
 
 ### Status
 
