@@ -896,3 +896,41 @@ Added route-local handoff from a saved topic review note into the anchor draft a
 ### Next Steps
 
 - None - task complete
+
+
+## Session 23: Home anchor return action
+
+**Date**: 2026-06-19
+**Task**: Home anchor return action
+**Branch**: `main`
+
+### Summary
+
+Added a Home anchor action that opens Return-To-Self from the visible support phrase.
+
+### Main Changes
+
+- Added a primary Home anchor action labeled "带着这句回到自己" that navigates to `/return-to-self`.
+- Kept the episode-linked "打开来源记录" action and placed both anchor actions in a stable stacked layout.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `fa30214` | feat: add home anchor return action |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test` (12 files, 93 tests)
+- [OK] `npm run build`
+- [OK] forbidden product/network pattern scan
+- [OK] browser check: `/home` action visible, click opens `/return-to-self`
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
