@@ -385,7 +385,10 @@ Implemented the /experiments personal action menu as a route-local three-choice 
 
 ### Main Changes
 
-(Add details)
+- Added a Topic Detail "回看补记" textarea and save action.
+- Added `updateDiscoveryPointReviewNote(...)` through the store boundary.
+- Added pure domain helper coverage for note update, blank-note clearing, and no storage-jar summary movement.
+- Documented the review-note state contract in frontend state-management specs.
 
 ### Git Commits
 
@@ -487,6 +490,44 @@ Added a P2-light emotion calibration flow that reframes one strong emotion as a 
 - [OK] Forbidden copy/network scan had no hits.
 - [OK] `curl -I http://127.0.0.1:5176/emotion-calibration` returned 200 while the temporary dev server was running.
 - [WARN] Full in-app browser click verification was not completed because the browser plugin stalled on external telemetry retries in the prior run; local route availability and automated checks passed.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 13: Topic review note
+
+**Date**: 2026-06-19
+**Task**: Topic review note
+**Branch**: `main`
+
+### Summary
+
+Added a topic detail review-note save flow, updated the store/domain contract, verified the feature, and archived the Trellis task.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `e90b06b` | (see git log) |
+| `6eededf` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden product-copy scan against `src`
+- [OK] Browser check on `http://127.0.0.1:5174/topics` and a topic detail route
 
 ### Status
 
