@@ -9,6 +9,7 @@ import { RecordDetailPage } from "./routes/RecordDetailPage";
 import { RecordPage } from "./routes/RecordPage";
 import { ReturnToSelfPage } from "./routes/ReturnToSelfPage";
 import { SettingsPage } from "./routes/SettingsPage";
+import { SignalCheckPage } from "./routes/SignalCheckPage";
 import { SetupPage } from "./routes/SetupPage";
 import { TopicDetailPage } from "./routes/TopicDetailPage";
 import { TopicsPage } from "./routes/TopicsPage";
@@ -92,6 +93,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/return-to-self") {
     return <ReturnToSelfPage navigate={navigate} />;
+  }
+
+  if (route === "/signal-check") {
+    return <SignalCheckPage navigate={navigate} />;
   }
 
   if (route === "/topics") {

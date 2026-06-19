@@ -221,3 +221,70 @@ const result = actions.saveQuickRecord({
   laterTopic: { title, note },
 });
 ```
+
+## Scenario: Signal Check Saves A Discovery Point
+
+### 1. Scope / Trigger
+
+- Trigger: `/signal-check` lets the user complete a buffering flow and optionally save the pattern/result for later review.
+- Scope: route-local `SignalCheck*` choices -> `buildSignalCheckDiscoveryPointInput(...)` -> `actions.saveDiscoveryPoint(...)`.
+
+### 2. Signatures
+
+```ts
+type SignalCheckSaveInput = {
+  spaceId: string;
+  target: SignalCheckTarget;
+  goodReaction: GoodSignalReaction;
+  absentReaction: AbsentSignalReaction;
+  action: SignalCheckAction;
+  result?: SignalCheckResult;
+};
+
+buildSignalCheckDiscoveryPointInput(input: SignalCheckSaveInput): DiscoveryPointInput;
+```
+
+### 3. Contracts
+
+- Completing the flow without explicit save is route-local only and must not persist data.
+- Explicit save creates exactly one `DiscoveryPoint` through `actions.saveDiscoveryPoint(...)`.
+- Saved signal-check output uses `sourceType: "manual"` unless a future PRD adds a durable `signal_check` source model.
+- Non-checking actions should save as `kind: "action_idea"` with `theme: "action_experiment"`.
+- Checking-anyway results should save as `kind: "discovery"` with emotion/old-echo theme based on selected content.
+- Signal Check must not create `Episode`, `Draft`, `AccountImpact`, or derived storage-jar summary changes.
+
+### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| User completes and taps "完成" | No persisted data. |
+| User explicitly saves a non-checking action | One manual discovery point/action idea is saved. |
+| User chooses "我还是想检查" and result is "我不想记录" | No persisted data; copy says it was not saved. |
+| Storage save fails | Return/show honest failure copy and do not claim the pattern was saved. |
+
+### 5. Good/Base/Bad Cases
+
+- Good: user completes Signal Check, saves a 10-minute action, and sees it in `/topics` without storage-jar movement.
+- Base: user completes Signal Check and closes it; no state changes.
+- Bad: saving Signal Check writes an account impact, creates an episode, or interprets another person's silence/activity.
+
+### 6. Tests Required
+
+- Unit test `buildSignalCheckDiscoveryPointInput(...)` for non-checking and checking paths.
+- Regression test that adding the resulting discovery point leaves `deriveAllAccountSummaries(...)` unchanged.
+- Browser check for Home -> Signal Check -> save -> Topics, plus a no-save completion path.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+actions.saveQuickRecord({ facts: "想检查对方有没有回应", nextAction: "phone_down_10" });
+```
+
+#### Correct
+
+```ts
+const input = buildSignalCheckDiscoveryPointInput(signalCheckState);
+actions.saveDiscoveryPoint(input);
+```

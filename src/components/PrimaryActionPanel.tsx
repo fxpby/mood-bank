@@ -29,10 +29,8 @@ const actions: Array<{
   },
   {
     label: "想检查信号",
-    subtitle: "稍后支持",
+    subtitle: "先缓冲 10 分钟",
     route: "/signal-check",
-    badge: "稍后",
-    tone: "placeholder",
     icon: FileSearch,
   },
   {
