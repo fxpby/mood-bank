@@ -3,6 +3,7 @@ import { AppShell } from "./components/AppShell";
 import { useAppStore } from "./store/AppStoreContext";
 import { AccountDetailPage } from "./routes/AccountDetailPage";
 import { DraftCheckPage } from "./routes/DraftCheckPage";
+import { EmotionCalibrationPage } from "./routes/EmotionCalibrationPage";
 import { ExperimentsPage } from "./routes/ExperimentsPage";
 import { HomePage } from "./routes/HomePage";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
@@ -108,6 +109,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/rich-incoming") {
     return <RichIncomingPage navigate={navigate} />;
+  }
+
+  if (route === "/emotion-calibration") {
+    return <EmotionCalibrationPage navigate={navigate} />;
   }
 
   if (route === "/topics") {

@@ -46,6 +46,10 @@ describe("route helpers", () => {
     expect(normalizeRoute("/rich-incoming")).toBe("/rich-incoming");
   });
 
+  it("recognizes the emotion calibration route", () => {
+    expect(normalizeRoute("/emotion-calibration")).toBe("/emotion-calibration");
+  });
+
   it("keeps unknown routes on the home fallback", () => {
     expect(normalizeRoute("/not-real")).toBe("/");
   });

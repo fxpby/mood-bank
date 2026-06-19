@@ -1,4 +1,4 @@
-import { NotebookPen } from "lucide-react";
+import { Compass, NotebookPen } from "lucide-react";
 import { AccountSummaryCard } from "../components/AccountSummaryCard";
 import { PageHeader } from "../components/PageHeader";
 import { PrimaryActionPanel } from "../components/PrimaryActionPanel";
@@ -51,6 +51,18 @@ export function HomePage({ navigate }: HomePageProps) {
         <span>
           <strong>记录互动</strong>
           <small>先存下一个可确认的事实</small>
+        </span>
+      </button>
+
+      <button
+        className="record-action record-action--calibration"
+        type="button"
+        onClick={() => navigate("/emotion-calibration")}
+      >
+        <Compass size={19} strokeWidth={1.8} />
+        <span>
+          <strong>校准一个情绪</strong>
+          <small>把情绪当作信使，不急着让它开车</small>
         </span>
       </button>
 
