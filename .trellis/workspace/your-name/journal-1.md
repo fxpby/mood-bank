@@ -198,3 +198,46 @@ Connected Trigger and Quick Record save-later choices to durable discovery point
 ### Next Steps
 
 - None - task complete
+
+
+## Session 6: Topic detail review
+
+**Date**: 2026-06-19
+**Task**: Topic detail review
+**Branch**: `main`
+
+### Summary
+
+Added a low-pressure topic detail route with source context, status review actions, dynamic route helpers, tests, and browser verification.
+
+### Main Changes
+
+- Added `/topics/:id` route support with URL-safe topic route helpers and route tests.
+- Added `TopicDetailPage` for source context, note/explore question display, missing-id empty state, and gentle review actions.
+- Added "打开回看" from topic list cards.
+- Added topic detail styling consistent with the existing Topics page.
+- Added regression coverage that topic status review does not affect derived storage-jar summaries.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `65e5408` | feat: add topic detail review |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] forbidden copy/network scan
+- [OK] browser check: list -> detail -> status update -> refresh persistence
+- [OK] browser check: unknown topic id empty state
+- [OK] browser console check
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 5
+- **Total Sessions**: 6
 - **Last Active**: 2026-06-19
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~192 | Active |
+| `journal-1.md` | ~233 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 6 | 2026-06-19 | Topic detail review | `65e5408` | `main` |
 | 5 | 2026-06-19 | Connect topic capture flows | `13b0b94` | `main` |
 | 4 | 2026-06-18 | Topics discovery points | `00ac225` | `main` |
 | 3 | 2026-06-18 | Account detail view | `52a8a3e` | `main` |
