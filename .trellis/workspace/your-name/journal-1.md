@@ -659,3 +659,43 @@ Added a Record Detail anchor panel that can show and save episode-linked anchors
 ### Next Steps
 
 - None - task complete
+
+
+## Session 17: Home anchor source link
+
+**Date**: 2026-06-19
+**Task**: Home anchor source link
+**Branch**: `main`
+
+### Summary
+
+Added a Home anchor source action that opens the source record for episode-linked anchors.
+
+### Main Changes
+
+- Home now keeps the latest anchor fallback behavior while reading the latest anchor object.
+- Episode-linked latest anchors show a secondary `打开来源记录` action.
+- The action reuses `buildRecordRoute(...)` and does not write or derive persisted state.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `06d6602` | (see git log) |
+| `19cc5ab` | (see git log) |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden product-copy scan against `src`
+- [OK] Browser check: Home anchor source action navigates to Record Detail
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
