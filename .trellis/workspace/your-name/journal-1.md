@@ -410,3 +410,45 @@ Implemented the /experiments personal action menu as a route-local three-choice 
 ### Next Steps
 
 - None - task complete
+
+
+## Session 11: Rich incoming review flow
+
+**Date**: 2026-06-19
+**Task**: Rich incoming review flow
+**Branch**: `main`
+
+### Summary
+
+Added a rich incoming review flow for dense incoming messages, with explicit discovery-point saves and no account impacts.
+
+### Main Changes
+
+- Added `/rich-incoming` as a local flow for receiving dense incoming messages without reply pressure.
+- Added route/domain helpers for message shapes, received threads, mixed emotions, handling choices, and summary/discovery-point payloads.
+- Added Record and Return-To-Self entry points.
+- Added atomic `saveDiscoveryPoints(...)` support so multiple saved threads land in one commit without account impacts.
+- Documented the Rich Incoming Review state contract in frontend state-management spec.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `2bbca1f` | feat: add rich incoming review flow |
+| `7d8ffd0` | chore: record rich incoming review task |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Forbidden copy/network scan had no hits.
+- [WARN] In-app browser full click verification was not completed because the browser plugin stalled on external telemetry retries; the local route redirect to setup was observed on a clean origin.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
