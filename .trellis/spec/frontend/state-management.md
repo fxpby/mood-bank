@@ -288,3 +288,61 @@ actions.saveQuickRecord({ facts: "想检查对方有没有回应", nextAction: "
 const input = buildSignalCheckDiscoveryPointInput(signalCheckState);
 actions.saveDiscoveryPoint(input);
 ```
+
+## Scenario: Draft Self Check Saves Only Explicit User Choices
+
+### 1. Scope / Trigger
+
+- Trigger: `/draft-check` helps the user check whether a message draft is ready enough, should be softened, saved, turned into a private record, or paused with Return-To-Self.
+- Scope: route-local `DraftCheck*` choices -> `buildDraftCheck*Input(...)` -> explicit `AppActions` calls.
+
+### 2. Signatures
+
+```ts
+type DraftCheckSaveInput = {
+  spaceId: string;
+  spaceType: SpaceType;
+  draftText: string;
+  state: DraftCheckState;
+  motivation: DraftCheckMotivation;
+  noResponseTolerance: DraftNoResponseTolerance;
+  contentRisk: DraftContentRisk;
+  stance: DraftStance;
+  afterSend: DraftAfterSend;
+};
+
+buildDraftCheckDiscoveryPointInput(input, recommendation): DiscoveryPointInput;
+buildDraftCheckDraftInput(input): DraftInput;
+buildDraftCheckPrivateRecordInput(input): QuickRecordInput;
+```
+
+### 3. Contracts
+
+- Completing Draft Self Check without an explicit save is route-local only and must not persist data.
+- Explicit recommendation/topic save creates exactly one `DiscoveryPoint` through `actions.saveDiscoveryPoint(...)`.
+- Explicit draft save creates one `Draft` through `actions.saveDraft(...)`.
+- Explicit private-record conversion may call `actions.saveQuickRecord(...)`, but the payload must avoid connection evidence, self-contact evidence, energy effect, owned next action, and interpretation-split fields unless a future PRD deliberately adds account movement.
+- Draft Self Check must not rewrite the draft, optimize for a reply, predict the other person's reaction, include a send button, or inspect external apps.
+- Draft Self Check saves must not create account impacts by default.
+
+### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| User completes and taps "完成" | No persisted data. |
+| User taps "保存检查结果" / "保存轻一点方向" / "保存边界方向" / "放进稍后" | One `DiscoveryPoint` with `sourceType: "draft_check"`. |
+| User taps "保存草稿" / "保存草稿不发" | One `Draft`; no account impacts. |
+| User taps "转成私下记录" with non-empty draft | One `Episode`; no account impacts by default. |
+| Storage save fails | Return/show honest failure copy and do not claim the item was saved. |
+
+### 5. Good/Base/Bad Cases
+
+- Good: user checks a draft, saves a boundary direction, and sees it in `/topics` without storage-jar movement.
+- Base: user completes the check and closes it; no state changes.
+- Bad: route saves a draft automatically, creates an account impact for checking, or adds a send/copy button that implies message delivery.
+
+### 6. Tests Required
+
+- Unit test deterministic recommendation rules and payload builders.
+- Regression test that saved discovery points and private-record conversion do not change derived storage-jar summaries by default.
+- Browser check Home -> Draft Self Check -> recommendation, save draft, save topic, private record conversion, Return-To-Self, and no-save finish.

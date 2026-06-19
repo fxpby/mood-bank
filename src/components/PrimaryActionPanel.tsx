@@ -35,10 +35,8 @@ const actions: Array<{
   },
   {
     label: "草稿自检",
-    subtitle: "稍后支持",
+    subtitle: "先看适不适合发",
     route: "/draft-check",
-    badge: "稍后",
-    tone: "placeholder",
     icon: MessageSquareText,
   },
 ];

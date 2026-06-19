@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "./components/AppShell";
 import { useAppStore } from "./store/AppStoreContext";
 import { AccountDetailPage } from "./routes/AccountDetailPage";
+import { DraftCheckPage } from "./routes/DraftCheckPage";
 import { HomePage } from "./routes/HomePage";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
 import { QuickRecordPage } from "./routes/QuickRecordPage";
@@ -97,6 +98,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/signal-check") {
     return <SignalCheckPage navigate={navigate} />;
+  }
+
+  if (route === "/draft-check") {
+    return <DraftCheckPage navigate={navigate} />;
   }
 
   if (route === "/topics") {

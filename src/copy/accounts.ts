@@ -42,6 +42,7 @@ const accountEvidenceCopy = {
   delay_10_min: "晚点再回",
   save_draft_do_not_send: "先存下，不发送",
   record_facts: "记录事实",
+  not_now: "暂时没有",
   save_later_topic: "保存一个话题",
   five_senses: "五感观察",
   drink_water_wash_hands: "喝水或洗手",
