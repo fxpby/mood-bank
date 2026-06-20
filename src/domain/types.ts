@@ -250,6 +250,11 @@ export type SetupInput = {
   dailyMarket: DailyMarket;
 };
 
+export type SpaceInput = {
+  displayName: string;
+  description: string;
+};
+
 export type DailyMarketInput = {
   market: DailyMarket;
 };

@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend required checks."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Check new settings store action against durable write contracts."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Check typed result handling and validation-safe data flow."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Check no direct storage/network and honest placeholder copy."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Check route-owned Settings UI and accessible native controls."}

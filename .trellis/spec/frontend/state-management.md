@@ -64,6 +64,7 @@ Required action behavior:
 | Action | May Persist | Notes |
 |---|---:|---|
 | `completeSetup` | Yes | Replaces initial state with setup state. |
+| `updateActiveSpace` | Yes | Updates the active emotional space name/description only. Blank name falls back to the default space name. Missing/stale active space ids return no-op success. |
 | `updateDailyMarket` | Yes | Upserts today's market by date key. |
 | `saveQuickRecord` | Yes | Creates an episode and clears a matching draft id after successful state construction. May also create one source-linked discovery point when `nextAction === "save_later_topic"`; this must happen in the same `commitState` call. |
 | `saveReturnToSelfPractice` | Yes | Creates a practice and optional anchor. Never creates connection impact. |
@@ -160,6 +161,23 @@ actions.saveAnchor({ spaceId, text });
 ```
 
 Saving an anchor must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Anchors are not tasks, experiments, relationship verdicts, or evidence rows.
+
+### Settings Space Contract
+
+Settings may update the current emotional space metadata through:
+
+```ts
+actions.updateActiveSpace({ displayName, description });
+```
+
+Rules:
+
+- Only the active `EmotionalSpace` may be updated.
+- `displayName.trim() || DEFAULT_SPACE_NAME` becomes the saved name.
+- `description.trim()` becomes the saved description.
+- Missing or stale `activeSpaceId` returns no-op success and must not create a new space.
+- Updating space metadata must not affect episodes, accounts, topics, anchors, experiments, daily market, or settings flags.
+- Export/import controls in Settings are placeholders until a future PRD adds real file transfer. Placeholder controls must not read files, write files, access localStorage directly, or imply backup exists.
 
 ### Experiment Contract
 

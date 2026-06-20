@@ -20,6 +20,7 @@ import type {
   Draft,
   DraftInput,
   Episode,
+  EmotionalSpace,
   PersonalExperiment,
   PersonalExperimentAttempt,
   PersonalExperimentAttemptInput,
@@ -28,6 +29,7 @@ import type {
   ReturnToSelfInput,
   ReturnToSelfPractice,
   SetupInput,
+  SpaceInput,
   StorageStatus,
   StoreNoWriteResult,
   StoreWriteResult,
@@ -48,6 +50,7 @@ import {
   updateDiscoveryPointStatusInState,
 } from "../domain/topics";
 import { addExperimentAttemptToState, addExperimentToState } from "../domain/experiments";
+import { updateActiveSpaceInState } from "../domain/spaces";
 
 export type AppStoreStatus =
   | "loading"
@@ -60,6 +63,7 @@ export type AppStoreStatus =
 
 export type AppActions = {
   completeSetup(input: SetupInput): StoreWriteResult;
+  updateActiveSpace(input: SpaceInput): StoreWriteResult<EmotionalSpace>;
   updateDailyMarket(input: DailyMarketInput): StoreWriteResult;
   saveQuickRecord(input: QuickRecordInput): StoreWriteResult<Episode>;
   saveReturnToSelfPractice(input: ReturnToSelfInput): StoreWriteResult<ReturnToSelfPractice>;
@@ -136,6 +140,21 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       return commitState(nextState);
     },
     [commitState],
+  );
+
+  const updateActiveSpace = useCallback(
+    (input: SpaceInput): StoreWriteResult<EmotionalSpace> => {
+      const timestamp = nowIso();
+      const { state: nextState, space } = updateActiveSpaceInState(state, input, timestamp);
+
+      if (!space) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const result = commitState(nextState);
+      return result.ok ? { ...result, value: space } : result;
+    },
+    [commitState, state],
   );
 
   const updateDailyMarket = useCallback(
@@ -450,6 +469,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const actions = useMemo<AppActions>(
     () => ({
       completeSetup,
+      updateActiveSpace,
       updateDailyMarket,
       saveQuickRecord,
       saveReturnToSelfPractice,
@@ -485,6 +505,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       savePersonalExperiment,
       savePersonalExperimentAttempt,
       saveReturnToSelfPractice,
+      updateActiveSpace,
       updateDiscoveryPointStatus,
       updateDiscoveryPointReviewNote,
       updateDailyMarket,

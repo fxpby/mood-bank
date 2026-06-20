@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend task overview and required checks."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Settings changes add a durable store action and must preserve local-first write contracts."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Settings UI stays route-owned with native controls and typed navigation."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "New action/input types must use strict result unions and avoid unsafe persisted data assumptions."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no network, no direct storage, honest persistence copy, and mobile-safe settings UI."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared thinking triggers for cross-layer settings write flow."}
