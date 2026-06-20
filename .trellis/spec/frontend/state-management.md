@@ -160,6 +160,7 @@ Current example:
 
 ```ts
 actions.saveDiscoveryPoint(buildOldEchoDiscoveryPointInput(input));
+actions.saveDiscoveryPoint(buildBoundaryClarityDiscoveryPointInput(input));
 ```
 
 Rules:
@@ -167,6 +168,7 @@ Rules:
 - P2 branch saves must use `sourceType: "manual"` or an already-supported source type.
 - P2 branch saves must not create account impacts unless the branch PRD defines explicit transparent rules.
 - Old-echo / inner-critic branch saves must use `theme: "old_echo"` and must not claim to diagnose trauma source, attachment style, object constancy, self-worth, inner parts, or the other person.
+- Boundary clarity branch saves must use `theme: "boundary"` and must not create Connection / Self / Energy impact by itself. Account movement can only come later from a separate episode, return-to-self practice, or experiment attempt with explicit source-owned evidence.
 - Routes must still show honest storage failure copy and must not show success copy when `saveDiscoveryPoint` fails.
 
 ### Anchor Contract

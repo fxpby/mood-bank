@@ -1,0 +1,7 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend task overview and required checks."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "New route and domain files must follow existing frontend module boundaries."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "New P2 branch should reuse existing route components and native controls."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Boundary branch save must use discovery point store action and create no account impacts."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Route union and domain chip unions must stay strictly typed."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Product copy must avoid diagnostic, transactional, network, and storage-bypass patterns."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Cross-layer and reuse thinking guide for route/domain/store changes."}

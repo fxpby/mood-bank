@@ -512,6 +512,9 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
               <Save size={16} strokeWidth={1.8} />
               保存边界方向
             </button>
+            <button className="button button--secondary" type="button" onClick={() => navigate("/boundary-clarity")}>
+              看看边界
+            </button>
             <button className="button button--secondary" type="button" onClick={saveDraft}>
               保存草稿
             </button>

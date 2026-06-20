@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend required checks."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify discovery-point save contract and no account impacts."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Verify route UI follows existing component patterns."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify strict route/domain typing."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no network/storage bypass and no diagnostic/control copy."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Review cross-layer consistency."}

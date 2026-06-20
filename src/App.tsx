@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "./components/AppShell";
 import { useAppStore } from "./store/AppStoreContext";
 import { AccountDetailPage } from "./routes/AccountDetailPage";
+import { BoundaryClarityPage } from "./routes/BoundaryClarityPage";
 import { DraftCheckPage } from "./routes/DraftCheckPage";
 import { EmotionCalibrationPage } from "./routes/EmotionCalibrationPage";
 import { ExperimentDetailPage } from "./routes/ExperimentDetailPage";
@@ -119,6 +120,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/old-echo") {
     return <OldEchoPage navigate={navigate} />;
+  }
+
+  if (route === "/boundary-clarity") {
+    return <BoundaryClarityPage navigate={navigate} />;
   }
 
   if (route === "/topics") {

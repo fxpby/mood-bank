@@ -104,6 +104,8 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
     impulse === "check_repeat" ||
     impulse === "over_explain" ||
     impulse === "attack_blame";
+  const shouldOfferBoundary =
+    signal === "boundary" || emotion === "anger" || wiseAction === "boundary_sentence";
 
   function resetSaveState() {
     setHasSaved(false);
@@ -304,6 +306,11 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
         {shouldOfferOldEcho ? (
           <button className="button button--secondary" type="button" onClick={() => navigate("/old-echo")}>
             看看旧感觉
+          </button>
+        ) : null}
+        {shouldOfferBoundary ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/boundary-clarity")}>
+            看看边界
           </button>
         ) : null}
         <button className="button button--secondary" type="button" onClick={() => navigate("/record/new")}>

@@ -312,6 +312,11 @@ export function OldEchoPage({ navigate }: OldEchoPageProps) {
           <HeartHandshake size={16} strokeWidth={1.8} />
           回到自己
         </button>
+        {response === "boundary_sentence" ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/boundary-clarity")}>
+            看看边界
+          </button>
+        ) : null}
         <button className="button button--secondary" type="button" onClick={() => navigate("/record/new")}>
           <NotebookPen size={16} strokeWidth={1.8} />
           记录一下

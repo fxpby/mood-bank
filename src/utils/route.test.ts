@@ -76,6 +76,11 @@ describe("route helpers", () => {
     expect(normalizeRoute("/old-echo/")).toBe("/old-echo");
   });
 
+  it("recognizes the boundary clarity branch route", () => {
+    expect(normalizeRoute("/boundary-clarity")).toBe("/boundary-clarity");
+    expect(normalizeRoute("/boundary-clarity/")).toBe("/boundary-clarity");
+  });
+
   it("keeps unknown routes on the home fallback", () => {
     expect(normalizeRoute("/not-real")).toBe("/");
   });
