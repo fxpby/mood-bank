@@ -317,6 +317,9 @@ export function OldEchoPage({ navigate }: OldEchoPageProps) {
             看看边界
           </button>
         ) : null}
+        <button className="button button--secondary" type="button" onClick={() => navigate("/self-compassion")}>
+          自我关怀一下
+        </button>
         <button className="button button--secondary" type="button" onClick={() => navigate("/record/new")}>
           <NotebookPen size={16} strokeWidth={1.8} />
           记录一下

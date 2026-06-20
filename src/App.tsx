@@ -16,6 +16,7 @@ import { RecordPage } from "./routes/RecordPage";
 import { RichIncomingPage } from "./routes/RichIncomingPage";
 import { ReturnToSelfPage } from "./routes/ReturnToSelfPage";
 import { SettingsPage } from "./routes/SettingsPage";
+import { SelfCompassionPage } from "./routes/SelfCompassionPage";
 import { SignalCheckPage } from "./routes/SignalCheckPage";
 import { SetupPage } from "./routes/SetupPage";
 import { TopicDetailPage } from "./routes/TopicDetailPage";
@@ -124,6 +125,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/boundary-clarity") {
     return <BoundaryClarityPage navigate={navigate} />;
+  }
+
+  if (route === "/self-compassion") {
+    return <SelfCompassionPage navigate={navigate} />;
   }
 
   if (route === "/topics") {

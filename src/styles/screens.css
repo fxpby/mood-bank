@@ -919,6 +919,10 @@
   padding-bottom: var(--space-6);
 }
 
+.self-compassion-page {
+  padding-bottom: var(--space-6);
+}
+
 .signal-check-landing {
   display: grid;
   gap: var(--space-4);
@@ -981,12 +985,28 @@
   color: var(--account-connection);
 }
 
+.self-compassion-landing {
+  display: grid;
+  gap: var(--space-4);
+  background:
+    linear-gradient(135deg, rgba(233, 240, 229, 0.82), rgba(255, 255, 255, 0.68)),
+    var(--account-self-bg);
+}
+
+.self-compassion-landing > svg {
+  color: var(--account-self);
+}
+
 .draft-check-textarea {
   min-height: 156px;
 }
 
 .boundary-clarity-textarea {
   min-height: 116px;
+}
+
+.self-compassion-textarea {
+  min-height: 104px;
 }
 
 .rich-incoming-note {
@@ -1003,7 +1023,8 @@
 .rich-incoming-actions,
 .emotion-calibration-actions,
 .old-echo-actions,
-.boundary-clarity-actions {
+.boundary-clarity-actions,
+.self-compassion-actions {
   display: grid;
   width: 100%;
   gap: var(--space-2);
@@ -1134,6 +1155,31 @@
 .boundary-responsibility-grid {
   display: grid;
   gap: var(--space-5);
+}
+
+.self-compassion-note {
+  display: grid;
+  gap: var(--space-2);
+  border: 1px solid rgba(183, 204, 177, 0.64);
+  border-radius: var(--radius-md);
+  background: rgba(233, 240, 229, 0.62);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-inset);
+}
+
+.self-compassion-note span {
+  color: var(--account-self);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.self-compassion-note p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .rich-incoming-note-card {

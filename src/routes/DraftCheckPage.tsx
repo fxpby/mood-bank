@@ -140,6 +140,11 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
   const result = getDraftCheckRecommendation(checkInput);
   const recommendationCopy = draftRecommendationCopy[result.recommendation];
   const shouldOfferOldEcho = state === "old_echo" || state === "inner_judge";
+  const shouldOfferSelfCompassion =
+    state === "inner_judge" ||
+    state === "old_echo" ||
+    motivation === "prove_self" ||
+    contentRisk === "over_explain";
 
   function goBack() {
     setMessage(null);
@@ -541,6 +546,11 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
         {shouldOfferOldEcho ? (
           <button className="button button--secondary" type="button" onClick={() => navigate("/old-echo")}>
             看看旧感觉
+          </button>
+        ) : null}
+        {shouldOfferSelfCompassion ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/self-compassion")}>
+            自我关怀一下
           </button>
         ) : null}
         <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>

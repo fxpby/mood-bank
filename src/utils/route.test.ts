@@ -81,6 +81,11 @@ describe("route helpers", () => {
     expect(normalizeRoute("/boundary-clarity/")).toBe("/boundary-clarity");
   });
 
+  it("recognizes the self-compassion branch route", () => {
+    expect(normalizeRoute("/self-compassion")).toBe("/self-compassion");
+    expect(normalizeRoute("/self-compassion/")).toBe("/self-compassion");
+  });
+
   it("keeps unknown routes on the home fallback", () => {
     expect(normalizeRoute("/not-real")).toBe("/");
   });

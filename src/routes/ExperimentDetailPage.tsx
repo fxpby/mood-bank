@@ -32,6 +32,7 @@ export function ExperimentDetailPage({ navigate }: ExperimentDetailPageProps) {
   const experiment = getExperimentById(state, experimentId);
   const [outcome, setOutcome] = useState<PersonalExperimentAttemptOutcome>("partial");
   const [note, setNote] = useState("");
+  const [latestOutcome, setLatestOutcome] = useState<PersonalExperimentAttemptOutcome | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,6 +77,7 @@ export function ExperimentDetailPage({ navigate }: ExperimentDetailPageProps) {
     }
 
     setNote("");
+    setLatestOutcome(outcome);
     setError(null);
     setFeedback(`已记录：${experimentOutcomeCopy[outcome]}。`);
   }
@@ -143,6 +145,11 @@ export function ExperimentDetailPage({ navigate }: ExperimentDetailPageProps) {
           记录一次练习
         </button>
         {feedback ? <p className="helper-text">{feedback}</p> : null}
+        {latestOutcome && latestOutcome !== "completed" ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/self-compassion")}>
+            自我关怀一下
+          </button>
+        ) : null}
         {error ? <p className="form-error">{error}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
       </section>

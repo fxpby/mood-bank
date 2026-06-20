@@ -161,6 +161,7 @@ Current example:
 ```ts
 actions.saveDiscoveryPoint(buildOldEchoDiscoveryPointInput(input));
 actions.saveDiscoveryPoint(buildBoundaryClarityDiscoveryPointInput(input));
+actions.saveDiscoveryPoint(buildSelfCompassionDiscoveryPointInput(input));
 ```
 
 Rules:
@@ -169,6 +170,7 @@ Rules:
 - P2 branch saves must not create account impacts unless the branch PRD defines explicit transparent rules.
 - Old-echo / inner-critic branch saves must use `theme: "old_echo"` and must not claim to diagnose trauma source, attachment style, object constancy, self-worth, inner parts, or the other person.
 - Boundary clarity branch saves must use `theme: "boundary"` and must not create Connection / Self / Energy impact by itself. Account movement can only come later from a separate episode, return-to-self practice, or experiment attempt with explicit source-owned evidence.
+- Self-compassion branch saves must use `theme: "self_care"` and must not create self-worth/self-esteem scores, biological claims, therapy claims, or account impacts by itself.
 - Routes must still show honest storage failure copy and must not show success copy when `saveDiscoveryPoint` fails.
 
 ### Anchor Contract

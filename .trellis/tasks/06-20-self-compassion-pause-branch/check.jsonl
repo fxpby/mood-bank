@@ -1,0 +1,7 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend required checks."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify discovery-point save contract and no account impacts."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Verify route UI follows existing component patterns."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify strict route/domain typing."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no network/storage bypass and no diagnostic or worth-score copy."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Review cross-layer consistency."}
+{"file": ".trellis/tasks/archive/2026-06/06-17-emotional-account-pwa/research/self-compassion-product-mapping.md", "reason": "Verify scope and copy stay within the research-backed safety boundary."}

@@ -264,6 +264,9 @@ export function ReturnToSelfPage({ navigate }: ReturnToSelfPageProps) {
         <button className="button button--secondary" type="button" onClick={() => setStep("body")}>
           再做一次
         </button>
+        <button className="button button--secondary" type="button" onClick={() => navigate("/self-compassion")}>
+          自我关怀一下
+        </button>
         <button className="button button--secondary" type="button" onClick={() => navigate("/rich-incoming")}>
           <MessageSquareText size={16} strokeWidth={1.8} />
           我收到很多内容，不知道怎么接
