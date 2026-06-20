@@ -1,4 +1,4 @@
-import { Compass, HeartHandshake, NotebookPen } from "lucide-react";
+import { Compass, HeartHandshake, NotebookPen, Plus } from "lucide-react";
 import { AccountSummaryCard } from "../components/AccountSummaryCard";
 import { PageHeader } from "../components/PageHeader";
 import { PrimaryActionPanel } from "../components/PrimaryActionPanel";
@@ -32,27 +32,20 @@ export function HomePage({ navigate }: HomePageProps) {
 
   return (
     <section className="home-page page-stack">
-      <PageHeader title="情感储蓄罐" kicker="一个本地保存的关系观察空间。" />
+      <PageHeader title="情感储蓄罐" />
 
-      <section className="home-context" aria-label="当前空间">
-        <div className="home-context__copy">
-          <span>当前空间</span>
-          <strong>{activeSpace?.displayName ?? "某段关系"}</strong>
+      <section className="home-hero" aria-label="当前空间">
+        <div className="home-hero__row">
+          <h2>{activeSpace?.displayName ?? "某段关系"}</h2>
+          <span>{marketLabel}</span>
         </div>
-        <div className="home-context__market">
-          <span>今日状态</span>
-          <strong>{marketLabel}</strong>
-        </div>
-      </section>
-
-      <section className="market-note">
         <p>{marketNote}</p>
       </section>
 
       <PrimaryActionPanel navigate={navigate} />
 
       <button className="record-action" type="button" onClick={() => navigate("/record")}>
-        <NotebookPen size={19} strokeWidth={1.8} />
+        <Plus size={19} strokeWidth={1.9} />
         <span>
           <strong>记录互动</strong>
           <small>先存下一个可确认的事实</small>

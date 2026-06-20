@@ -16,9 +16,12 @@ const accountRoutes: Record<AccountSummary["account"], AppRoute> = {
 export function AccountSummaryCard({ summary, navigate }: AccountSummaryCardProps) {
   return (
     <article className={`account-card account-card--${summary.account}`}>
-      <div className="account-card__top">
-        <span className="account-card__marker" aria-hidden="true" />
-        <strong>{summary.label}</strong>
+      <span className="account-card__marker" aria-hidden="true" />
+      <div className="account-card__content">
+        <div className="account-card__copy">
+          <strong>{summary.label}</strong>
+          <p className="account-card__state">{summary.stateLabel}</p>
+        </div>
         <button
           className="account-card__detail"
           type="button"
@@ -27,7 +30,6 @@ export function AccountSummaryCard({ summary, navigate }: AccountSummaryCardProp
           明细 <ChevronRight size={15} strokeWidth={1.8} />
         </button>
       </div>
-      <p className="account-card__state">{summary.stateLabel}</p>
       <p className="account-card__reason">{summary.reason}</p>
     </article>
   );

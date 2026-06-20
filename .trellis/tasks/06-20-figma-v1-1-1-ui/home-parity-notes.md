@@ -16,6 +16,13 @@ Reference:
   - kept existing labels, routes, and active-route logic unchanged
 - Kept safe bottom padding aligned with the taller bar through `--bottom-nav-height`.
 - Verified responsive widths at `430`, `360`, and `320` with no horizontal overflow.
+- Reworked Home main structure toward Figma `2:452` while preserving app logic:
+  - Home header now uses centered title and trailing more icon styling.
+  - Current space and daily state render as relationship heading plus warm status chip.
+  - Primary actions render as a 2 x 2 card grid in Figma order.
+  - The record entry renders as a full-width solid primary button.
+  - Account preview cards use compact white-card styling with semantic circular markers.
+  - The emotion-calibration entry was moved below account preview so it no longer interrupts the Figma home main structure.
 
 ## Recorded, Not Changed
 
@@ -23,15 +30,17 @@ These differences affect structure, copy, product priority, or local state, so t
 
 | Area | Figma `2:452` | Current app | Decision |
 |---|---|---|---|
-| Top bar | Back icon, centered title, more icon | Home page header with title and kicker, no back/more controls | Navigation semantics differ; do not change |
-| Context state | Relationship title plus warm status chip | Current space and daily state as two cards | Information architecture differs; do not change |
-| Primary actions | Four equal 2 x 2 action cards | Trigger and return-to-self span full width for trigger-first hierarchy | Product priority differs; do not change |
-| Record entry | One full-width record button | Record button plus emotion-calibration entry | Existing feature entry; do not remove |
-| Account preview | Compact white status cards | Semantic color cards with detail entry | Existing detail-entry decision; do not change |
+| Top bar | Back icon, centered title, more icon | Home page has centered title and more icon; no back button | Back on root home has different navigation semantics; do not add without alignment |
+| Context state | Relationship title plus warm status chip | Now matches the same structure using current local space/market data | Implemented |
+| Primary actions | Four equal 2 x 2 action cards | Now matches 2 x 2 Figma order while keeping existing routes/copy | Implemented |
+| Record entry | One full-width record button | Now matches as solid full-width primary button | Implemented |
+| Account preview | Compact white status cards | Now matches compact white-card direction; keeps the existing detail entry | Detail entry is product decision; do not remove |
 | Lower content | Latest record shown in design state | Local data may show latest record or today's anchor | State/data difference; do not reset data |
+| Extra entry | Not present in Figma home | Existing emotion-calibration route remains available below account preview | Existing feature entry; moved but not removed |
 
 ## Screenshot Artifacts
 
 - Before: `/tmp/mood-bank-home-current.png`
 - Figma scaled: `/tmp/figma-home-430.png`
 - After: `/tmp/mood-bank-home-after-nav.png`
+- Home structure pass: `/tmp/mood-bank-home-v3.png`

@@ -10,7 +10,7 @@ const actions: Array<{
   subtitle: string;
   route: AppRoute;
   badge?: string;
-  tone?: "trigger" | "return" | "placeholder";
+  tone: "trigger" | "signal" | "draft" | "return";
   icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
 }> = [
   {
@@ -21,23 +21,25 @@ const actions: Array<{
     icon: RotateCcw,
   },
   {
-    label: "回到自己",
-    subtitle: "取一个小动作",
-    route: "/return-to-self",
-    tone: "return",
-    icon: HeartHandshake,
-  },
-  {
     label: "想检查信号",
     subtitle: "先缓冲 10 分钟",
     route: "/signal-check",
+    tone: "signal",
     icon: FileSearch,
   },
   {
     label: "草稿自检",
     subtitle: "先看适不适合发",
     route: "/draft-check",
+    tone: "draft",
     icon: MessageSquareText,
+  },
+  {
+    label: "回到自己",
+    subtitle: "取一个小动作",
+    route: "/return-to-self",
+    tone: "return",
+    icon: HeartHandshake,
   },
 ];
 
@@ -56,8 +58,7 @@ export function PrimaryActionPanel({ navigate }: PrimaryActionPanelProps) {
             <button
               className={[
                 "action-tile",
-                index === 0 ? "action-tile--primary" : "",
-                action.tone === "return" ? "action-tile--return" : "",
+                `action-tile--${action.tone}`,
               ]
                 .filter(Boolean)
                 .join(" ")}
