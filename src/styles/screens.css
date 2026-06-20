@@ -923,6 +923,10 @@
   padding-bottom: var(--space-6);
 }
 
+.connection-continuity-page {
+  padding-bottom: var(--space-6);
+}
+
 .old-echo-page {
   padding-bottom: var(--space-6);
 }
@@ -1013,6 +1017,18 @@
   color: var(--color-action);
 }
 
+.connection-continuity-landing {
+  display: grid;
+  gap: var(--space-4);
+  background:
+    linear-gradient(135deg, rgba(233, 243, 245, 0.76), rgba(255, 255, 255, 0.68)),
+    var(--account-energy-bg);
+}
+
+.connection-continuity-landing > svg {
+  color: var(--account-energy);
+}
+
 .old-echo-landing {
   display: grid;
   gap: var(--space-4);
@@ -1065,6 +1081,10 @@
   min-height: 116px;
 }
 
+.connection-continuity-textarea {
+  min-height: 104px;
+}
+
 .self-compassion-textarea {
   min-height: 104px;
 }
@@ -1085,6 +1105,7 @@
 .empowerment-shift-actions,
 .seeing-evidence-actions,
 .healthy-love-actions,
+.connection-continuity-actions,
 .old-echo-actions,
 .boundary-clarity-actions,
 .self-compassion-actions {
@@ -1236,6 +1257,31 @@
 }
 
 .healthy-love-note p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.connection-continuity-note {
+  display: grid;
+  gap: var(--space-2);
+  border: 1px solid rgba(176, 203, 210, 0.76);
+  border-radius: var(--radius-md);
+  background: rgba(233, 243, 245, 0.64);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-inset);
+}
+
+.connection-continuity-note span {
+  color: var(--account-energy);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.connection-continuity-note p {
   margin: 0;
   color: var(--color-text-muted);
   font-size: var(--text-sm);

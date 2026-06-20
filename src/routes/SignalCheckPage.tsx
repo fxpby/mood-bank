@@ -93,6 +93,16 @@ export function SignalCheckPage({ navigate }: SignalCheckPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [hasSaved, setHasSaved] = useState(false);
   const isCheckingPath = action === "still_check";
+  const shouldOfferConnectionContinuity =
+    target === "cold_connection" ||
+    target === "ignored" ||
+    target === "send_again" ||
+    target === "relationship_future" ||
+    target === "ease_anxiety" ||
+    absentReaction === "connection_gone" ||
+    absentReaction === "cut_off" ||
+    absentReaction === "keep_refreshing" ||
+    absentReaction === "over_explain";
 
   function goBack() {
     setMessage(null);
@@ -334,6 +344,11 @@ export function SignalCheckPage({ navigate }: SignalCheckPageProps) {
               <Save size={16} strokeWidth={1.8} />
               {isCheckingPath ? "保存结果" : "保存这个模式"}
             </button>
+            {shouldOfferConnectionContinuity ? (
+              <button className="button button--secondary" type="button" onClick={() => navigate("/connection-continuity")}>
+                看连接感
+              </button>
+            ) : null}
             <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>
               完成
             </button>

@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend local-first constraints."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Verify UI composition follows existing branch patterns."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify durable writes go through store actions and no account impacts are added."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify route typing and discovery point construction."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no forbidden product or technical patterns."}
+{"file": ".trellis/tasks/archive/2026-06/06-17-emotional-account-pwa/research/attachment-continuity-awareness.md", "reason": "Verify feature stays non-diagnostic and moment-level."}

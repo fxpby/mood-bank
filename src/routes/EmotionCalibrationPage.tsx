@@ -113,6 +113,15 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
     impulse === "control" ||
     impulse === "rescue" ||
     impulse === "over_explain";
+  const shouldOfferConnectionContinuity =
+    signal === "care_loss" ||
+    signal === "need_safety" ||
+    signal === "vulnerability" ||
+    impulse === "control" ||
+    impulse === "check_repeat" ||
+    impulse === "over_explain" ||
+    impulse === "withdraw" ||
+    impulse === "freeze";
 
   function resetSaveState() {
     setHasSaved(false);
@@ -323,6 +332,11 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
         {shouldOfferHealthyLove ? (
           <button className="button button--secondary" type="button" onClick={() => navigate("/healthy-love")}>
             学习怎么爱/被爱
+          </button>
+        ) : null}
+        {shouldOfferConnectionContinuity ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/connection-continuity")}>
+            看连接感
           </button>
         ) : null}
         <button className="button button--secondary" type="button" onClick={() => navigate("/record/new")}>

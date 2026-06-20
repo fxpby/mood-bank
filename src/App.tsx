@@ -3,6 +3,7 @@ import { AppShell } from "./components/AppShell";
 import { useAppStore } from "./store/AppStoreContext";
 import { AccountDetailPage } from "./routes/AccountDetailPage";
 import { BoundaryClarityPage } from "./routes/BoundaryClarityPage";
+import { ConnectionContinuityPage } from "./routes/ConnectionContinuityPage";
 import { DraftCheckPage } from "./routes/DraftCheckPage";
 import { EmotionCalibrationPage } from "./routes/EmotionCalibrationPage";
 import { EmpowermentShiftPage } from "./routes/EmpowermentShiftPage";
@@ -132,6 +133,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/healthy-love") {
     return <HealthyLovePage navigate={navigate} />;
+  }
+
+  if (route === "/connection-continuity") {
+    return <ConnectionContinuityPage navigate={navigate} />;
   }
 
   if (route === "/old-echo") {

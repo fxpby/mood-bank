@@ -79,6 +79,11 @@ export function HealthyLovePage({ navigate }: HealthyLovePageProps) {
     [activeSpace?.id, action, leaning, momentNote, phase],
   );
   const summary = getHealthyLoveSummary(input);
+  const shouldOfferConnectionContinuity =
+    leaning === "attachment_alarm" ||
+    leaning === "control_outcome" ||
+    action === "pause_before_message" ||
+    action === "let_topic_wait";
 
   function resetSaveState() {
     setHasSaved(false);
@@ -280,6 +285,11 @@ export function HealthyLovePage({ navigate }: HealthyLovePageProps) {
         <button className="button button--secondary" type="button" onClick={() => navigate("/boundary-clarity")}>
           看看边界
         </button>
+        {shouldOfferConnectionContinuity ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/connection-continuity")}>
+            看连接感
+          </button>
+        ) : null}
         <button className="button button--secondary" type="button" onClick={() => navigate("/draft-check")}>
           <NotebookPen size={16} strokeWidth={1.8} />
           去草稿自检

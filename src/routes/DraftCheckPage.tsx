@@ -168,6 +168,17 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
     stance === "victim" ||
     stance === "rescuer" ||
     stance === "persecutor";
+  const shouldOfferConnectionContinuity =
+    state === "connection_alarm" ||
+    motivation === "hope_response" ||
+    motivation === "ease_anxiety" ||
+    noResponseTolerance === "check_repeatedly" ||
+    noResponseTolerance === "send_more" ||
+    noResponseTolerance === "ruminate_sleep" ||
+    noResponseTolerance === "collapse" ||
+    afterSend === "watch_reply" ||
+    afterSend === "send_more" ||
+    afterSend === "ruminate_sleep";
 
   function goBack() {
     setMessage(null);
@@ -589,6 +600,11 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
         {shouldOfferHealthyLove ? (
           <button className="button button--secondary" type="button" onClick={() => navigate("/healthy-love")}>
             学习怎么爱/被爱
+          </button>
+        ) : null}
+        {shouldOfferConnectionContinuity ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/connection-continuity")}>
+            看连接感
           </button>
         ) : null}
         <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>
