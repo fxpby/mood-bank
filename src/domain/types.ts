@@ -26,7 +26,8 @@ export type EpisodeSource =
 export type AccountImpactSourceType =
   | "episode"
   | "return_to_self"
-  | "trigger_completion";
+  | "trigger_completion"
+  | "experiment_attempt";
 
 export type AccountImpactReasonCode =
   | "observable_connection_evidence"
@@ -39,7 +40,10 @@ export type AccountImpactReasonCode =
   | "energy_depleted"
   | "energy_restored"
   | "energy_neutral"
-  | "no_connection_evidence";
+  | "no_connection_evidence"
+  | "experiment_completed"
+  | "experiment_partial"
+  | "experiment_noticed";
 
 export type ConnectionLevel = 0 | 1 | 2 | 3 | 4 | "not_sure";
 export type ActivationLevel = 0 | 1 | 2 | 3 | 4 | "not_sure";
@@ -177,6 +181,36 @@ export type ReservedItem = {
   updatedAt: string;
 };
 
+export type PersonalExperimentSource = "manual" | "personal_action";
+
+export type PersonalExperimentAttemptOutcome =
+  | "completed"
+  | "partial"
+  | "noticed"
+  | "not_suitable";
+
+export type PersonalExperimentAttempt = {
+  id: string;
+  outcome: PersonalExperimentAttemptOutcome;
+  note?: string;
+  accountImpacts: AccountImpact[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PersonalExperiment = {
+  id: string;
+  spaceId: string;
+  focus: string;
+  tinyAction: string;
+  completionMarker: string;
+  source: PersonalExperimentSource;
+  sourceActionId?: string;
+  attempts: PersonalExperimentAttempt[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type DiscoveryPoint = {
   id: string;
   spaceId: string;
@@ -204,7 +238,7 @@ export type AppState = {
   anchors: Anchor[];
   drafts: Draft[];
   topics: DiscoveryPoint[];
-  experiments: ReservedItem[];
+  experiments: PersonalExperiment[];
   personalActions: ReservedItem[];
   settings: AppSettings;
 };
@@ -314,6 +348,21 @@ export type AnchorInput = {
   text: string;
   sourceType?: Anchor["sourceType"];
   sourceId?: string;
+};
+
+export type PersonalExperimentInput = {
+  spaceId: string;
+  focus: string;
+  tinyAction: string;
+  completionMarker: string;
+  source?: PersonalExperimentSource;
+  sourceActionId?: string;
+};
+
+export type PersonalExperimentAttemptInput = {
+  experimentId: string;
+  outcome: PersonalExperimentAttemptOutcome;
+  note?: string;
 };
 
 export type DraftInput = {

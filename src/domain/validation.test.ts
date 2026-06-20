@@ -55,6 +55,33 @@ describe("validateMinimumAppState", () => {
     }
   });
 
+  it("normalizes legacy reserved experiments into readable small practices", () => {
+    const raw = {
+      ...createInitialState(),
+      experiments: [
+        {
+          id: "experiment_legacy",
+          createdAt: "2026-06-18T10:00:00.000Z",
+          updatedAt: "2026-06-18T10:00:00.000Z",
+        },
+      ],
+    };
+
+    const result = validateMinimumAppState(raw);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.state.experiments[0]).toMatchObject({
+        id: "experiment_legacy",
+        focus: "一个小练习",
+        tinyAction: "做一个今天能完成的小动作",
+        completionMarker: "我试过一次就算",
+        source: "manual",
+        attempts: [],
+      });
+    }
+  });
+
   it("rejects missing schemaVersion as corrupted shape", () => {
     const raw = createInitialState() as Record<string, unknown>;
     delete raw.schemaVersion;

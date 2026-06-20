@@ -4,6 +4,7 @@ import { useAppStore } from "./store/AppStoreContext";
 import { AccountDetailPage } from "./routes/AccountDetailPage";
 import { DraftCheckPage } from "./routes/DraftCheckPage";
 import { EmotionCalibrationPage } from "./routes/EmotionCalibrationPage";
+import { ExperimentDetailPage } from "./routes/ExperimentDetailPage";
 import { ExperimentsPage } from "./routes/ExperimentsPage";
 import { HomePage } from "./routes/HomePage";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
@@ -125,6 +126,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/experiments") {
     return <ExperimentsPage navigate={navigate} />;
+  }
+
+  if (route.startsWith("/experiments/")) {
+    return <ExperimentDetailPage navigate={navigate} />;
   }
 
   if (route === "/accounts/connection") {

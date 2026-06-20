@@ -73,6 +73,8 @@ Required action behavior:
 | `saveDiscoveryPoints` | Yes | Creates multiple discovery points in one commit. Must not create account impacts by default. |
 | `updateDiscoveryPointStatus` | Yes | Updates one discovery point status. Unknown ids return no-op success. Must not create account impacts. |
 | `updateDiscoveryPointReviewNote` | Yes | Updates one discovery point note for later review. Unknown ids return no-op success. Must not create account impacts or auto-change status. |
+| `savePersonalExperiment` | Yes | Creates one local small-practice record. Must not create account impacts on creation. |
+| `savePersonalExperimentAttempt` | Yes | Adds one attempt to an existing experiment. Completed/partial/noticed attempts may create transparent Self/Energy impacts; not-suitable creates no impact. Unknown ids return no-op success. |
 | `saveDraft` | Yes | Saves route draft data only; drafts never create account impacts. |
 | `deleteDraft` | Yes | No-op success if the draft is already absent. |
 | `resetLocalData` | Yes | Resets storage only after adapter reset succeeds. |
@@ -158,6 +160,24 @@ actions.saveAnchor({ spaceId, text });
 ```
 
 Saving an anchor must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Anchors are not tasks, experiments, relationship verdicts, or evidence rows.
+
+### Experiment Contract
+
+`experiments` in `AppState` stores `PersonalExperiment[]`, not streaks, reminders, tasks, or rewards. The Experiments pages may use route-local state for selecting a suggested personal action or composing the three small-practice fields, but durable changes must go through:
+
+```ts
+actions.savePersonalExperiment(input);
+actions.savePersonalExperimentAttempt(input);
+```
+
+Creating a small practice must not change Connection / Self / Energy summaries. Recording an attempt may add transparent source-owned impacts:
+
+- `completed`: Self +1 and Energy +1
+- `partial`: Self +1
+- `noticed`: Self +1
+- `not_suitable`: no impact
+
+Experiment attempts must not create Connection impact, streaks, due dates, scores, punishment, or partner-behavior rewards.
 
 ### Scenario: Record Detail Saves An Episode-Linked Anchor
 

@@ -20,6 +20,10 @@ import type {
   Draft,
   DraftInput,
   Episode,
+  PersonalExperiment,
+  PersonalExperimentAttempt,
+  PersonalExperimentAttemptInput,
+  PersonalExperimentInput,
   QuickRecordInput,
   ReturnToSelfInput,
   ReturnToSelfPractice,
@@ -43,6 +47,7 @@ import {
   updateDiscoveryPointNoteInState,
   updateDiscoveryPointStatusInState,
 } from "../domain/topics";
+import { addExperimentAttemptToState, addExperimentToState } from "../domain/experiments";
 
 export type AppStoreStatus =
   | "loading"
@@ -64,6 +69,10 @@ export type AppActions = {
   saveDiscoveryPoints(input: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoint[]>;
   updateDiscoveryPointStatus(input: DiscoveryPointStatusInput): StoreWriteResult<DiscoveryPoint>;
   updateDiscoveryPointReviewNote(input: DiscoveryPointReviewNoteInput): StoreWriteResult<DiscoveryPoint>;
+  savePersonalExperiment(input: PersonalExperimentInput): StoreWriteResult<PersonalExperiment>;
+  savePersonalExperimentAttempt(
+    input: PersonalExperimentAttemptInput,
+  ): StoreWriteResult<PersonalExperimentAttempt>;
   saveDraft(input: DraftInput): StoreWriteResult<Draft>;
   deleteDraft(draftId: string): StoreWriteResult;
   resetLocalData(): StoreWriteResult;
@@ -366,6 +375,38 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [commitState, state],
   );
 
+  const savePersonalExperiment = useCallback(
+    (input: PersonalExperimentInput): StoreWriteResult<PersonalExperiment> => {
+      const timestamp = nowIso();
+      const { state: nextState, experiment } = addExperimentToState(state, input, {
+        id: createId("experiment"),
+        timestamp,
+      });
+      const result = commitState(nextState);
+
+      return result.ok ? { ...result, value: experiment } : result;
+    },
+    [commitState, state],
+  );
+
+  const savePersonalExperimentAttempt = useCallback(
+    (input: PersonalExperimentAttemptInput): StoreWriteResult<PersonalExperimentAttempt> => {
+      const timestamp = nowIso();
+      const { state: nextState, attempt } = addExperimentAttemptToState(state, input, {
+        id: createId("experiment_attempt"),
+        timestamp,
+      });
+
+      if (!attempt) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const result = commitState(nextState);
+      return result.ok ? { ...result, value: attempt } : result;
+    },
+    [commitState, state],
+  );
+
   const deleteDraft = useCallback(
     (draftId: string): StoreWriteResult => {
       if (!state.drafts.some((draft) => draft.id === draftId)) {
@@ -424,6 +465,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveDiscoveryPoints,
       updateDiscoveryPointStatus,
       updateDiscoveryPointReviewNote,
+      savePersonalExperiment,
+      savePersonalExperimentAttempt,
       saveDraft,
       deleteDraft,
       resetLocalData,
@@ -439,6 +482,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveDiscoveryPoint,
       saveDiscoveryPoints,
       saveQuickRecord,
+      savePersonalExperiment,
+      savePersonalExperimentAttempt,
       saveReturnToSelfPractice,
       updateDiscoveryPointStatus,
       updateDiscoveryPointReviewNote,

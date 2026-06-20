@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend required checks."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify writes go through AppStoreContext and storage failure semantics are honest."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify typed model, validation, and route helpers."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no forbidden network/product/copy patterns."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared review checklist."}

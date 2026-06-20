@@ -5,6 +5,10 @@ import type {
   DiscoveryPointSourceType,
   DiscoveryPointStatus,
   DiscoveryPointTheme,
+  PersonalExperiment,
+  PersonalExperimentAttempt,
+  PersonalExperimentAttemptOutcome,
+  PersonalExperimentSource,
 } from "./types";
 import { SCHEMA_VERSION } from "./types";
 
@@ -41,7 +45,7 @@ export function validateMinimumAppState(value: unknown): MinimumShapeResult {
     anchors: asArray(state.anchors),
     drafts: asArray(state.drafts),
     topics: normalizeDiscoveryPoints(state.topics),
-    experiments: asArray(state.experiments),
+    experiments: normalizePersonalExperiments(state.experiments),
     personalActions: asArray(state.personalActions),
     settings: {
       hasCompletedSetup: settings.hasCompletedSetup,
@@ -50,6 +54,51 @@ export function validateMinimumAppState(value: unknown): MinimumShapeResult {
   };
 
   return { ok: true, state: normalized };
+}
+
+function normalizePersonalExperiments(value: unknown): PersonalExperiment[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter(isRecord).map((item) => {
+    const createdAt = getString(item.createdAt) ?? new Date(0).toISOString();
+    const updatedAt = getString(item.updatedAt) ?? createdAt;
+    const id = getString(item.id) ?? `experiment_${createdAt}`;
+
+    return {
+      id,
+      spaceId: getString(item.spaceId) ?? "",
+      focus: getString(item.focus) ?? getString(item.title) ?? "一个小练习",
+      tinyAction: getString(item.tinyAction) ?? getString(item.label) ?? "做一个今天能完成的小动作",
+      completionMarker: getString(item.completionMarker) ?? "我试过一次就算",
+      source: asPersonalExperimentSource(item.source),
+      sourceActionId: getString(item.sourceActionId),
+      attempts: normalizeExperimentAttempts(item.attempts),
+      createdAt,
+      updatedAt,
+    };
+  });
+}
+
+function normalizeExperimentAttempts(value: unknown): PersonalExperimentAttempt[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter(isRecord).map((item) => {
+    const createdAt = getString(item.createdAt) ?? new Date(0).toISOString();
+    const updatedAt = getString(item.updatedAt) ?? createdAt;
+
+    return {
+      id: getString(item.id) ?? `experiment_attempt_${createdAt}`,
+      outcome: asExperimentAttemptOutcome(item.outcome),
+      note: getString(item.note),
+      accountImpacts: Array.isArray(item.accountImpacts) ? item.accountImpacts : [],
+      createdAt,
+      updatedAt,
+    };
+  });
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -150,4 +199,21 @@ function asDiscoveryPointTheme(value: unknown): DiscoveryPointTheme | undefined 
   }
 
   return undefined;
+}
+
+function asPersonalExperimentSource(value: unknown): PersonalExperimentSource {
+  return value === "personal_action" ? "personal_action" : "manual";
+}
+
+function asExperimentAttemptOutcome(value: unknown): PersonalExperimentAttemptOutcome {
+  if (
+    value === "completed" ||
+    value === "partial" ||
+    value === "noticed" ||
+    value === "not_suitable"
+  ) {
+    return value;
+  }
+
+  return "noticed";
 }

@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend constraints, local-first PWA boundary, and required checks."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Route/domain/store/storage file placement conventions."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Durable write boundary and local state rules."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Typed app state, validation, route-state, and dynamic route conventions."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Forbidden network, telemetry, storage, verdict, score, and pressure-copy patterns."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared thinking guide index and pre-modification rule."}

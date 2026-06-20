@@ -16,6 +16,8 @@ import type {
   DiscoveryPoint,
   EmotionalSpace,
   Episode,
+  PersonalExperiment,
+  PersonalExperimentAttempt,
   ReturnToSelfPractice,
 } from "./types";
 
@@ -49,7 +51,7 @@ export function selectAccountSummaries(state: AppState): AccountSummary[] {
   return deriveAllAccountSummaries(state);
 }
 
-export type AccountImpactSourceLabel = "互动记录" | "回到自己" | "触发支持";
+export type AccountImpactSourceLabel = "互动记录" | "回到自己" | "触发支持" | "小练习";
 
 export type AccountDetailSourceRow = {
   impact: AccountImpact;
@@ -135,6 +137,17 @@ function buildAccountDetailRow(impact: AccountImpact, state: AppState): AccountD
     };
   }
 
+  if (impact.sourceType === "experiment_attempt") {
+    const source = findExperimentAttemptSource(state, impact.sourceId);
+    return {
+      impact,
+      sourceLabel: "小练习",
+      sourceTitle: source?.experiment.focus ?? "一次小练习",
+      sourceContext: source?.experiment.tinyAction ?? "这条练习记录暂时无法读取。",
+      evidence: getReadableEvidence(impact.evidence),
+    };
+  }
+
   return {
     impact,
     sourceLabel: "触发支持",
@@ -142,6 +155,21 @@ function buildAccountDetailRow(impact: AccountImpact, state: AppState): AccountD
     sourceContext: "这次只保存了完成信息，没有单独记录互动内容。",
     evidence: getReadableEvidence(impact.evidence),
   };
+}
+
+function findExperimentAttemptSource(
+  state: AppState,
+  attemptId: string,
+): { experiment: PersonalExperiment; attempt: PersonalExperimentAttempt } | null {
+  for (const experiment of state.experiments) {
+    const attempt = experiment.attempts.find((item) => item.id === attemptId);
+
+    if (attempt) {
+      return { experiment, attempt };
+    }
+  }
+
+  return null;
 }
 
 function getReadableEvidence(evidence: string | undefined): string | undefined {

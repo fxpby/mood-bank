@@ -49,6 +49,9 @@ export function collectAccountImpacts(state: AppState): AccountImpact[] {
   return [
     ...state.episodes.flatMap((episode) => episode.accountImpacts),
     ...state.returnToSelfPractices.flatMap((practice) => practice.accountImpacts),
+    ...state.experiments.flatMap((experiment) =>
+      experiment.attempts.flatMap((attempt) => attempt.accountImpacts),
+    ),
   ].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 

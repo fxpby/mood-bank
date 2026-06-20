@@ -11,6 +11,7 @@ export type AppRoute =
   | "/topics"
   | `/topics/${string}`
   | "/experiments"
+  | `/experiments/${string}`
   | "/signal-check"
   | "/draft-check"
   | "/rich-incoming"
@@ -32,6 +33,8 @@ export function normalizeRoute(pathname: string): AppRoute {
   if (recordRoute) return recordRoute;
   const topicRoute = getNormalizedTopicRoute(pathname);
   if (topicRoute) return topicRoute;
+  const experimentRoute = getNormalizedExperimentRoute(pathname);
+  if (experimentRoute) return experimentRoute;
 
   const cleanPath = pathname.replace(/\/+$/, "") || "/";
   const knownRoutes: AppRoute[] = [
@@ -80,6 +83,15 @@ export function buildRecordRoute(id: string): `/record/${string}` {
   return `/record/${encodeURIComponent(id)}`;
 }
 
+export function getExperimentRouteId(pathname: string): string | null {
+  const match = pathname.match(/^\/experiments\/([^/]+)\/?$/);
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
+}
+
+export function buildExperimentRoute(id: string): `/experiments/${string}` {
+  return `/experiments/${encodeURIComponent(id)}`;
+}
+
 function getNormalizedRecordRoute(pathname: string): `/record/${string}` | null {
   const match = pathname.match(/^\/record\/([^/]+)\/?$/);
   if (!match?.[1] || match[1] === "new") {
@@ -92,4 +104,9 @@ function getNormalizedRecordRoute(pathname: string): `/record/${string}` | null 
 function getNormalizedTopicRoute(pathname: string): `/topics/${string}` | null {
   const match = pathname.match(/^\/topics\/([^/]+)\/?$/);
   return match?.[1] ? `/topics/${encodeURIComponent(decodeURIComponent(match[1]))}` : null;
+}
+
+function getNormalizedExperimentRoute(pathname: string): `/experiments/${string}` | null {
+  const match = pathname.match(/^\/experiments\/([^/]+)\/?$/);
+  return match?.[1] ? `/experiments/${encodeURIComponent(decodeURIComponent(match[1]))}` : null;
 }

@@ -1,6 +1,14 @@
-import { ArrowRight, CheckCircle2, HeartHandshake, NotebookPen, RefreshCcw } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  HeartHandshake,
+  NotebookPen,
+  Plus,
+  RefreshCcw,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
+import { getExperimentsNewestFirst } from "../domain/experiments";
 import {
   buildPersonalActionQuickRecordPrefill,
   getNextPersonalActionRotation,
@@ -15,7 +23,7 @@ import {
   selectTodayMarketNote,
 } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute, RouteState } from "../utils/route";
+import { buildExperimentRoute, type AppRoute, type RouteState } from "../utils/route";
 
 type ExperimentsPageProps = {
   navigate: (route: AppRoute, state?: RouteState) => void;
@@ -24,7 +32,7 @@ type ExperimentsPageProps = {
 type CompletionState = "choosing" | "selected" | "completed";
 
 export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
-  const { state } = useAppStore();
+  const { state, actions, status, lastError } = useAppStore();
   const activeSpace = selectActiveSpace(state);
   const market = selectTodayMarket(state);
   const marketLabel = selectTodayMarketLabel(state);
@@ -32,11 +40,17 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
   const [rotationIndex, setRotationIndex] = useState(0);
   const [selectedAction, setSelectedAction] = useState<PersonalAction | null>(null);
   const [completionState, setCompletionState] = useState<CompletionState>("choosing");
+  const [focus, setFocus] = useState("");
+  const [tinyAction, setTinyAction] = useState("");
+  const [completionMarker, setCompletionMarker] = useState("");
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const actionSet = useMemo(
     () => getPersonalActionSet({ market, rotationIndex }),
     [market, rotationIndex],
   );
   const visibleActions = [actionSet.recommended, ...actionSet.alternatives];
+  const savedExperiments = getExperimentsNewestFirst(state);
 
   function chooseAction(action: PersonalAction) {
     setSelectedAction(action);
@@ -47,6 +61,8 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
     setRotationIndex((current) => getNextPersonalActionRotation(current));
     setSelectedAction(null);
     setCompletionState("choosing");
+    setFeedback(null);
+    setError(null);
   }
 
   function completeAction() {
@@ -57,6 +73,80 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
     navigate("/record/new", {
       quickRecordPrefill: buildPersonalActionQuickRecordPrefill(action),
     });
+  }
+
+  function saveSelectedActionAsExperiment(action: PersonalAction) {
+    if (!activeSpace) {
+      setError("还没有可以保存的空间。");
+      setFeedback(null);
+      return;
+    }
+
+    const result = actions.savePersonalExperiment({
+      spaceId: activeSpace.id,
+      focus: personalActionCategoryCopy[action.category],
+      tinyAction: action.label,
+      completionMarker: action.completionMarker,
+      source: "personal_action",
+      sourceActionId: action.id,
+    });
+
+    if (!result.ok) {
+      setError(result.error ?? "这次还没有存下。");
+      setFeedback(null);
+      return;
+    }
+
+    if (!result.value) {
+      setError("这次还没有存下。");
+      setFeedback(null);
+      return;
+    }
+
+    setError(null);
+    setFeedback("已存成小练习。可以之后回来记录一次。");
+    navigate(buildExperimentRoute(result.value.id));
+  }
+
+  function saveManualExperiment() {
+    if (!activeSpace) {
+      setError("还没有可以保存的空间。");
+      setFeedback(null);
+      return;
+    }
+
+    if (!focus.trim() || !tinyAction.trim() || !completionMarker.trim()) {
+      setError("先把三个小问题都留一句。");
+      setFeedback(null);
+      return;
+    }
+
+    const result = actions.savePersonalExperiment({
+      spaceId: activeSpace.id,
+      focus,
+      tinyAction,
+      completionMarker,
+      source: "manual",
+    });
+
+    if (!result.ok) {
+      setError(result.error ?? "这次还没有存下。");
+      setFeedback(null);
+      return;
+    }
+
+    if (!result.value) {
+      setError("这次还没有存下。");
+      setFeedback(null);
+      return;
+    }
+
+    setFocus("");
+    setTinyAction("");
+    setCompletionMarker("");
+    setError(null);
+    setFeedback("小练习已存下。");
+    navigate(buildExperimentRoute(result.value.id));
   }
 
   return (
@@ -97,6 +187,16 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
             ))}
           </div>
           <div className="experiments-inline-actions">
+            {selectedAction ? (
+              <button
+                className="button button--primary"
+                type="button"
+                onClick={() => saveSelectedActionAsExperiment(selectedAction)}
+              >
+                <Plus size={16} strokeWidth={1.8} />
+                存成小练习
+              </button>
+            ) : null}
             <button className="button button--secondary" type="button" onClick={rotateActions}>
               <RefreshCcw size={16} strokeWidth={1.8} />
               换一个
@@ -123,6 +223,14 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
             <button className="button button--ghost" type="button" onClick={rotateActions}>
               <RefreshCcw size={16} strokeWidth={1.8} />
               换一个
+            </button>
+            <button
+              className="button button--secondary"
+              type="button"
+              onClick={() => saveSelectedActionAsExperiment(selectedAction)}
+            >
+              <Plus size={16} strokeWidth={1.8} />
+              存成小练习
             </button>
           </div>
         </section>
@@ -163,6 +271,78 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
           </div>
         </section>
       ) : null}
+
+      <section className="panel page-stack">
+        <div className="section-heading">
+          <h2>自己建一个小练习</h2>
+          <p>三个短句就够，不需要写成计划。</p>
+        </div>
+        <label className="field">
+          <span className="field-label">我想练习什么</span>
+          <input
+            className="field-input"
+            value={focus}
+            onChange={(event) => setFocus(event.target.value)}
+            placeholder="例如：慢一点回复"
+          />
+        </label>
+        <label className="field">
+          <span className="field-label">小到今天能试一次的动作</span>
+          <input
+            className="field-input"
+            value={tinyAction}
+            onChange={(event) => setTinyAction(event.target.value)}
+            placeholder="例如：先写一句事实，不发送"
+          />
+        </label>
+        <label className="field">
+          <span className="field-label">什么算练习过一次</span>
+          <input
+            className="field-input"
+            value={completionMarker}
+            onChange={(event) => setCompletionMarker(event.target.value)}
+            placeholder="例如：写出来就算"
+          />
+        </label>
+        <button className="button button--primary" type="button" onClick={saveManualExperiment}>
+          <Plus size={16} strokeWidth={1.8} />
+          存下小练习
+        </button>
+        {feedback ? <p className="helper-text">{feedback}</p> : null}
+        {error ? <p className="form-error">{error}</p> : null}
+        {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
+      </section>
+
+      <section className="panel page-stack">
+        <div className="section-heading">
+          <h2>已经存下的小练习</h2>
+          <p>只是给之后的自己留一个入口。</p>
+        </div>
+        {savedExperiments.length ? (
+          <div className="experiment-list">
+            {savedExperiments.map((experiment) => (
+              <article className="experiment-card" key={experiment.id}>
+                <span>{experiment.attempts.length ? `记录过 ${experiment.attempts.length} 次` : "还没记录"}</span>
+                <h3>{experiment.focus}</h3>
+                <p>{experiment.tinyAction}</p>
+                <button
+                  className="button button--secondary"
+                  type="button"
+                  onClick={() => navigate(buildExperimentRoute(experiment.id))}
+                >
+                  打开练习
+                  <ArrowRight size={16} strokeWidth={1.8} />
+                </button>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="topics-empty">
+            <h2>还没有存下小练习</h2>
+            <p>可以先从一个推荐动作开始，也可以自己写一个很小的动作。</p>
+          </div>
+        )}
+      </section>
     </section>
   );
 }

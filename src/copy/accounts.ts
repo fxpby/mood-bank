@@ -36,6 +36,9 @@ export const accountReasonCopy: Record<AccountImpactReasonCode, string> = {
   energy_depleted: "这次让你明显消耗。",
   energy_neutral: "能量变化不明显。",
   no_connection_evidence: "这次还没有单独的连接证据。",
+  experiment_completed: "你完成了一次小练习。",
+  experiment_partial: "你完成了一部分小练习。",
+  experiment_noticed: "你看见了一个练习线索。",
 };
 
 const accountEvidenceCopy = {
@@ -55,6 +58,9 @@ const accountEvidenceCopy = {
   noticed_need: "看见自己需要停一下",
   lighter: "轻一点",
   more_tired: "更重",
+  completed: "完成了",
+  partial: "完成一部分",
+  noticed: "只是看见了",
 } as const satisfies Record<string, string>;
 
 export function getAccountEvidenceCopy(evidence: string): string {

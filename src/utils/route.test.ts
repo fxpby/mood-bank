@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   buildRecordRoute,
+  buildExperimentRoute,
   buildTopicRoute,
+  getExperimentRouteId,
   getRecordRouteId,
   getTopicRouteId,
   normalizeRoute,
@@ -40,6 +42,25 @@ describe("route helpers", () => {
 
   it("builds encoded record detail routes", () => {
     expect(buildRecordRoute("episode with space")).toBe("/record/episode%20with%20space");
+  });
+
+  it("normalizes experiment detail routes with ids", () => {
+    expect(normalizeRoute("/experiments/experiment_1")).toBe("/experiments/experiment_1");
+    expect(normalizeRoute("/experiments/experiment%20with%20space/")).toBe(
+      "/experiments/experiment%20with%20space",
+    );
+  });
+
+  it("extracts experiment route ids", () => {
+    expect(getExperimentRouteId("/experiments/experiment_1")).toBe("experiment_1");
+    expect(getExperimentRouteId("/experiments")).toBeNull();
+    expect(getExperimentRouteId("/experiments/experiment_1/extra")).toBeNull();
+  });
+
+  it("builds encoded experiment detail routes", () => {
+    expect(buildExperimentRoute("experiment with space")).toBe(
+      "/experiments/experiment%20with%20space",
+    );
   });
 
   it("recognizes the rich incoming review route", () => {
