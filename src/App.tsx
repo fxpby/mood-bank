@@ -8,6 +8,7 @@ import { EmotionCalibrationPage } from "./routes/EmotionCalibrationPage";
 import { EmpowermentShiftPage } from "./routes/EmpowermentShiftPage";
 import { ExperimentDetailPage } from "./routes/ExperimentDetailPage";
 import { ExperimentsPage } from "./routes/ExperimentsPage";
+import { HealthyLovePage } from "./routes/HealthyLovePage";
 import { HomePage } from "./routes/HomePage";
 import { OldEchoPage } from "./routes/OldEchoPage";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
@@ -127,6 +128,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/seeing-evidence") {
     return <SeeingEvidencePage navigate={navigate} />;
+  }
+
+  if (route === "/healthy-love") {
+    return <HealthyLovePage navigate={navigate} />;
   }
 
   if (route === "/old-echo") {

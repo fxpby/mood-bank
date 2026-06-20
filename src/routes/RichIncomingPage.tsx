@@ -157,6 +157,13 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
     emotions.includes("moved") ||
     emotions.includes("grateful") ||
     emotions.includes("settled");
+  const shouldOfferHealthyLove =
+    shouldOfferSeeingEvidence ||
+    selectedThreads.includes("values_meaning") ||
+    selectedThreads.includes("vulnerability") ||
+    direction === "ask_open_question" ||
+    direction === "reflect_key_point" ||
+    direction === "express_gratitude";
 
   function goBack() {
     setMessage(null);
@@ -410,6 +417,11 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
             {shouldOfferSeeingEvidence ? (
               <button className="button button--secondary" type="button" onClick={() => navigate("/seeing-evidence")}>
                 看见被看见的证据
+              </button>
+            ) : null}
+            {shouldOfferHealthyLove ? (
+              <button className="button button--secondary" type="button" onClick={() => navigate("/healthy-love")}>
+                学习怎么爱/被爱
               </button>
             ) : null}
             <button className="button button--secondary" type="button" onClick={() => navigate("/return-to-self")}>

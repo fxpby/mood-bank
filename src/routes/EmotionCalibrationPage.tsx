@@ -106,6 +106,13 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
     impulse === "attack_blame";
   const shouldOfferBoundary =
     signal === "boundary" || emotion === "anger" || wiseAction === "boundary_sentence";
+  const shouldOfferHealthyLove =
+    signal === "care_loss" ||
+    signal === "vulnerability" ||
+    signal === "values" ||
+    impulse === "control" ||
+    impulse === "rescue" ||
+    impulse === "over_explain";
 
   function resetSaveState() {
     setHasSaved(false);
@@ -311,6 +318,11 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
         {shouldOfferBoundary ? (
           <button className="button button--secondary" type="button" onClick={() => navigate("/boundary-clarity")}>
             看看边界
+          </button>
+        ) : null}
+        {shouldOfferHealthyLove ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/healthy-love")}>
+            学习怎么爱/被爱
           </button>
         ) : null}
         <button className="button button--secondary" type="button" onClick={() => navigate("/record/new")}>

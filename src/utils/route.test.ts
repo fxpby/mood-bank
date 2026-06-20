@@ -81,6 +81,11 @@ describe("route helpers", () => {
     expect(normalizeRoute("/seeing-evidence/")).toBe("/seeing-evidence");
   });
 
+  it("recognizes the healthy love branch route", () => {
+    expect(normalizeRoute("/healthy-love")).toBe("/healthy-love");
+    expect(normalizeRoute("/healthy-love/")).toBe("/healthy-love");
+  });
+
   it("recognizes the old echo branch route", () => {
     expect(normalizeRoute("/old-echo")).toBe("/old-echo");
     expect(normalizeRoute("/old-echo/")).toBe("/old-echo");

@@ -1,0 +1,8 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend implementation entry point and local project constraints."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Route/domain/test placement for the new branch."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Page and component reuse expectations for chip-first flows."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Store write contract and P2 branch output rules."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "TypeScript union/copy-map conventions for domain helpers."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Required checks and test expectations."}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "Reuse existing P2 branch patterns rather than inventing a new flow."}
+{"file": ".trellis/tasks/archive/2026-06/06-17-emotional-account-pwa/research/love-better-product-mapping.md", "reason": "Product framing for healthy love literacy and explicit exclusions."}

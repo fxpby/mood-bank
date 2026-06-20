@@ -153,6 +153,21 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
     motivation === "stay_present" ||
     contentRisk === "over_explain" ||
     state === "present";
+  const shouldOfferHealthyLove =
+    motivation === "repair_apologize" ||
+    motivation === "name_boundary" ||
+    motivation === "hope_response" ||
+    motivation === "prove_self" ||
+    motivation === "rescue_other" ||
+    motivation === "ease_anxiety" ||
+    motivation === "show_wrong" ||
+    result.recommendation === "boundary_expression" ||
+    contentRisk === "over_explain" ||
+    contentRisk === "attack_blame" ||
+    contentRisk === "unclear_boundary" ||
+    stance === "victim" ||
+    stance === "rescuer" ||
+    stance === "persecutor";
 
   function goBack() {
     setMessage(null);
@@ -569,6 +584,11 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
         {shouldOfferSeeingEvidence ? (
           <button className="button button--secondary" type="button" onClick={() => navigate("/seeing-evidence")}>
             看见被看见的证据
+          </button>
+        ) : null}
+        {shouldOfferHealthyLove ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/healthy-love")}>
+            学习怎么爱/被爱
           </button>
         ) : null}
         <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>
