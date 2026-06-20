@@ -145,6 +145,8 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
     state === "old_echo" ||
     motivation === "prove_self" ||
     contentRisk === "over_explain";
+  const shouldOfferEmpowermentShift =
+    stance === "victim" || stance === "rescuer" || stance === "persecutor";
 
   function goBack() {
     setMessage(null);
@@ -551,6 +553,11 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
         {shouldOfferSelfCompassion ? (
           <button className="button button--secondary" type="button" onClick={() => navigate("/self-compassion")}>
             自我关怀一下
+          </button>
+        ) : null}
+        {shouldOfferEmpowermentShift ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/empowerment-shift")}>
+            换到赋能三角
           </button>
         ) : null}
         <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>

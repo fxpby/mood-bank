@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Required frontend quality gate and project constraints."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify P2 branch saves only discovery points and no account impacts."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no hidden persistence, diagnostic copy, or forbidden behavior."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify route and product helper type safety."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared review prompts for reuse and cross-layer consistency."}

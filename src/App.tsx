@@ -5,6 +5,7 @@ import { AccountDetailPage } from "./routes/AccountDetailPage";
 import { BoundaryClarityPage } from "./routes/BoundaryClarityPage";
 import { DraftCheckPage } from "./routes/DraftCheckPage";
 import { EmotionCalibrationPage } from "./routes/EmotionCalibrationPage";
+import { EmpowermentShiftPage } from "./routes/EmpowermentShiftPage";
 import { ExperimentDetailPage } from "./routes/ExperimentDetailPage";
 import { ExperimentsPage } from "./routes/ExperimentsPage";
 import { HomePage } from "./routes/HomePage";
@@ -117,6 +118,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/emotion-calibration") {
     return <EmotionCalibrationPage navigate={navigate} />;
+  }
+
+  if (route === "/empowerment-shift") {
+    return <EmpowermentShiftPage navigate={navigate} />;
   }
 
   if (route === "/old-echo") {

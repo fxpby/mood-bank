@@ -16,6 +16,7 @@ export type AppRoute =
   | "/draft-check"
   | "/rich-incoming"
   | "/emotion-calibration"
+  | "/empowerment-shift"
   | "/old-echo"
   | "/boundary-clarity"
   | "/self-compassion"
@@ -55,6 +56,7 @@ export function normalizeRoute(pathname: string): AppRoute {
     "/draft-check",
     "/rich-incoming",
     "/emotion-calibration",
+    "/empowerment-shift",
     "/old-echo",
     "/boundary-clarity",
     "/self-compassion",

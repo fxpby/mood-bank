@@ -71,6 +71,11 @@ describe("route helpers", () => {
     expect(normalizeRoute("/emotion-calibration")).toBe("/emotion-calibration");
   });
 
+  it("recognizes the empowerment shift branch route", () => {
+    expect(normalizeRoute("/empowerment-shift")).toBe("/empowerment-shift");
+    expect(normalizeRoute("/empowerment-shift/")).toBe("/empowerment-shift");
+  });
+
   it("recognizes the old echo branch route", () => {
     expect(normalizeRoute("/old-echo")).toBe("/old-echo");
     expect(normalizeRoute("/old-echo/")).toBe("/old-echo");
