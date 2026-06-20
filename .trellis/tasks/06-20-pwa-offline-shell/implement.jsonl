@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend constraints for local-first PWA runtime and required checks."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Frontend file placement and persistence boundary conventions."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Forbidden network/telemetry/product patterns and quality checks."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "TypeScript and browser boundary safety conventions."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared pre-modification and thinking guide index."}

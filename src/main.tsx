@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { registerServiceWorker } from "./registerServiceWorker";
 import { AppStoreProvider } from "./store/AppStoreContext";
 import "./styles/global.css";
 import "./styles/screens.css";
@@ -18,3 +19,5 @@ createRoot(root).render(
     </AppStoreProvider>
   </StrictMode>,
 );
+
+registerServiceWorker();

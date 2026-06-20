@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend required checks and PWA constraints."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no forbidden network/telemetry or persistence boundary violations."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify TypeScript/browser API handling is safe."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared review checklist."}

@@ -23,6 +23,8 @@ The P0 app is a private local-first tool for emotionally activated use. Quality 
 
 Do not add backend sync, login, telemetry, push, AI calls, `fetch`, `XMLHttpRequest`, or `navigator.sendBeacon` in P0 product code.
 
+Controlled exception: a root-scoped `public/service-worker.js` may use `fetch` only to cache the app shell and same-origin static assets for offline reopening. It must not send telemetry, call application APIs, cache user state, use push/background sync, or change the `localStorage` persistence boundary.
+
 ### Browser Storage Outside Adapter
 
 Do not call `window.localStorage` outside `src/storage/storageAdapter.ts`.
