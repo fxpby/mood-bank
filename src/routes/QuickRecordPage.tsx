@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Save } from "lucide-react";
 import { CompletionCard } from "../components/CompletionCard";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { accountReasonCopy } from "../copy/accounts";
@@ -382,10 +383,18 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
   return (
     <section className="quick-record-page page-stack">
       <header className="quick-record-header">
-        <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>
-          关闭
-        </button>
-        <h1>{modeCopy.title}</h1>
+        <div className="quick-record-header__bar">
+          <button
+            className="icon-button quick-record-header__back"
+            type="button"
+            onClick={() => navigate("/home")}
+            aria-label="关闭并返回首页"
+          >
+            <ArrowLeft size={24} strokeWidth={1.8} />
+          </button>
+          <h1>{modeCopy.title}</h1>
+          <span className="quick-record-header__spacer" aria-hidden="true" />
+        </div>
         <p>{modeCopy.helper}</p>
       </header>
 
@@ -399,37 +408,43 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
           />
         </label>
 
-        <label className="field fact-field">
-          <span className="field-label">可确认的事实</span>
-          <span className="meta-text">摄像头能拍到的部分。</span>
-          <textarea
-            className="field-textarea"
-            value={facts}
-            onChange={(event) => setFacts(event.target.value)}
-            rows={3}
-            placeholder="例如：对方具体回应了我提到的勇气。"
-          />
-        </label>
+        <section className="record-form__fact-card" aria-label="事实和解释">
+          <label className="field fact-field">
+            <span className="record-form__label-row">
+              <span className="field-label">可确认的事实</span>
+              <span className="meta-text">摄像头能拍到的部分。</span>
+            </span>
+            <textarea
+              className="field-textarea"
+              value={facts}
+              onChange={(event) => setFacts(event.target.value)}
+              rows={3}
+              placeholder="例如：对方具体回应了我提到的勇气。"
+            />
+          </label>
 
-        <label className="field interpretation-field">
-          <span className="field-label">我脑中出现的解释</span>
-          <span className="meta-text">解释可以被记录，但暂时不用当成事实。</span>
-          <textarea
-            className="field-textarea"
-            value={interpretation}
-            onChange={(event) => setInterpretation(event.target.value)}
-            rows={3}
-            placeholder="我猜它可能意味着..."
-          />
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={interpretationSkipped}
-            onChange={(event) => setInterpretationSkipped(event.target.checked)}
-          />
-          <span>暂时不解释</span>
-        </label>
+          <label className="field interpretation-field">
+            <span className="record-form__label-row">
+              <span className="field-label">我脑中出现的解释</span>
+              <span className="meta-text">解释可以被记录，但暂时不用当成事实。</span>
+            </span>
+            <textarea
+              className="field-textarea"
+              value={interpretation}
+              onChange={(event) => setInterpretation(event.target.value)}
+              rows={3}
+              placeholder="我猜它可能意味着..."
+            />
+          </label>
+          <label className="checkbox-row">
+            <input
+              type="checkbox"
+              checked={interpretationSkipped}
+              onChange={(event) => setInterpretationSkipped(event.target.checked)}
+            />
+            <span>暂时不解释</span>
+          </label>
+        </section>
 
         <ChipGroup label="情绪" options={emotionOptions} value={emotion} onChange={setEmotion} />
         <ChipGroup label="身体" options={bodyOptions} value={body} onChange={setBody} />
@@ -518,6 +533,7 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
 
         <div className="record-form__actions">
           <button className="button button--primary" type="button" onClick={save}>
+            <Save size={20} strokeWidth={1.8} aria-hidden="true" />
             {status === "saving" ? "正在存下" : "存下"}
           </button>
           <button className="button button--ghost" type="button" onClick={saveDraftAndClose}>

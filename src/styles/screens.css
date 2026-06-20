@@ -1550,8 +1550,6 @@
 }
 
 .recommend-card,
-.quick-record-header,
-.record-form,
 .impact-preview {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -1561,14 +1559,12 @@
 }
 
 .recommend-card,
-.quick-record-header,
 .record-form {
   display: grid;
   gap: var(--space-3);
 }
 
 .recommend-card span,
-.quick-record-header p,
 .impact-preview span {
   color: var(--color-text-muted);
   font-size: var(--text-sm);
@@ -1582,48 +1578,183 @@
 }
 
 .recommend-card p,
-.quick-record-header h1,
-.quick-record-header p,
 .impact-preview h2 {
   margin: 0;
 }
 
-.quick-record-header {
-  background:
-    linear-gradient(135deg, rgba(233, 240, 229, 0.76), rgba(255, 255, 255, 0.7)),
-    var(--color-surface);
+.quick-record-page {
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
 }
 
-.quick-record-header .button {
-  justify-self: start;
+.quick-record-header {
+  display: grid;
+  gap: var(--space-2);
+  margin-inline: calc(var(--space-5) * -1);
+  margin-top: calc(var(--space-5) * -1);
+  border-bottom: 1px solid rgba(229, 225, 216, 0.68);
+  background: rgba(251, 249, 244, 0.94);
+  padding: var(--space-3) var(--space-5) var(--space-4);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.quick-record-header__bar {
+  display: grid;
+  min-height: 56px;
+  grid-template-columns: var(--touch-min) minmax(0, 1fr) var(--touch-min);
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.quick-record-header__back {
+  background: transparent;
+  color: var(--color-action);
+}
+
+.quick-record-header__spacer {
+  width: var(--touch-min);
+  height: var(--touch-min);
 }
 
 .quick-record-header h1 {
+  margin: 0;
   color: var(--color-text);
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: 28px;
   font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.28;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.quick-record-header p {
+  max-width: 30ch;
+  margin: 0 auto;
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  text-align: center;
 }
 
 .record-form {
-  padding-bottom: var(--space-5);
+  display: grid;
+  gap: var(--space-4);
+  border: 0;
+  background: transparent;
+  padding: 0 0 var(--space-5);
+  box-shadow: none;
+}
+
+.record-form > .field:first-child {
+  gap: var(--space-3);
+}
+
+.record-form > .field:first-child .field-label {
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+
+.quick-record-page .field-input,
+.quick-record-page .field-textarea {
+  border-color: rgba(116, 120, 113, 0.54);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: none;
+}
+
+.quick-record-page .field-input {
+  min-height: 56px;
+  font-size: var(--text-md);
+}
+
+.quick-record-page .field-textarea {
+  min-height: 118px;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-md);
+  line-height: 1.48;
+}
+
+.record-form__fact-card {
+  display: grid;
+  gap: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.82);
+  padding: var(--space-4);
+  box-shadow: 0 16px 40px rgba(45, 45, 45, 0.06), var(--shadow-inset);
+}
+
+.record-form__label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.record-form__label-row .field-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.record-form__label-row .meta-text {
+  flex: 0 0 auto;
+  line-height: 1.3;
 }
 
 .fact-field {
-  border-left: 3px solid var(--account-connection);
-  padding-left: var(--space-3);
+  gap: var(--space-3);
 }
 
 .interpretation-field {
-  border-left: 3px solid var(--account-self);
-  padding-left: var(--space-3);
+  gap: var(--space-3);
+}
+
+.fact-field .field-label {
+  color: var(--color-action);
+  font-size: var(--text-lg);
+  font-weight: 500;
+}
+
+.interpretation-field .field-label {
+  color: var(--account-connection);
+  font-size: var(--text-lg);
+  font-weight: 500;
+}
+
+.quick-record-page .checkbox-row {
+  margin-top: calc(var(--space-3) * -1);
+}
+
+.quick-record-page .chip-group {
+  gap: var(--space-3);
+}
+
+.quick-record-page .chip-group legend {
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+
+.quick-record-page .chip-row {
+  gap: var(--space-3);
+}
+
+.quick-record-page .chip {
+  min-height: 44px;
+  border-color: rgba(229, 225, 216, 0.9);
+  background: rgba(255, 255, 255, 0.78);
+  padding-inline: var(--space-4);
+  box-shadow: 0 6px 18px rgba(45, 45, 45, 0.04), var(--shadow-inset);
+}
+
+.quick-record-page .chip[aria-pressed="true"] {
+  border-color: var(--color-action);
+  background: var(--color-action);
+  color: var(--color-action-text);
+  box-shadow: 0 10px 20px rgba(78, 97, 75, 0.16);
 }
 
 .split-controls {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
 .impact-preview {
@@ -1653,17 +1784,26 @@
 }
 
 .record-form__actions {
-  position: sticky;
-  bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + var(--space-3));
   display: grid;
   gap: var(--space-2);
-  border: 1px solid rgba(229, 225, 216, 0.92);
+  border: 1px solid rgba(229, 225, 216, 0.68);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.9);
   padding: var(--space-3);
-  box-shadow: 0 14px 32px rgba(45, 45, 45, 0.1), var(--shadow-inset);
+  box-shadow: 0 18px 42px rgba(45, 45, 45, 0.08), var(--shadow-inset);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+}
+
+.record-form__actions .button--primary {
+  min-height: 60px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xl);
+  font-weight: 500;
+}
+
+.record-form__actions .button--ghost {
+  min-height: 44px;
 }
 
 .account-detail-page {
@@ -2000,6 +2140,22 @@
   background:
     linear-gradient(135deg, rgba(233, 240, 229, 0.88), rgba(255, 255, 255, 0.68)),
     var(--color-surface);
+}
+
+@media (max-width: 380px) {
+  .quick-record-header h1 {
+    font-size: var(--text-xl);
+    line-height: 1.2;
+  }
+
+  .record-form__label-row {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .record-form__label-row .meta-text {
+    flex: initial;
+  }
 }
 
 @media (max-width: 359px) {
