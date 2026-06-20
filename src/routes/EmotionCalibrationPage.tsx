@@ -97,6 +97,13 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
     [activeSpace?.id, emotion, impulse, signal, wiseAction],
   );
   const summary = getEmotionCalibrationSummary(saveInput);
+  const shouldOfferOldEcho =
+    signal === "old_echo" ||
+    emotion === "shame" ||
+    impulse === "control" ||
+    impulse === "check_repeat" ||
+    impulse === "over_explain" ||
+    impulse === "attack_blame";
 
   function resetSaveState() {
     setHasSaved(false);
@@ -294,6 +301,11 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
           <HeartHandshake size={16} strokeWidth={1.8} />
           回到自己
         </button>
+        {shouldOfferOldEcho ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/old-echo")}>
+            看看旧感觉
+          </button>
+        ) : null}
         <button className="button button--secondary" type="button" onClick={() => navigate("/record/new")}>
           <NotebookPen size={16} strokeWidth={1.8} />
           记录一下

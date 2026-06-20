@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend required checks."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify branch save contract and no account impacts."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify route and domain types."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no forbidden behavior or diagnostic copy."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Verify component and accessibility conventions."}

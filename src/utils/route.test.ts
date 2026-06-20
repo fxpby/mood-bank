@@ -71,6 +71,11 @@ describe("route helpers", () => {
     expect(normalizeRoute("/emotion-calibration")).toBe("/emotion-calibration");
   });
 
+  it("recognizes the old echo branch route", () => {
+    expect(normalizeRoute("/old-echo")).toBe("/old-echo");
+    expect(normalizeRoute("/old-echo/")).toBe("/old-echo");
+  });
+
   it("keeps unknown routes on the home fallback", () => {
     expect(normalizeRoute("/not-real")).toBe("/");
   });

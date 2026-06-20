@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend task overview and checks."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Branch save uses existing discovery point store action and must create no account impacts."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "P2 branch should reuse route-level components and native controls."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "New route, domain unions, and route state must stay strictly typed."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Check no network/storage bypass and no diagnostic/product pressure copy."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Cross-layer route/domain/store thinking guide."}

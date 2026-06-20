@@ -139,6 +139,7 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
   );
   const result = getDraftCheckRecommendation(checkInput);
   const recommendationCopy = draftRecommendationCopy[result.recommendation];
+  const shouldOfferOldEcho = state === "old_echo" || state === "inner_judge";
 
   function goBack() {
     setMessage(null);
@@ -532,6 +533,11 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
           <button className="button button--primary" type="button" onClick={() => navigate("/return-to-self")}>
             <HeartHandshake size={16} strokeWidth={1.8} />
             回到自己
+          </button>
+        ) : null}
+        {shouldOfferOldEcho ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/old-echo")}>
+            看看旧感觉
           </button>
         ) : null}
         <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>

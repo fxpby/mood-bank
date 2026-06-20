@@ -152,6 +152,23 @@ actions.updateDiscoveryPointReviewNote({ id, note });
 
 Saving or reviewing a discovery point must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Tests should assert that topic helpers leave derived storage-jar summaries unchanged.
 
+### P2 Branch Output Contract
+
+First-release P2 branches may save compact structured reflections as `DiscoveryPoint` records instead of adding dedicated persisted models. This is allowed when the branch is optional, low-risk, and does not need later editing beyond the normal Topics flow.
+
+Current example:
+
+```ts
+actions.saveDiscoveryPoint(buildOldEchoDiscoveryPointInput(input));
+```
+
+Rules:
+
+- P2 branch saves must use `sourceType: "manual"` or an already-supported source type.
+- P2 branch saves must not create account impacts unless the branch PRD defines explicit transparent rules.
+- Old-echo / inner-critic branch saves must use `theme: "old_echo"` and must not claim to diagnose trauma source, attachment style, object constancy, self-worth, inner parts, or the other person.
+- Routes must still show honest storage failure copy and must not show success copy when `saveDiscoveryPoint` fails.
+
 ### Anchor Contract
 
 `anchors` in `AppState` stores short support phrases that can be reused on Home and Return-To-Self. Durable anchor creation must go through:

@@ -7,6 +7,7 @@ import { EmotionCalibrationPage } from "./routes/EmotionCalibrationPage";
 import { ExperimentDetailPage } from "./routes/ExperimentDetailPage";
 import { ExperimentsPage } from "./routes/ExperimentsPage";
 import { HomePage } from "./routes/HomePage";
+import { OldEchoPage } from "./routes/OldEchoPage";
 import { PlaceholderPage } from "./routes/PlaceholderPage";
 import { QuickRecordPage } from "./routes/QuickRecordPage";
 import { RecordDetailPage } from "./routes/RecordDetailPage";
@@ -114,6 +115,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/emotion-calibration") {
     return <EmotionCalibrationPage navigate={navigate} />;
+  }
+
+  if (route === "/old-echo") {
+    return <OldEchoPage navigate={navigate} />;
   }
 
   if (route === "/topics") {
