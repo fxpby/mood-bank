@@ -915,6 +915,10 @@
   padding-bottom: var(--space-6);
 }
 
+.seeing-evidence-page {
+  padding-bottom: var(--space-6);
+}
+
 .old-echo-page {
   padding-bottom: var(--space-6);
 }
@@ -981,6 +985,18 @@
   color: var(--color-action);
 }
 
+.seeing-evidence-landing {
+  display: grid;
+  gap: var(--space-4);
+  background:
+    linear-gradient(135deg, rgba(255, 237, 229, 0.76), rgba(255, 255, 255, 0.7)),
+    var(--account-connection-bg);
+}
+
+.seeing-evidence-landing > svg {
+  color: var(--account-connection);
+}
+
 .old-echo-landing {
   display: grid;
   gap: var(--space-4);
@@ -1025,6 +1041,10 @@
   min-height: 116px;
 }
 
+.seeing-evidence-textarea {
+  min-height: 116px;
+}
+
 .self-compassion-textarea {
   min-height: 104px;
 }
@@ -1043,6 +1063,7 @@
 .rich-incoming-actions,
 .emotion-calibration-actions,
 .empowerment-shift-actions,
+.seeing-evidence-actions,
 .old-echo-actions,
 .boundary-clarity-actions,
 .self-compassion-actions {
@@ -1144,6 +1165,31 @@
 
 .empowerment-shift-note p,
 .empowerment-shift-card p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.seeing-evidence-note {
+  display: grid;
+  gap: var(--space-2);
+  border: 1px solid rgba(216, 161, 139, 0.52);
+  border-radius: var(--radius-md);
+  background: rgba(255, 237, 229, 0.62);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-inset);
+}
+
+.seeing-evidence-note span {
+  color: var(--account-connection);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.seeing-evidence-note p {
   margin: 0;
   color: var(--color-text-muted);
   font-size: var(--text-sm);

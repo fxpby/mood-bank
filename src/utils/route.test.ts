@@ -76,6 +76,11 @@ describe("route helpers", () => {
     expect(normalizeRoute("/empowerment-shift/")).toBe("/empowerment-shift");
   });
 
+  it("recognizes the seeing evidence branch route", () => {
+    expect(normalizeRoute("/seeing-evidence")).toBe("/seeing-evidence");
+    expect(normalizeRoute("/seeing-evidence/")).toBe("/seeing-evidence");
+  });
+
   it("recognizes the old echo branch route", () => {
     expect(normalizeRoute("/old-echo")).toBe("/old-echo");
     expect(normalizeRoute("/old-echo/")).toBe("/old-echo");

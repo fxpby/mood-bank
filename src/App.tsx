@@ -16,6 +16,7 @@ import { RecordDetailPage } from "./routes/RecordDetailPage";
 import { RecordPage } from "./routes/RecordPage";
 import { RichIncomingPage } from "./routes/RichIncomingPage";
 import { ReturnToSelfPage } from "./routes/ReturnToSelfPage";
+import { SeeingEvidencePage } from "./routes/SeeingEvidencePage";
 import { SettingsPage } from "./routes/SettingsPage";
 import { SelfCompassionPage } from "./routes/SelfCompassionPage";
 import { SignalCheckPage } from "./routes/SignalCheckPage";
@@ -122,6 +123,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/empowerment-shift") {
     return <EmpowermentShiftPage navigate={navigate} />;
+  }
+
+  if (route === "/seeing-evidence") {
+    return <SeeingEvidencePage navigate={navigate} />;
   }
 
   if (route === "/old-echo") {

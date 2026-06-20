@@ -1,0 +1,9 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend local-first constraints and required checks for P2 branch implementation."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Route/domain/store boundary placement for the new branch."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "React component, routing prop, CSS, and accessibility patterns."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Discovery point and P2 branch persistence contracts."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "No relationship verdicts, no hidden writes, and storage failure honesty."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Typed route and product data helper expectations."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared thinking guides for cross-layer and reuse checks."}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "Reuse existing P2 branch patterns instead of inventing a new flow structure."}
+{"file": ".trellis/tasks/archive/2026-06/06-17-emotional-account-pwa/research/seeing-and-being-seen-product-mapping.md", "reason": "Product mapping for being-seen evidence, listening micro-skills, and safety boundaries."}

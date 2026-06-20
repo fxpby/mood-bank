@@ -147,6 +147,16 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
   );
   const summary = getRichIncomingSummary(saveInput);
   const discoveryPointInputs = activeSpace ? buildRichIncomingDiscoveryPointInputs(saveInput) : [];
+  const shouldOfferSeeingEvidence =
+    shapes.includes("seen") ||
+    shapes.includes("warm") ||
+    selectedThreads.includes("being_seen") ||
+    selectedThreads.includes("mutual_care") ||
+    emotions.includes("seen") ||
+    emotions.includes("warm") ||
+    emotions.includes("moved") ||
+    emotions.includes("grateful") ||
+    emotions.includes("settled");
 
   function goBack() {
     setMessage(null);
@@ -397,6 +407,11 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
             <button className="button button--secondary" type="button" onClick={() => navigate("/draft-check")}>
               进入草稿自检
             </button>
+            {shouldOfferSeeingEvidence ? (
+              <button className="button button--secondary" type="button" onClick={() => navigate("/seeing-evidence")}>
+                看见被看见的证据
+              </button>
+            ) : null}
             <button className="button button--secondary" type="button" onClick={() => navigate("/return-to-self")}>
               <HeartHandshake size={16} strokeWidth={1.8} />
               回到自己

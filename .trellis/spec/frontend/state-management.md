@@ -172,6 +172,7 @@ Rules:
 - Boundary clarity branch saves must use `theme: "boundary"` and must not create Connection / Self / Energy impact by itself. Account movement can only come later from a separate episode, return-to-self practice, or experiment attempt with explicit source-owned evidence.
 - Self-compassion branch saves must use `theme: "self_care"` and must not create self-worth/self-esteem scores, biological claims, therapy claims, or account impacts by itself.
 - Empowerment shift branch saves must use `theme: "action_experiment"` and must not create account impacts in the first build. It may reference Victim / Rescuer / Persecutor only as the user's current interaction stance, must use "引导者" for the Coach/TED role, and must not label the other person or turn restored agency into blame, forced positivity, or a relationship verdict.
+- Seeing evidence branch saves must use `theme: "relationship_learning"` and must not create Connection / Self / Energy impacts in the first build. It may help the user name observable being-seen or mutual-listening evidence, but must not treat warmth as future proof, infer the other person's psychology, create an empathy score, or require the user to keep listening/responding when capacity is low.
 - Routes must still show honest storage failure copy and must not show success copy when `saveDiscoveryPoint` fails.
 
 ### Anchor Contract

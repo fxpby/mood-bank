@@ -147,6 +147,12 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
     contentRisk === "over_explain";
   const shouldOfferEmpowermentShift =
     stance === "victim" || stance === "rescuer" || stance === "persecutor";
+  const shouldOfferSeeingEvidence =
+    motivation === "express_feeling" ||
+    motivation === "repair_apologize" ||
+    motivation === "stay_present" ||
+    contentRisk === "over_explain" ||
+    state === "present";
 
   function goBack() {
     setMessage(null);
@@ -558,6 +564,11 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
         {shouldOfferEmpowermentShift ? (
           <button className="button button--secondary" type="button" onClick={() => navigate("/empowerment-shift")}>
             换到赋能三角
+          </button>
+        ) : null}
+        {shouldOfferSeeingEvidence ? (
+          <button className="button button--secondary" type="button" onClick={() => navigate("/seeing-evidence")}>
+            看见被看见的证据
           </button>
         ) : null}
         <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>
