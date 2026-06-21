@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import { deriveAllAccountSummaries } from "./accounts";
 import { createInitialState } from "./defaults";
 import {
+  buildPersonalActionExperimentInput,
   buildPersonalActionQuickRecordPrefill,
   getNextPersonalActionRotation,
   getPersonalActionSet,
   personalActions,
+  personalActionCategoryCopy,
 } from "./personalActions";
 
 describe("getPersonalActionSet", () => {
@@ -71,6 +73,19 @@ describe("getPersonalActionSet", () => {
       title: `完成一个小动作：${action.label}`,
       facts: `我在练习页选择并完成了「${action.label}」。${action.completionMarker}`,
       nextAction: "not_now",
+    });
+  });
+
+  it("builds a small-practice input from a personal action", () => {
+    const action = personalActions[2];
+
+    expect(buildPersonalActionExperimentInput(action, "space_1")).toEqual({
+      spaceId: "space_1",
+      focus: personalActionCategoryCopy[action.category],
+      tinyAction: action.label,
+      completionMarker: action.completionMarker,
+      source: "personal_action",
+      sourceActionId: action.id,
     });
   });
 });

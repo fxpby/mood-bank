@@ -2455,6 +2455,45 @@
   line-height: 1.45;
 }
 
+.account-action-confirmation__copy {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.account-action-confirmation__copy span {
+  color: var(--color-text-soft);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.account-action-confirmation__copy small {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.42;
+}
+
+.account-action-confirmation__actions {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.account-action-result {
+  display: grid;
+  gap: var(--space-2);
+  border: 1px solid rgba(183, 204, 177, 0.68);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.7);
+  padding: var(--space-3);
+}
+
+.account-action-result p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
 .experiments-page {
   padding-bottom: var(--space-6);
 }

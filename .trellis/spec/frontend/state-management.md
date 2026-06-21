@@ -75,7 +75,7 @@ Required action behavior:
 | `updateDiscoveryPointStatus` | Yes | Updates one discovery point status. Unknown ids return no-op success. Must not create account impacts. |
 | `updateDiscoveryPointReviewNote` | Yes | Updates one discovery point note for later review. Unknown ids return no-op success. Must not create account impacts or auto-change status. |
 | `savePersonalExperiment` | Yes | Creates one local small-practice record. Must not create account impacts on creation. |
-| `savePersonalExperimentAttempt` | Yes | Adds one attempt to an existing experiment. Completed/partial/noticed attempts may create transparent Self/Energy impacts; not-suitable creates no impact. Unknown ids return no-op success. |
+| `savePersonalExperimentAttempt` | Yes | Adds one attempt to an existing experiment. Completed/partial/noticed attempts may create transparent Self/Energy impacts; not-suitable creates no impact. Unknown ids return no-op success. Consecutive experiment writes in one UI event must read the latest successfully committed state, not stale React render state. |
 | `saveDraft` | Yes | Saves route draft data only; drafts never create account impacts. |
 | `deleteDraft` | Yes | No-op success if the draft is already absent. |
 | `resetLocalData` | Yes | Resets storage only after adapter reset succeeds. |
@@ -227,6 +227,42 @@ Supported `PersonalExperiment.source` values are:
 - `discovery_point`: created from Topic Detail; `sourceActionId` stores the source discovery point id.
 
 Experiment attempts must not create Connection impact, streaks, due dates, scores, punishment, or partner-behavior rewards.
+
+### Account Detail Personal Action Contract
+
+Account Detail may offer a lightweight personal action menu, but it must use the experiment model rather than a separate persisted intention model.
+
+Rules:
+
+- Selecting a personal action on `/accounts/:account` is route-local only. It must not persist an intention and must not create account impacts.
+- "存成小练习" calls `actions.savePersonalExperiment(buildPersonalActionExperimentInput(action, spaceId))`. Creating the experiment must not change Connection / Self / Energy summaries.
+- "完成一点" first saves the personal-action experiment, then records one `completed` attempt for that newly created experiment. This creates only the existing transparent experiment attempt impacts: Self +1 and Energy +1.
+- Account Detail personal action completion must never create Connection impact.
+- If experiment creation fails, do not record an attempt and do not show success copy.
+- If attempt creation fails after experiment creation succeeds, show honest partial-failure copy and do not claim completion was recorded.
+- "记录一下" may open Quick Record with `buildPersonalActionQuickRecordPrefill(action)`, but the Quick Record save remains a separate explicit user action.
+
+Wrong:
+
+```ts
+setSelectedActionId(action.id);
+actions.savePersonalExperimentAttempt({ experimentId: action.id, outcome: "completed" });
+```
+
+Correct:
+
+```ts
+const experimentResult = actions.savePersonalExperiment(
+  buildPersonalActionExperimentInput(action, activeSpace.id),
+);
+
+if (experimentResult.ok && experimentResult.value) {
+  actions.savePersonalExperimentAttempt({
+    experimentId: experimentResult.value.id,
+    outcome: "completed",
+  });
+}
+```
 
 ### Scenario: Record Detail Saves An Episode-Linked Anchor
 

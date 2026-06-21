@@ -1,21 +1,33 @@
-import { ArrowRight, RefreshCcw } from "lucide-react";
+import { ArrowRight, CheckCircle2, NotebookPen, Plus, RefreshCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import { accountCopy } from "../copy/accounts";
-import { selectAccountDetail, type AccountDetailSourceRow } from "../domain/selectors";
+import {
+  buildPersonalActionExperimentInput,
+  buildPersonalActionQuickRecordPrefill,
+  getNextPersonalActionRotation,
+  getPersonalActionSet,
+  personalActionCategoryCopy,
+  type PersonalAction,
+} from "../domain/personalActions";
+import {
+  selectAccountDetail,
+  selectActiveSpace,
+  selectTodayMarket,
+  type AccountDetailSourceRow,
+} from "../domain/selectors";
 import type { AccountId } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
-import { buildRecordRoute, type AppRoute } from "../utils/route";
+import { buildExperimentRoute, buildRecordRoute, type AppRoute, type RouteState } from "../utils/route";
 
 type AccountDetailPageProps = {
   account: AccountId;
-  navigate: (route: AppRoute) => void;
+  navigate: (route: AppRoute, state?: RouteState) => void;
 };
 
-type SuggestedAction = {
-  id: string;
-  label: string;
-  helper: string;
+type ActionFeedback = {
+  message: string;
+  experimentRoute: `/experiments/${string}`;
 };
 
 const accountTitles: Record<AccountId, string> = {
@@ -45,66 +57,112 @@ const reasonExplanations: Record<AccountId, string[]> = {
   ],
 };
 
-const suggestedActions: Record<AccountId, SuggestedAction[]> = {
-  connection: [
-    {
-      id: "record_observable",
-      label: "只存一个可观察事实",
-      helper: "先不推导未来，只写下真实发生的一句。",
-    },
-    {
-      id: "name_uncertainty",
-      label: "允许这次还不确定",
-      helper: "把温暖和结论分开放，给关系留一点空间。",
-    },
-    {
-      id: "return_body",
-      label: "先回到身体",
-      helper: "如果想反复检查信号，先把注意力带回来。",
-    },
-  ],
-  self: [
-    {
-      id: "one_owned_step",
-      label: "选一个自己的下一步",
-      helper: "小到两分钟也可以，不需要一次想完整。",
-    },
-    {
-      id: "save_draft",
-      label: "把想解释的话先存下",
-      helper: "让情绪先落地，不急着用回应换确定。",
-    },
-    {
-      id: "soft_sentence",
-      label: "给自己一句不攻击的话",
-      helper: "先停止内在审判，再决定要不要行动。",
-    },
-  ],
-  energy: [
-    {
-      id: "lighter_action",
-      label: "换一个更轻的动作",
-      helper: "喝水、洗手、站起来，先让系统降一点负荷。",
-    },
-    {
-      id: "close_loop",
-      label: "今天先不做重大结论",
-      helper: "把结论留到更稳的时候，今晚只照顾能量。",
-    },
-    {
-      id: "notice_cost",
-      label: "写下一个消耗来源",
-      helper: "看见消耗，不等于责怪任何人。",
-    },
-  ],
-};
-
 export function AccountDetailPage({ account, navigate }: AccountDetailPageProps) {
-  const { state } = useAppStore();
+  const { state, actions: storeActions, status, lastError } = useAppStore();
+  const activeSpace = selectActiveSpace(state);
+  const market = selectTodayMarket(state);
+  const [rotationIndex, setRotationIndex] = useState(0);
   const [selectedActionId, setSelectedActionId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<ActionFeedback | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const detail = useMemo(() => selectAccountDetail(state, account), [account, state]);
-  const actions = suggestedActions[account];
-  const selectedAction = actions.find((action) => action.id === selectedActionId);
+  const actionSet = useMemo(
+    () => getPersonalActionSet({ market, rotationIndex }),
+    [market, rotationIndex],
+  );
+  const visibleActions = [actionSet.recommended, ...actionSet.alternatives];
+  const selectedAction = visibleActions.find((action) => action.id === selectedActionId);
+
+  function chooseAction(action: PersonalAction) {
+    setSelectedActionId(action.id);
+    setFeedback(null);
+    setError(null);
+  }
+
+  function rotateActions() {
+    setRotationIndex((current) => getNextPersonalActionRotation(current));
+    setSelectedActionId(null);
+    setFeedback(null);
+    setError(null);
+  }
+
+  function clearSelection() {
+    setSelectedActionId(null);
+    setFeedback(null);
+    setError(null);
+  }
+
+  function saveSelectedActionAsExperiment(action: PersonalAction) {
+    if (!activeSpace) {
+      setError("还没有可以保存的空间。");
+      setFeedback(null);
+      return;
+    }
+
+    const result = storeActions.savePersonalExperiment(
+      buildPersonalActionExperimentInput(action, activeSpace.id),
+    );
+
+    if (!result.ok || !result.value) {
+      setError(result.ok ? "这次还没有存下，小练习还没有写进本机。" : result.error ?? "这次还没有存下。");
+      setFeedback(null);
+      return;
+    }
+
+    setError(null);
+    setFeedback(null);
+    navigate(buildExperimentRoute(result.value.id));
+  }
+
+  function completeSelectedAction(action: PersonalAction) {
+    if (!activeSpace) {
+      setError("还没有可以保存的空间。");
+      setFeedback(null);
+      return;
+    }
+
+    const experimentResult = storeActions.savePersonalExperiment(
+      buildPersonalActionExperimentInput(action, activeSpace.id),
+    );
+
+    if (!experimentResult.ok || !experimentResult.value) {
+      setError(
+        experimentResult.ok
+          ? "这次还没有存下，小练习还没有写进本机。"
+          : experimentResult.error ?? "这次还没有存下。",
+      );
+      setFeedback(null);
+      return;
+    }
+
+    const attemptResult = storeActions.savePersonalExperimentAttempt({
+      experimentId: experimentResult.value.id,
+      outcome: "completed",
+      note: action.completionMarker,
+    });
+
+    if (!attemptResult.ok || !attemptResult.value) {
+      setError(
+        attemptResult.ok
+          ? "小练习已存下，但完成记录还没有写进本机。可以打开小练习后再记录一次。"
+          : attemptResult.error ?? "小练习已存下，但完成记录还没有写进本机。",
+      );
+      setFeedback(null);
+      return;
+    }
+
+    setError(null);
+    setFeedback({
+      message: "已记录一次完成。它只会作为自己和能量的一点透明来源。",
+      experimentRoute: buildExperimentRoute(experimentResult.value.id),
+    });
+  }
+
+  function recordSelectedAction(action: PersonalAction) {
+    navigate("/record/new", {
+      quickRecordPrefill: buildPersonalActionQuickRecordPrefill(action),
+    });
+  }
 
   return (
     <section className="account-detail-page page-stack">
@@ -175,12 +233,13 @@ export function AccountDetailPage({ account, navigate }: AccountDetailPageProps)
           <p>只选一个，别把照顾自己也变成任务。</p>
         </div>
         <div className="personal-action-menu">
-          {actions.map((action, index) => (
+          {visibleActions.map((action, index) => (
             <button
               className={`personal-action-menu__item${selectedActionId === action.id ? " is-selected" : ""}`}
               type="button"
               key={action.id}
-              onClick={() => setSelectedActionId(action.id)}
+              aria-pressed={selectedActionId === action.id}
+              onClick={() => chooseAction(action)}
             >
               <span>{index === 0 ? "推荐" : "也可以"}</span>
               <strong>{action.label}</strong>
@@ -190,13 +249,63 @@ export function AccountDetailPage({ account, navigate }: AccountDetailPageProps)
         </div>
         {selectedAction ? (
           <div className="account-action-confirmation" role="status">
-            <p>已放进今天的小动作：{selectedAction.label}</p>
-            <button className="button button--ghost" type="button" onClick={() => setSelectedActionId(null)}>
-              <RefreshCcw size={16} strokeWidth={1.8} />
-              换一个
+            <div className="account-action-confirmation__copy">
+              <span>{personalActionCategoryCopy[selectedAction.category]}</span>
+              <p>已放进今天的小动作：{selectedAction.label}</p>
+              <small>{selectedAction.completionMarker}</small>
+            </div>
+            <div className="account-action-confirmation__actions">
+              <button
+                className="button button--primary"
+                type="button"
+                onClick={() => completeSelectedAction(selectedAction)}
+              >
+                <CheckCircle2 size={16} strokeWidth={1.8} />
+                完成一点
+              </button>
+              <button
+                className="button button--secondary"
+                type="button"
+                onClick={() => saveSelectedActionAsExperiment(selectedAction)}
+              >
+                <Plus size={16} strokeWidth={1.8} />
+                存成小练习
+              </button>
+              <button
+                className="button button--secondary"
+                type="button"
+                onClick={() => recordSelectedAction(selectedAction)}
+              >
+                <NotebookPen size={16} strokeWidth={1.8} />
+                记录一下
+              </button>
+              <button className="button button--ghost" type="button" onClick={clearSelection}>
+                换一个
+              </button>
+            </div>
+          </div>
+        ) : null}
+        <div className="experiments-inline-actions">
+          <button className="button button--secondary" type="button" onClick={rotateActions}>
+            <RefreshCcw size={16} strokeWidth={1.8} />
+            换一组
+          </button>
+        </div>
+        {feedback ? (
+          <div className="account-action-result" role="status">
+            <p>{feedback.message}</p>
+            <button
+              className="button button--secondary"
+              type="button"
+              onClick={() => navigate(feedback.experimentRoute)}
+            >
+              打开小练习
+              <ArrowRight size={16} strokeWidth={1.8} />
             </button>
           </div>
         ) : null}
+        {error ? <p className="form-error">{error}</p> : null}
+        {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
       </section>
     </section>
   );

@@ -1,4 +1,4 @@
-import type { DailyMarket, QuickRecordPrefill } from "./types";
+import type { DailyMarket, PersonalExperimentInput, QuickRecordPrefill } from "./types";
 
 export type PersonalActionCategory =
   | "lower_activation"
@@ -162,6 +162,20 @@ export function buildPersonalActionQuickRecordPrefill(
     title: `完成一个小动作：${action.label}`,
     facts: `我在练习页选择并完成了「${action.label}」。${action.completionMarker}`,
     nextAction: "not_now",
+  };
+}
+
+export function buildPersonalActionExperimentInput(
+  action: PersonalAction,
+  spaceId: string,
+): PersonalExperimentInput {
+  return {
+    spaceId,
+    focus: personalActionCategoryCopy[action.category],
+    tinyAction: action.label,
+    completionMarker: action.completionMarker,
+    source: "personal_action",
+    sourceActionId: action.id,
   };
 }
 

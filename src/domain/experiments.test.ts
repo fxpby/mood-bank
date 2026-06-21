@@ -9,6 +9,7 @@ import {
   getExperimentById,
   getExperimentsNewestFirst,
 } from "./experiments";
+import { buildPersonalActionExperimentInput, personalActions } from "./personalActions";
 import type { DiscoveryPoint } from "./types";
 
 describe("personal experiments", () => {
@@ -83,6 +84,40 @@ describe("personal experiments", () => {
       sourceActionId: "topic_2",
     });
     expect(deriveAllAccountSummaries(result.state)).toEqual(before);
+  });
+
+  it("keeps personal-action experiment creation no-impact and completed attempt self/energy only", () => {
+    const state = createInitialState();
+    const before = deriveAllAccountSummaries(state);
+    const created = addExperimentToState(
+      state,
+      buildPersonalActionExperimentInput(personalActions[0], "space_1"),
+      { id: "experiment_1", timestamp: "2026-06-20T09:00:00.000Z" },
+    );
+
+    expect(created.experiment).toMatchObject({
+      source: "personal_action",
+      sourceActionId: personalActions[0].id,
+    });
+    expect(deriveAllAccountSummaries(created.state)).toEqual(before);
+
+    const attempted = addExperimentAttemptToState(
+      created.state,
+      {
+        experimentId: created.experiment.id,
+        outcome: "completed",
+        note: personalActions[0].completionMarker,
+      },
+      { id: "attempt_1", timestamp: "2026-06-20T10:00:00.000Z" },
+    );
+
+    expect(attempted.attempt?.accountImpacts.map((impact) => impact.account)).toEqual([
+      "self",
+      "energy",
+    ]);
+    expect(
+      attempted.attempt?.accountImpacts.some((impact) => impact.account === "connection"),
+    ).toBe(false);
   });
 
   it("records attempts newest first", () => {

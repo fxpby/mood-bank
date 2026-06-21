@@ -98,6 +98,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const adapterRef = useRef<StorageAdapter>(createLocalStorageAdapter());
   const initialLoad = useMemo(() => adapterRef.current.load(), []);
   const [state, setState] = useState<AppState>(() => loadState(initialLoad));
+  const stateRef = useRef<AppState>(state);
   const [status, setStatus] = useState<AppStoreStatus>(() =>
     initialLoad.ok ? "ready" : "storage_warning",
   );
@@ -126,6 +127,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     }
 
     const savedAt = nowIso();
+    stateRef.current = nextState;
     setState(nextState);
     setStatus("ready");
     setStorageStatus("available");
@@ -397,7 +399,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const savePersonalExperiment = useCallback(
     (input: PersonalExperimentInput): StoreWriteResult<PersonalExperiment> => {
       const timestamp = nowIso();
-      const { state: nextState, experiment } = addExperimentToState(state, input, {
+      const { state: nextState, experiment } = addExperimentToState(stateRef.current, input, {
         id: createId("experiment"),
         timestamp,
       });
@@ -411,7 +413,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const savePersonalExperimentAttempt = useCallback(
     (input: PersonalExperimentAttemptInput): StoreWriteResult<PersonalExperimentAttempt> => {
       const timestamp = nowIso();
-      const { state: nextState, attempt } = addExperimentAttemptToState(state, input, {
+      const { state: nextState, attempt } = addExperimentAttemptToState(stateRef.current, input, {
         id: createId("experiment_attempt"),
         timestamp,
       });
@@ -452,7 +454,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     }
 
     const savedAt = nowIso();
-    setState(createInitialState());
+    const nextState = createInitialState();
+    stateRef.current = nextState;
+    setState(nextState);
     setStatus("ready");
     setStorageStatus("available");
     setLastError(undefined);
