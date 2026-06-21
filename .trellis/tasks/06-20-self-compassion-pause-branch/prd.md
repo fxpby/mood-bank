@@ -27,12 +27,12 @@ Add a compact `/self-compassion` branch for shame, harsh self-talk, perfectionis
 
 ## Acceptance Criteria
 
-- [ ] `/self-compassion` is recognized by route normalization and renders after setup.
-- [ ] User can complete the branch and see a summary with pain, reminder, critic/rewrite, kindness action, and responsible next action.
-- [ ] User can save the summary as a self-care discovery point.
-- [ ] Saved discovery point uses self-care theme, manual source, readable Chinese note copy, and no account impacts.
-- [ ] Old Echo, Draft Check, Experiment Detail, and Return-To-Self expose contextual entry buttons without blocking existing actions.
-- [ ] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
+- [x] `/self-compassion` is recognized by route normalization and renders after setup.
+- [x] User can complete the branch and see a summary with pain, reminder, critic/rewrite, kindness action, and responsible next action.
+- [x] User can save the summary as a self-care discovery point.
+- [x] Saved discovery point uses self-care theme, manual source, readable Chinese note copy, and no account impacts.
+- [x] Old Echo, Draft Check, Experiment Detail, and Return-To-Self expose contextual entry buttons without blocking existing actions.
+- [x] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
 
 ## Definition of Done
 

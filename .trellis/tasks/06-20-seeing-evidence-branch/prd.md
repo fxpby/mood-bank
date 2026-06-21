@@ -25,12 +25,12 @@ Add a compact optional `/seeing-evidence` branch that helps the user recognize o
 
 ## Acceptance Criteria
 
-- [ ] `/seeing-evidence` is recognized by route normalization and renders after setup.
-- [ ] User can complete the branch and see a summary with focus, observable evidence, calibration, capacity, and next direction.
-- [ ] User can save the summary as a relationship-learning discovery point.
-- [ ] Saved discovery point uses manual source, readable Chinese note copy, and no account impacts.
-- [ ] Rich Incoming and Draft Check expose contextual entry buttons without blocking existing actions.
-- [ ] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
+- [x] `/seeing-evidence` is recognized by route normalization and renders after setup.
+- [x] User can complete the branch and see a summary with focus, observable evidence, calibration, capacity, and next direction.
+- [x] User can save the summary as a relationship-learning discovery point.
+- [x] Saved discovery point uses manual source, readable Chinese note copy, and no account impacts.
+- [x] Rich Incoming and Draft Check expose contextual entry buttons without blocking existing actions.
+- [x] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
 
 ## Definition of Done
 

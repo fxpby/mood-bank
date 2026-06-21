@@ -27,12 +27,12 @@ Add a compact optional `/connection-continuity` branch for moments when connecti
 
 ## Acceptance Criteria
 
-- [ ] `/connection-continuity` is recognized by route normalization and renders after setup.
-- [ ] User can complete the branch and see a summary with felt state, evidence-that-existed, cannot-prove line, next action, and calibration reminder.
-- [ ] User can save the summary as a relationship-learning discovery point.
-- [ ] Saved discovery point uses manual source, readable Chinese note copy, and no account impacts.
-- [ ] Signal Check, Draft Check, Emotion Calibration, and Healthy Love expose contextual entry buttons without blocking existing actions.
-- [ ] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
+- [x] `/connection-continuity` is recognized by route normalization and renders after setup.
+- [x] User can complete the branch and see a summary with felt state, evidence-that-existed, cannot-prove line, next action, and calibration reminder.
+- [x] User can save the summary as a relationship-learning discovery point.
+- [x] Saved discovery point uses manual source, readable Chinese note copy, and no account impacts.
+- [x] Signal Check, Draft Check, Emotion Calibration, and Healthy Love expose contextual entry buttons without blocking existing actions.
+- [x] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
 
 ## Definition of Done
 

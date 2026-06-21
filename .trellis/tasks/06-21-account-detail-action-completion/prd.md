@@ -48,13 +48,13 @@ This gives the action a real source-owned record while avoiding a new model, str
 
 ## Acceptance Criteria
 
-- [ ] Account Detail still supports choosing/refeshing/skipping a personal action without durable impact.
-- [ ] Selected action can be saved as a small practice and opens the created practice detail.
-- [ ] Selected action can be marked completed, creating a practice and one completed attempt.
-- [ ] Completed action creates transparent Self/Energy impact via existing experiment attempt rules and never creates Connection impact.
-- [ ] Failure in either write path shows honest error copy and does not show completion success.
-- [ ] User can open Quick Record with a selected-action prefill.
-- [ ] `npm run typecheck`, `npm test`, and `npm run build` pass.
+- [x] Account Detail still supports choosing/refeshing/skipping a personal action without durable impact.
+- [x] Selected action can be saved as a small practice and opens the created practice detail.
+- [x] Selected action can be marked completed, creating a practice and one completed attempt.
+- [x] Completed action creates transparent Self/Energy impact via existing experiment attempt rules and never creates Connection impact.
+- [x] Failure in either write path shows honest error copy and does not show completion success.
+- [x] User can open Quick Record with a selected-action prefill.
+- [x] `npm run typecheck`, `npm test`, and `npm run build` pass.
 
 ## Definition Of Done
 

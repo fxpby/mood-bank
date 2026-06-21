@@ -76,12 +76,12 @@ Do not build:
 
 ## Acceptance Criteria
 
-- [ ] A reusable `SupportBoundaryCard` exists and is used in at least Boundary Clarity, Old Echo, Emotion Calibration, Draft Check, Trigger, and Return-To-Self/Self-Compassion where relevant.
-- [ ] `src/copy/safety.ts` centralizes support-boundary user-facing copy.
-- [ ] `src/domain/safety.ts` exposes tested deterministic helpers.
-- [ ] High-risk/support copy remains non-diagnostic and does not score danger.
-- [ ] Existing save flows still use `AppStoreContext` actions and are not changed by the support copy.
-- [ ] `npm run typecheck`, `npm test`, and `npm run build` pass.
+- [x] A reusable `SupportBoundaryCard` exists and is used in at least Boundary Clarity, Old Echo, Emotion Calibration, Draft Check, Trigger, and Return-To-Self/Self-Compassion where relevant.
+- [x] `src/copy/safety.ts` centralizes support-boundary user-facing copy.
+- [x] `src/domain/safety.ts` exposes tested deterministic helpers.
+- [x] High-risk/support copy remains non-diagnostic and does not score danger.
+- [x] Existing save flows still use `AppStoreContext` actions and are not changed by the support copy.
+- [x] `npm run typecheck`, `npm test`, and `npm run build` pass.
 
 ## Commit Message
 

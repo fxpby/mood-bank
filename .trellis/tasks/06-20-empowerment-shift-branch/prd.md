@@ -24,12 +24,12 @@ Add a compact optional `/empowerment-shift` branch that helps the user notice a 
 
 ## Acceptance Criteria
 
-- [ ] `/empowerment-shift` is recognized by route normalization and renders after setup.
-- [ ] User can complete the branch and see a summary with current stance, empowered stance, prompt response, and owned next action.
-- [ ] User can save the summary as an action-experiment discovery point.
-- [ ] Saved discovery point uses manual source, readable Chinese note copy, and no account impacts.
-- [ ] Draft Check exposes the contextual entry only for drama-triangle stances.
-- [ ] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
+- [x] `/empowerment-shift` is recognized by route normalization and renders after setup.
+- [x] User can complete the branch and see a summary with current stance, empowered stance, prompt response, and owned next action.
+- [x] User can save the summary as an action-experiment discovery point.
+- [x] Saved discovery point uses manual source, readable Chinese note copy, and no account impacts.
+- [x] Draft Check exposes the contextual entry only for drama-triangle stances.
+- [x] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
 
 ## Definition of Done
 

@@ -30,14 +30,14 @@ Add a small, low-pressure path from a saved discovery point to a saved small pra
 
 ## Acceptance Criteria
 
-- [ ] `/topics/:id` shows a low-pressure conversion section for an existing discovery point.
-- [ ] The conversion section has editable focus, tiny action, and completion marker fields.
-- [ ] Saving creates one `PersonalExperiment` and routes to `/experiments/:id`.
-- [ ] Save failure shows honest error copy and does not navigate.
-- [ ] Creating from a discovery point creates no account impacts.
-- [ ] Experiment source supports `discovery_point` and old stored values still validate.
-- [ ] Unknown topic ids still show the existing recoverable empty state and no writes.
-- [ ] `npm run typecheck`, `npm test`, and `npm run build` pass.
+- [x] `/topics/:id` shows a low-pressure conversion section for an existing discovery point.
+- [x] The conversion section has editable focus, tiny action, and completion marker fields.
+- [x] Saving creates one `PersonalExperiment` and routes to `/experiments/:id`.
+- [x] Save failure shows honest error copy and does not navigate.
+- [x] Creating from a discovery point creates no account impacts.
+- [x] Experiment source supports `discovery_point` and old stored values still validate.
+- [x] Unknown topic ids still show the existing recoverable empty state and no writes.
+- [x] `npm run typecheck`, `npm test`, and `npm run build` pass.
 
 ## Definition Of Done
 

@@ -26,12 +26,12 @@ Add a compact optional `/healthy-love` branch that helps the user distinguish ca
 
 ## Acceptance Criteria
 
-- [ ] `/healthy-love` is recognized by route normalization and renders after setup.
-- [ ] User can complete the branch and see a summary with moment phase, leaning/motivation, optional note, freedom-preserving action, and calibration reminder.
-- [ ] User can save the summary as a relationship-learning discovery point.
-- [ ] Saved discovery point uses manual source, readable Chinese note copy, and no account impacts.
-- [ ] Draft Check, Rich Incoming, Emotion Calibration, and Boundary Clarity expose contextual entry buttons without blocking existing actions.
-- [ ] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
+- [x] `/healthy-love` is recognized by route normalization and renders after setup.
+- [x] User can complete the branch and see a summary with moment phase, leaning/motivation, optional note, freedom-preserving action, and calibration reminder.
+- [x] User can save the summary as a relationship-learning discovery point.
+- [x] Saved discovery point uses manual source, readable Chinese note copy, and no account impacts.
+- [x] Draft Check, Rich Incoming, Emotion Calibration, and Boundary Clarity expose contextual entry buttons without blocking existing actions.
+- [x] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
 
 ## Definition of Done
 

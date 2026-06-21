@@ -27,12 +27,12 @@ Add a compact P2 `/boundary-clarity` branch for moments involving guilt, resentm
 
 ## Acceptance Criteria
 
-- [ ] `/boundary-clarity` is recognized by route normalization and renders after setup.
-- [ ] User can complete the branch and see a summary with signal, mine, not-mine, limit/request, form/practice, and next action.
-- [ ] User can save the summary as a discovery point.
-- [ ] Saved discovery point uses boundary theme, manual source, readable Chinese note copy, and no account impacts.
-- [ ] Draft Check, Emotion Calibration, and Old Echo expose contextual entry buttons without blocking their existing actions.
-- [ ] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
+- [x] `/boundary-clarity` is recognized by route normalization and renders after setup.
+- [x] User can complete the branch and see a summary with signal, mine, not-mine, limit/request, form/practice, and next action.
+- [x] User can save the summary as a discovery point.
+- [x] Saved discovery point uses boundary theme, manual source, readable Chinese note copy, and no account impacts.
+- [x] Draft Check, Emotion Calibration, and Old Echo expose contextual entry buttons without blocking their existing actions.
+- [x] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
 
 ## Definition of Done
 

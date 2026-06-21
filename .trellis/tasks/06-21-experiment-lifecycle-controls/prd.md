@@ -44,15 +44,15 @@ Do not add a separate archive model, reminder model, streak model, or deletion f
 
 ## Acceptance Criteria
 
-- [ ] `PersonalExperiment` has a typed lifecycle status and validation defaults legacy records to active.
-- [ ] Manual practice creation can save as active or idea.
-- [ ] Experiments list shows and filters lifecycle statuses without hiding history permanently.
-- [ ] Experiment detail can edit the three core sentences and status.
-- [ ] Experiment detail can save one discovery point from practice learning without account impact.
-- [ ] Recording attempts still uses existing attempt rules and never creates Connection impact.
-- [ ] Non-active practices do not imply failure, streak loss, debt, or overdue states.
-- [ ] Storage failures show honest error copy.
-- [ ] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
+- [x] `PersonalExperiment` has a typed lifecycle status and validation defaults legacy records to active.
+- [x] Manual practice creation can save as active or idea.
+- [x] Experiments list shows and filters lifecycle statuses without hiding history permanently.
+- [x] Experiment detail can edit the three core sentences and status.
+- [x] Experiment detail can save one discovery point from practice learning without account impact.
+- [x] Recording attempts still uses existing attempt rules and never creates Connection impact.
+- [x] Non-active practices do not imply failure, streak loss, debt, or overdue states.
+- [x] Storage failures show honest error copy.
+- [x] `npm run typecheck`, `npm test`, `npm run build`, and `git diff --check` pass.
 
 ## Definition Of Done
 
