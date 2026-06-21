@@ -1142,7 +1142,9 @@ Implemented local JSON export/import in Settings with validation, confirmation, 
 
 ### Main Changes
 
-(Add details)
+- Quick Record save completion now shows a calm-closure landing.
+- Completion can open the saved record detail, route high-activation users to Return-to-Self with a calm anchor, open Topics when a later topic was saved, and continue to Seeing / Being Seen when warmth was recorded.
+- Updated README usage manual and the P1/P2 implementation status matrix.
 
 ### Git Commits
 
@@ -1225,7 +1227,11 @@ Added explicit standalone anchor saving from Rich Incoming completion, with dete
 
 ### Testing
 
-- [OK] (Add test results)
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] `git diff --check`
+- [OK] Browser smoke on isolated `http://127.0.0.1:5177`
 
 ### Status
 
@@ -1255,6 +1261,39 @@ Added a lightweight repair/understanding P2 branch that saves one relationship-l
 | Hash | Message |
 |------|---------|
 | `d52ef55` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 32: Quick record calm closure
+
+**Date**: 2026-06-21
+**Task**: Quick record calm closure
+**Branch**: `main`
+
+### Summary
+
+Added a calm-closure completion landing after Quick Record save, including saved-record detail navigation, high-activation Return-to-Self routing, later-topic pickup, and docs/PRD status updates.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `bbbac34` | (see git log) |
 
 ### Testing
 
