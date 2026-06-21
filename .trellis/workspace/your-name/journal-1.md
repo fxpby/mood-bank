@@ -1201,3 +1201,36 @@ Added transient high-activation route-state nudges from Draft Check, Signal Chec
 ### Next Steps
 
 - None - task complete
+
+
+## Session 30: Rich incoming anchor save
+
+**Date**: 2026-06-21
+**Task**: Rich incoming anchor save
+**Branch**: `main`
+
+### Summary
+
+Added explicit standalone anchor saving from Rich Incoming completion, with deterministic suggestions, tests, docs, and updated state-management contract.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `f52be5a` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
