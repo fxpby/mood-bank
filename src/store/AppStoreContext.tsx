@@ -93,6 +93,7 @@ export type AppActions = {
   ): StoreWriteResult<PersonalExperimentAttempt>;
   saveDraft(input: DraftInput): StoreWriteResult<Draft>;
   deleteDraft(draftId: string): StoreWriteResult;
+  replaceLocalData(state: AppState): StoreWriteResult;
   resetLocalData(): StoreWriteResult;
   acknowledgeStorageWarning(): void;
 };
@@ -540,6 +541,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     return { ok: true, savedAt };
   }, []);
 
+  const replaceLocalData = useCallback(
+    (nextState: AppState): StoreWriteResult => commitState(nextState),
+    [commitState],
+  );
+
   const acknowledgeStorageWarning = useCallback(() => {
     if (status === "storage_warning") {
       setStatus("ready");
@@ -572,12 +578,14 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       savePersonalExperimentAttempt,
       saveDraft,
       deleteDraft,
+      replaceLocalData,
       resetLocalData,
       acknowledgeStorageWarning,
     }),
     [
       acknowledgeStorageWarning,
       completeSetup,
+      replaceLocalData,
       resetLocalData,
       saveAnchor,
       saveDraft,

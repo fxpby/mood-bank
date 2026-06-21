@@ -8767,7 +8767,7 @@ Status meanings:
 | Account Detail | Done | `/accounts/:account` shows qualitative status, numeric value as secondary detail, recent sources, readable reasons, evidence labels, and a lightweight personal action menu. Selection remains route-local; "存成小练习" creates a practice without impact; "完成一点" creates a practice plus one completed attempt through the experiment rules. | Keep any future additions source-owned and transparent. Do not turn account detail into earning balance, reward redemption, or relationship scoring. |
 | Personal Action Menu | Done | Experiments page and Account Detail support one recommendation plus two alternatives, refresh/skip, Quick Record prefill, conversion to a saved experiment, and explicit completion through a completed experiment attempt. | A separate persisted intention model is deliberately not in MVP. Choosing remains no-impact and local unless the user explicitly saves or completes. |
 | Experiments | Done | `/experiments` creates a small experiment from three short fields or selected personal action, can save manual practices as active or idea, filters by lifecycle status, and `/experiments/:id` records completed, partial, noticed-only, and not-suitable attempts. Detail also supports editing the three practice sentences, status changes, and saving learning as a discovery point. Attempts create transparent Self/Energy impact only when appropriate. | Keep lifecycle states low-pressure. Do not add streaks, missed-day penalties, reminders, delete flows, or partner-facing rewards. |
-| Settings | Done | `/settings` includes privacy note, active-space edit, storage status, export/import placeholders, reset/delete confirmation, and local-first framing. | Real export/import remains backlog. No login, sync, telemetry, or cloud storage in MVP. |
+| Settings | Done | `/settings` includes privacy note, active-space edit, storage status, local JSON export/import, reset/delete confirmation, and local-first framing. Import validates the file and requires confirmation before replacing local data. | Keep export/import local-file only. No login, sync, telemetry, cloud storage, merge restore, or external chat import in MVP. |
 | First-release safety support copy | Done | Shared `SupportBoundaryCard`, `src/copy/safety.ts`, and `src/domain/safety.ts` provide consistent human-support boundary copy across Trigger, Return-to-Self, Draft Check, Boundary Clarity, Old Echo, Self-Compassion, and Emotion Calibration when relevant. | Keep it non-diagnostic and non-blocking. Do not add danger scoring, hotline directory, legal advice, safety planning, telemetry, or crisis workflow behavior. |
 
 #### P2 Light Surface Status
@@ -8818,10 +8818,9 @@ The research files have been absorbed into the PRD as compact product decisions 
 
 Recommended order:
 
-1. Real export/import remains a later backlog item. It should preserve the local-first boundary and must not imply cloud backup, sync, or account login.
-2. P2 branch abstraction remains optional. Refactor only if page-specific duplication starts causing inconsistent behavior or bugs.
-3. High-activation route context remains optional. If source flows later pass activation into P2 routes, high activation should bias the first CTA toward Return-to-Self instead of deeper reflection.
-4. UI/Figma redesign work is paused and should remain separate from product behavior changes.
+1. P2 branch abstraction remains optional. Refactor only if page-specific duplication starts causing inconsistent behavior or bugs.
+2. High-activation route context remains optional. If source flows later pass activation into P2 routes, high activation should bias the first CTA toward Return-to-Self instead of deeper reflection.
+3. UI/Figma redesign work is paused and should remain separate from product behavior changes.
 
 ### Implementation Order
 

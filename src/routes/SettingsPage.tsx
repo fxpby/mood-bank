@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { PageHeader } from "../components/PageHeader";
 import { privacyCopy } from "../copy/privacy";
 import { DEFAULT_SPACE_NAME } from "../domain/defaults";
+import {
+  buildLocalDataExportFileName,
+  getLocalDataSummary,
+  parseLocalDataImport,
+  serializeLocalData,
+  type LocalDataSummary,
+} from "../domain/localDataTransfer";
 import { selectActiveSpace } from "../domain/selectors";
+import type { AppState } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
 import type { AppRoute } from "../utils/route";
 
@@ -14,14 +22,23 @@ type SettingsPageProps = {
 export function SettingsPage({ navigate }: SettingsPageProps) {
   const { state, actions, status, storageStatus, lastSavedAt, lastError } = useAppStore();
   const activeSpace = selectActiveSpace(state);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingImport, setPendingImport] = useState<{
+    state: AppState;
+    fileName: string;
+    summary: LocalDataSummary;
+  } | null>(null);
   const [resetMessage, setResetMessage] = useState("");
   const [spaceName, setSpaceName] = useState(activeSpace?.displayName ?? DEFAULT_SPACE_NAME);
   const [spaceDescription, setSpaceDescription] = useState(activeSpace?.description ?? "");
   const [spaceMessage, setSpaceMessage] = useState("");
   const [spaceError, setSpaceError] = useState("");
+  const [transferMessage, setTransferMessage] = useState("");
+  const [transferError, setTransferError] = useState("");
   const isResetting = status === "resetting";
   const isSaving = status === "saving";
+  const isWritingLocalData = status === "saving";
 
   function handleSpaceSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,6 +80,75 @@ export function SettingsPage({ navigate }: SettingsPageProps) {
     }
 
     setResetMessage(privacyCopy.resetFailed);
+  }
+
+  function handleExport() {
+    setTransferMessage("");
+    setTransferError("");
+
+    const blob = new Blob([serializeLocalData(state)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const fileName = buildLocalDataExportFileName();
+
+    link.href = url;
+    link.download = fileName;
+    link.rel = "noopener";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    setTransferMessage(`已准备下载 ${fileName}。这份文件只保存在你选择的位置。`);
+  }
+
+  async function handleImportFile(event: React.ChangeEvent<HTMLInputElement>) {
+    setTransferMessage("");
+    setTransferError("");
+    setPendingImport(null);
+
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const parsed = parseLocalDataImport(text);
+
+      if (!parsed.ok) {
+        setTransferError(getImportErrorCopy(parsed.reason));
+        return;
+      }
+
+      setPendingImport({
+        state: parsed.state,
+        fileName: file.name,
+        summary: getLocalDataSummary(parsed.state),
+      });
+    } catch {
+      setTransferError("没有成功读取这个文件。请确认浏览器允许读取你选择的本地文件。");
+    }
+  }
+
+  function handleConfirmImport() {
+    if (!pendingImport) {
+      return;
+    }
+
+    const result = actions.replaceLocalData(pendingImport.state);
+
+    if (!result.ok) {
+      setTransferError(result.error ?? "这次没有成功导入。当前本地数据没有被替换。");
+      setPendingImport(null);
+      return;
+    }
+
+    setSpaceName(selectActiveSpace(pendingImport.state)?.displayName ?? DEFAULT_SPACE_NAME);
+    setSpaceDescription(selectActiveSpace(pendingImport.state)?.description ?? "");
+    setTransferMessage(`已从 ${pendingImport.fileName} 导入本地数据。`);
+    setPendingImport(null);
   }
 
   return (
@@ -147,17 +233,33 @@ export function SettingsPage({ navigate }: SettingsPageProps) {
       <section className="subtle-panel page-stack">
         <div className="section-heading">
           <h2>导出 / 导入</h2>
-          <p>这个 MVP 版本还没有开放导出或导入。现在的数据只在这个浏览器里，清理浏览器数据后可能无法恢复。</p>
+          <p>可以把当前浏览器里的本地数据保存成 JSON 文件，也可以从之前导出的文件恢复。文件可能包含私密记录，请只放在你信任的位置。</p>
         </div>
-        <div className="settings-placeholder-actions" aria-label="导出导入占位">
-          <button className="button button--secondary" type="button" disabled>
-            导出数据（暂未开放）
+        <div className="settings-transfer-actions" aria-label="导出导入本地文件">
+          <button className="button button--secondary" type="button" onClick={handleExport}>
+            导出本地数据
           </button>
-          <button className="button button--secondary" type="button" disabled>
-            导入数据（暂未开放）
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => importInputRef.current?.click()}
+            disabled={isWritingLocalData}
+          >
+            导入本地数据
           </button>
         </div>
-        <p className="helper-text">这里不会创建文件、读取文件或上传任何内容。</p>
+        <input
+          ref={importInputRef}
+          className="settings-file-input"
+          type="file"
+          accept="application/json,.json"
+          onChange={(event) => {
+            void handleImportFile(event);
+          }}
+        />
+        <p className="helper-text">导入会在你确认后替换当前浏览器里的本地数据；不会上传文件，也不会合并两份数据。</p>
+        {transferMessage ? <p className="helper-text" role="status">{transferMessage}</p> : null}
+        {transferError ? <p className="form-error" role="alert">{transferError}</p> : null}
       </section>
 
       <section className="danger-zone page-stack">
@@ -176,13 +278,43 @@ export function SettingsPage({ navigate }: SettingsPageProps) {
           title={privacyCopy.resetConfirmTitle}
           body={privacyCopy.resetConfirmBody}
           confirmLabel="删除本地数据"
+          busyLabel="正在删除"
           isBusy={isResetting}
           onConfirm={handleReset}
           onCancel={() => setIsConfirmOpen(false)}
         />
       ) : null}
+      {pendingImport ? (
+        <ConfirmDialog
+          title="导入这份本地数据？"
+          body={`将从 ${pendingImport.fileName} 替换当前浏览器里的数据：${formatImportSummary(pendingImport.summary)}。这不会上传文件，也不会保留当前数据的另一份副本。`}
+          confirmLabel="确认导入"
+          cancelLabel="先不导入"
+          busyLabel="正在导入"
+          confirmVariant="primary"
+          isBusy={isWritingLocalData}
+          onConfirm={handleConfirmImport}
+          onCancel={() => setPendingImport(null)}
+        />
+      ) : null}
     </section>
   );
+}
+
+function getImportErrorCopy(reason: string): string {
+  if (reason === "invalid_json") return "这个文件不是可读取的 JSON，本地数据没有被替换。";
+  if (reason === "unsupported_version") return "这个文件来自更高版本，当前应用还不能导入。";
+  return "这个文件不像情感储蓄罐的本地数据，本地数据没有被替换。";
+}
+
+function formatImportSummary(summary: LocalDataSummary): string {
+  return [
+    `${summary.spaces} 个空间`,
+    `${summary.episodes} 条记录`,
+    `${summary.topics} 个发现点`,
+    `${summary.experiments} 个小练习`,
+    `${summary.anchors} 个锚点`,
+  ].join("、");
 }
 
 function storageStatusLabel(status: string): string {

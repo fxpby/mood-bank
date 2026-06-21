@@ -202,7 +202,10 @@ Rules:
 - `description.trim()` becomes the saved description.
 - Missing or stale `activeSpaceId` returns no-op success and must not create a new space.
 - Updating space metadata must not affect episodes, accounts, topics, anchors, experiments, daily market, or settings flags.
-- Export/import controls in Settings are placeholders until a future PRD adds real file transfer. Placeholder controls must not read files, write files, access localStorage directly, or imply backup exists.
+- Export/import controls in Settings may perform local JSON file transfer only. They must not upload files, create cloud backup, sync, login, telemetry, or read external chat data.
+- Export may serialize the current in-memory `AppState` into a user-downloaded JSON file. It must not mutate state or imply cloud backup.
+- Import must parse and validate the selected JSON through the existing persisted-state validator before any write. Valid import replaces the current state only after explicit confirmation and must write through a typed Store action.
+- Invalid JSON, unsupported schema version, or invalid minimum shape must leave the current state unchanged and show honest error copy.
 
 ### Experiment Contract
 

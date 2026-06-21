@@ -3,7 +3,9 @@ type ConfirmDialogProps = {
   body: string;
   confirmLabel: string;
   cancelLabel?: string;
+  busyLabel?: string;
   isBusy?: boolean;
+  confirmVariant?: "danger" | "primary";
   onConfirm: () => void;
   onCancel: () => void;
 };
@@ -13,10 +15,14 @@ export function ConfirmDialog({
   body,
   confirmLabel,
   cancelLabel = "先不删",
+  busyLabel,
   isBusy = false,
+  confirmVariant = "danger",
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const confirmClassName = confirmVariant === "primary" ? "button button--primary" : "button button--danger";
+
   return (
     <div className="dialog-backdrop" role="presentation">
       <section
@@ -31,8 +37,8 @@ export function ConfirmDialog({
           <button className="button button--secondary" type="button" onClick={onCancel} disabled={isBusy}>
             {cancelLabel}
           </button>
-          <button className="button button--danger" type="button" onClick={onConfirm} disabled={isBusy}>
-            {isBusy ? "正在删除" : confirmLabel}
+          <button className={confirmClassName} type="button" onClick={onConfirm} disabled={isBusy}>
+            {isBusy ? (busyLabel ?? confirmLabel) : confirmLabel}
           </button>
         </div>
       </section>
