@@ -1018,3 +1018,36 @@ Passed the Home anchor phrase into Return-To-Self as a one-time route-state pref
 ### Next Steps
 
 - None - task complete
+
+
+## Session 25: P1 P2 mobile persistence QA
+
+**Date**: 2026-06-21
+**Task**: P1 P2 mobile persistence QA
+**Branch**: `main`
+
+### Summary
+
+Ran 360px browser QA for representative P1/P2 routes, verified topic and experiment refresh persistence, checked reset confirmation without deleting data, and recorded results in the task notes.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `e7d43bc` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
