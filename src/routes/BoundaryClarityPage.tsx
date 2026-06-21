@@ -457,6 +457,9 @@ export function BoundaryClarityPage({ navigate }: BoundaryClarityPageProps) {
         <button className="button button--secondary" type="button" onClick={() => navigate("/healthy-love")}>
           学习怎么爱/被爱
         </button>
+        <button className="button button--secondary" type="button" onClick={() => navigate("/repair-understanding")}>
+          修复/理解一下
+        </button>
         <button className="button button--secondary" type="button" onClick={() => navigate("/return-to-self")}>
           <HeartHandshake size={16} strokeWidth={1.8} />
           回到自己

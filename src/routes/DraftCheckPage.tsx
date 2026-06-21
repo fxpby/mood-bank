@@ -649,6 +649,13 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
             学习怎么爱/被爱
           </button>
         ) : null}
+        <button
+          className="button button--secondary"
+          type="button"
+          onClick={() => navigate("/repair-understanding", branchRouteState)}
+        >
+          修复/理解一下
+        </button>
         {shouldOfferConnectionContinuity ? (
           <button
             className="button button--secondary"

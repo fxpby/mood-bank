@@ -494,6 +494,9 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
                 学习怎么爱/被爱
               </button>
             ) : null}
+            <button className="button button--secondary" type="button" onClick={() => navigate("/repair-understanding")}>
+              修复/理解一下
+            </button>
             <button className="button button--secondary" type="button" onClick={() => navigate("/return-to-self")}>
               <HeartHandshake size={16} strokeWidth={1.8} />
               回到自己

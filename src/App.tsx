@@ -16,6 +16,7 @@ import { PlaceholderPage } from "./routes/PlaceholderPage";
 import { QuickRecordPage } from "./routes/QuickRecordPage";
 import { RecordDetailPage } from "./routes/RecordDetailPage";
 import { RecordPage } from "./routes/RecordPage";
+import { RepairUnderstandingPage } from "./routes/RepairUnderstandingPage";
 import { RichIncomingPage } from "./routes/RichIncomingPage";
 import { ReturnToSelfPage } from "./routes/ReturnToSelfPage";
 import { SeeingEvidencePage } from "./routes/SeeingEvidencePage";
@@ -133,6 +134,10 @@ function renderRoute(route: AppRoute, navigate: (route: AppRoute, state?: RouteS
 
   if (route === "/healthy-love") {
     return <HealthyLovePage navigate={navigate} />;
+  }
+
+  if (route === "/repair-understanding") {
+    return <RepairUnderstandingPage navigate={navigate} />;
   }
 
   if (route === "/connection-continuity") {

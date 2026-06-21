@@ -291,6 +291,9 @@ export function HealthyLovePage({ navigate }: HealthyLovePageProps) {
         <button className="button button--secondary" type="button" onClick={() => navigate("/boundary-clarity")}>
           看看边界
         </button>
+        <button className="button button--secondary" type="button" onClick={() => navigate("/repair-understanding")}>
+          修复/理解一下
+        </button>
         {shouldOfferConnectionContinuity ? (
           <button className="button button--secondary" type="button" onClick={() => navigate("/connection-continuity")}>
             看连接感

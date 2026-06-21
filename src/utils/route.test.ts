@@ -88,6 +88,11 @@ describe("route helpers", () => {
     expect(normalizeRoute("/healthy-love/")).toBe("/healthy-love");
   });
 
+  it("recognizes the repair understanding branch route", () => {
+    expect(normalizeRoute("/repair-understanding")).toBe("/repair-understanding");
+    expect(normalizeRoute("/repair-understanding/")).toBe("/repair-understanding");
+  });
+
   it("recognizes the connection continuity branch route", () => {
     expect(normalizeRoute("/connection-continuity")).toBe("/connection-continuity");
     expect(normalizeRoute("/connection-continuity/")).toBe("/connection-continuity");
