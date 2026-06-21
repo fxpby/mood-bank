@@ -1,6 +1,7 @@
 import { CheckCircle2, HeartHandshake, NotebookPen, Save } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
+import { BranchActivationNudge } from "../components/BranchActivationNudge";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
@@ -21,10 +22,10 @@ import {
 import { getSupportBoundaryKind } from "../domain/safety";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute } from "../utils/route";
+import { buildHighActivationBranchState, type AppRoute, type RouteState } from "../utils/route";
 
 type EmotionCalibrationPageProps = {
-  navigate: (route: AppRoute) => void;
+  navigate: (route: AppRoute, state?: RouteState) => void;
 };
 
 type StepId = "landing" | "emotion" | "signal" | "impulse" | "choice" | "completion";
@@ -131,6 +132,9 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
     dissociativeValues: ["freeze"],
     overwhelmValues: ["control", "check_repeat", "over_explain", "withdraw", "return_to_self"],
   });
+  const branchRouteState = supportBoundaryKind
+    ? buildHighActivationBranchState("emotion_calibration")
+    : undefined;
 
   function resetSaveState() {
     setHasSaved(false);
@@ -187,6 +191,11 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
           onBack={goBack}
         />
         <section className="emotion-calibration-landing panel page-stack">
+          <BranchActivationNudge
+            onReturnToSelf={() => navigate("/return-to-self")}
+            onContinue={() => setStep("emotion")}
+            continueLabel="继续校准情绪"
+          />
           <div className="section-heading">
             <h2>情绪可以先被允许</h2>
             <p>
@@ -341,22 +350,38 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
           回到自己
         </button>
         {shouldOfferOldEcho ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/old-echo")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/old-echo", branchRouteState)}
+          >
             看看旧感觉
           </button>
         ) : null}
         {shouldOfferBoundary ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/boundary-clarity")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/boundary-clarity", branchRouteState)}
+          >
             看看边界
           </button>
         ) : null}
         {shouldOfferHealthyLove ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/healthy-love")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/healthy-love", branchRouteState)}
+          >
             学习怎么爱/被爱
           </button>
         ) : null}
         {shouldOfferConnectionContinuity ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/connection-continuity")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/connection-continuity", branchRouteState)}
+          >
             看连接感
           </button>
         ) : null}

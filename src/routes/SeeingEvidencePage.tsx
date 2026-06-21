@@ -1,6 +1,7 @@
 import { Eye, HeartHandshake, NotebookPen, Save, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
+import { BranchActivationNudge } from "../components/BranchActivationNudge";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
@@ -156,6 +157,11 @@ export function SeeingEvidencePage({ navigate }: SeeingEvidencePageProps) {
           onBack={goBack}
         />
         <section className="seeing-evidence-landing panel page-stack">
+          <BranchActivationNudge
+            onReturnToSelf={() => navigate("/return-to-self")}
+            onContinue={() => setStep("focus")}
+            continueLabel="继续看证据"
+          />
           <Eye size={26} strokeWidth={1.8} />
           <div className="section-heading">
             <h2>这份被看见，具体落在哪里？</h2>

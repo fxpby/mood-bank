@@ -30,7 +30,38 @@ export type AppRoute =
 export type RouteState = {
   quickRecordPrefill?: import("../domain/types").QuickRecordPrefill;
   returnToSelfAnchor?: string;
+  branchActivation?: BranchActivationContext;
 };
+
+export type BranchActivationSource = "draft_check" | "signal_check" | "emotion_calibration";
+
+export type BranchActivationContext = {
+  kind: "high_activation";
+  source: BranchActivationSource;
+};
+
+export function buildHighActivationBranchState(source: BranchActivationSource): RouteState {
+  return {
+    branchActivation: {
+      kind: "high_activation",
+      source,
+    },
+  };
+}
+
+export function getBranchActivationContext(value: unknown): BranchActivationContext | null {
+  if (!isRecord(value) || !isRecord(value.branchActivation)) {
+    return null;
+  }
+
+  const { kind, source } = value.branchActivation;
+
+  if (kind !== "high_activation" || !isBranchActivationSource(source)) {
+    return null;
+  }
+
+  return { kind, source };
+}
 
 export function normalizeRoute(pathname: string): AppRoute {
   if (pathname.startsWith("/accounts/connection")) return "/accounts/connection";
@@ -123,4 +154,12 @@ function getNormalizedTopicRoute(pathname: string): `/topics/${string}` | null {
 function getNormalizedExperimentRoute(pathname: string): `/experiments/${string}` | null {
   const match = pathname.match(/^\/experiments\/([^/]+)\/?$/);
   return match?.[1] ? `/experiments/${encodeURIComponent(decodeURIComponent(match[1]))}` : null;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isBranchActivationSource(value: unknown): value is BranchActivationSource {
+  return value === "draft_check" || value === "signal_check" || value === "emotion_calibration";
 }

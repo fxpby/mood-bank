@@ -22,6 +22,7 @@ Use route-local `useState` for transient UI state:
 - selected chips before save
 - text input drafts before the debounced draft write
 - local validation errors
+- transient route-state nudges such as high-activation branch context
 
 ### App Store State
 
@@ -81,6 +82,30 @@ Required action behavior:
 | `resetLocalData` | Yes | Resets storage only after adapter reset succeeds. |
 
 If storage save fails, return `{ ok: false, inMemoryOnly: true }` and do not update `state` as if the write were durable. UI copy must not claim the record was saved.
+
+### Route-State Contract
+
+Route state may carry temporary UI context between routes, but it is not durable app state.
+
+Current supported route-state fields:
+
+```ts
+type RouteState = {
+  quickRecordPrefill?: QuickRecordPrefill;
+  returnToSelfAnchor?: string;
+  branchActivation?: {
+    kind: "high_activation";
+    source: "draft_check" | "signal_check" | "emotion_calibration";
+  };
+};
+```
+
+Rules:
+
+- Route-state helpers live in `src/utils/route.ts`.
+- Route-state validation must treat `window.history.state` as untrusted unknown data and ignore malformed values.
+- High-activation branch context is allowed to change CTA order or show a nudge only. It must not create account impacts, discovery points, experiments, drafts, anchors, storage writes, scores, telemetry, or diagnosis.
+- If the user directly opens a branch route without route state, the branch must behave normally.
 
 ---
 

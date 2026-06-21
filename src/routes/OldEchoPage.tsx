@@ -1,6 +1,7 @@
 import { HeartHandshake, NotebookPen, Save } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
+import { BranchActivationNudge } from "../components/BranchActivationNudge";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
@@ -147,6 +148,11 @@ export function OldEchoPage({ navigate }: OldEchoPageProps) {
           onBack={goBack}
         />
         <section className="old-echo-landing panel page-stack">
+          <BranchActivationNudge
+            onReturnToSelf={() => navigate("/return-to-self")}
+            onContinue={() => setStep("fact")}
+            continueLabel="轻轻看一下"
+          />
           <div className="section-heading">
             <h2>这一下可能比今天更旧</h2>
             <p>

@@ -1,6 +1,7 @@
 import { Compass, HeartHandshake, NotebookPen, Save, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
+import { BranchActivationNudge } from "../components/BranchActivationNudge";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
@@ -137,6 +138,11 @@ export function EmpowermentShiftPage({ navigate }: EmpowermentShiftPageProps) {
           onBack={goBack}
         />
         <section className="empowerment-shift-landing panel page-stack">
+          <BranchActivationNudge
+            onReturnToSelf={() => navigate("/return-to-self")}
+            onContinue={() => setStep("stance")}
+            continueLabel="继续看站位"
+          />
           <Compass size={26} strokeWidth={1.8} />
           <div className="section-heading">
             <h2>我想把主动权拿回来一点</h2>

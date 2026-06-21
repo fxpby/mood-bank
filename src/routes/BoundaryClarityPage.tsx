@@ -1,6 +1,7 @@
 import { HeartHandshake, NotebookPen, Save, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
+import { BranchActivationNudge } from "../components/BranchActivationNudge";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
@@ -215,6 +216,11 @@ export function BoundaryClarityPage({ navigate }: BoundaryClarityPageProps) {
           onBack={goBack}
         />
         <section className="boundary-clarity-landing panel page-stack">
+          <BranchActivationNudge
+            onReturnToSelf={() => navigate("/return-to-self")}
+            onContinue={() => setStep("signal")}
+            continueLabel="继续看边界"
+          />
           <Sparkles size={26} strokeWidth={1.8} />
           <div className="section-heading">
             <h2>先把边界和控制分开</h2>

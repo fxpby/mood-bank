@@ -1,6 +1,7 @@
 import { HeartHandshake, Link2, Save } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
+import { BranchActivationNudge } from "../components/BranchActivationNudge";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
@@ -118,6 +119,11 @@ export function ConnectionContinuityPage({ navigate }: ConnectionContinuityPageP
           onBack={goBack}
         />
         <section className="connection-continuity-landing panel page-stack">
+          <BranchActivationNudge
+            onReturnToSelf={() => navigate("/return-to-self")}
+            onContinue={() => setStep("state")}
+            continueLabel="继续看连接感"
+          />
           <Link2 size={26} strokeWidth={1.8} />
           <div className="section-heading">
             <h2>连接感现在很响</h2>

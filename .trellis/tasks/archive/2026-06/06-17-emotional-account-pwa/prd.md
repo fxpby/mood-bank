@@ -8783,7 +8783,7 @@ Status meanings:
 | Healthy Love Literacy | Done | `/healthy-love` covers moment phase, care-vs-control/attachment/novelty leaning, one freedom-preserving action, saves one discovery point, and routes to boundary / connection-continuity / Return-to-Self. | Do not add true-love tests, compatibility scores, stay/leave advice, or relationship verdicts. |
 | Seeing / Being Seen | Done | `/seeing-evidence` supports being-seen / seeing-other / both focus, observable evidence, micro-action, capacity check, next direction, save as discovery point, and Return-to-Self. | Do not turn this into people-reading, empathy scoring, or obligation to keep listening when capacity is low. |
 | P2 shared primitives | Partial | Branches follow the same compact pattern in copy and behavior, and support-boundary UI/copy is now shared. The branch-specific chips, summaries, and save flows remain mostly page-specific. | Refactor branch primitives only if duplication starts causing inconsistent behavior. Generic branch abstraction is not required for the MVP. |
-| High-activation routing from P2 | Partial | Most P2 branches offer Return-to-Self as a visible action. They do not yet receive a shared activation context from source flows. | If source flows pass activation into P2 routes later, high activation should bias the first CTA toward Return-to-Self instead of deeper reflection. |
+| High-activation routing from P2 | Done | Draft Check, Signal Check, and Emotion Calibration can pass transient high-activation route context into P2 branches. Branch landing pages then show a first-position Return-to-Self nudge before deeper reflection, without blocking branch use or writing durable state. | Keep this route-state only. Do not persist activation context, create scores, or require grounding before the user can continue. |
 
 #### Deliberately Excluded From P1 / P2
 
@@ -8819,8 +8819,7 @@ The research files have been absorbed into the PRD as compact product decisions 
 Recommended order:
 
 1. P2 branch abstraction remains optional. Refactor only if page-specific duplication starts causing inconsistent behavior or bugs.
-2. High-activation route context remains optional. If source flows later pass activation into P2 routes, high activation should bias the first CTA toward Return-to-Self instead of deeper reflection.
-3. UI/Figma redesign work is paused and should remain separate from product behavior changes.
+2. UI/Figma redesign work is paused and should remain separate from product behavior changes.
 
 ### Implementation Order
 

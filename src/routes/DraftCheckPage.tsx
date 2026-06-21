@@ -27,10 +27,10 @@ import {
 import { getSupportBoundaryKind } from "../domain/safety";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute } from "../utils/route";
+import { buildHighActivationBranchState, type AppRoute, type RouteState } from "../utils/route";
 
 type DraftCheckPageProps = {
-  navigate: (route: AppRoute) => void;
+  navigate: (route: AppRoute, state?: RouteState) => void;
 };
 
 type StepId =
@@ -186,6 +186,10 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
     overwhelmValues: ["body_overload", "collapse", "ruminate_sleep"],
     violenceValues: ["attack_blame"],
   });
+  const branchRouteState =
+    result.recommendation === "return_to_self_first" || supportBoundaryKind
+      ? buildHighActivationBranchState("draft_check")
+      : undefined;
 
   function goBack() {
     setMessage(null);
@@ -570,7 +574,11 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
               <Save size={16} strokeWidth={1.8} />
               保存边界方向
             </button>
-            <button className="button button--secondary" type="button" onClick={() => navigate("/boundary-clarity")}>
+            <button
+              className="button button--secondary"
+              type="button"
+              onClick={() => navigate("/boundary-clarity", branchRouteState)}
+            >
               看看边界
             </button>
             <button className="button button--secondary" type="button" onClick={saveDraft}>
@@ -597,32 +605,56 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
           </button>
         ) : null}
         {shouldOfferOldEcho ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/old-echo")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/old-echo", branchRouteState)}
+          >
             看看旧感觉
           </button>
         ) : null}
         {shouldOfferSelfCompassion ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/self-compassion")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/self-compassion", branchRouteState)}
+          >
             自我关怀一下
           </button>
         ) : null}
         {shouldOfferEmpowermentShift ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/empowerment-shift")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/empowerment-shift", branchRouteState)}
+          >
             换到赋能三角
           </button>
         ) : null}
         {shouldOfferSeeingEvidence ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/seeing-evidence")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/seeing-evidence", branchRouteState)}
+          >
             看见被看见的证据
           </button>
         ) : null}
         {shouldOfferHealthyLove ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/healthy-love")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/healthy-love", branchRouteState)}
+          >
             学习怎么爱/被爱
           </button>
         ) : null}
         {shouldOfferConnectionContinuity ? (
-          <button className="button button--secondary" type="button" onClick={() => navigate("/connection-continuity")}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => navigate("/connection-continuity", branchRouteState)}
+          >
             看连接感
           </button>
         ) : null}

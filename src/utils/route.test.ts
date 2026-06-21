@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   buildRecordRoute,
+  buildHighActivationBranchState,
   buildExperimentRoute,
   buildTopicRoute,
+  getBranchActivationContext,
   getExperimentRouteId,
   getRecordRouteId,
   getTopicRouteId,
@@ -108,5 +110,20 @@ describe("route helpers", () => {
 
   it("keeps unknown routes on the home fallback", () => {
     expect(normalizeRoute("/not-real")).toBe("/");
+  });
+
+  it("builds and reads high activation branch route state", () => {
+    const routeState = buildHighActivationBranchState("draft_check");
+
+    expect(getBranchActivationContext(routeState)).toEqual({
+      kind: "high_activation",
+      source: "draft_check",
+    });
+  });
+
+  it("ignores malformed branch route state", () => {
+    expect(getBranchActivationContext({ branchActivation: { kind: "high_activation" } })).toBeNull();
+    expect(getBranchActivationContext({ branchActivation: { kind: "other", source: "draft_check" } })).toBeNull();
+    expect(getBranchActivationContext(null)).toBeNull();
   });
 });

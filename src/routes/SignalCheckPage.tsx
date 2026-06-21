@@ -17,10 +17,10 @@ import {
 } from "../domain/signalCheck";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute } from "../utils/route";
+import { buildHighActivationBranchState, type AppRoute, type RouteState } from "../utils/route";
 
 type SignalCheckPageProps = {
-  navigate: (route: AppRoute) => void;
+  navigate: (route: AppRoute, state?: RouteState) => void;
 };
 
 type StepId = "landing" | "target" | "good" | "absent" | "action" | "completion";
@@ -93,6 +93,17 @@ export function SignalCheckPage({ navigate }: SignalCheckPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [hasSaved, setHasSaved] = useState(false);
   const isCheckingPath = action === "still_check";
+  const isHighActivationSignalCheck =
+    isCheckingPath ||
+    absentReaction === "keep_refreshing" ||
+    absentReaction === "connection_gone" ||
+    absentReaction === "cut_off" ||
+    absentReaction === "ruminate_sleep" ||
+    result === "more_anxious" ||
+    result === "want_more";
+  const branchRouteState = isHighActivationSignalCheck
+    ? buildHighActivationBranchState("signal_check")
+    : undefined;
   const shouldOfferConnectionContinuity =
     target === "cold_connection" ||
     target === "ignored" ||
@@ -345,7 +356,11 @@ export function SignalCheckPage({ navigate }: SignalCheckPageProps) {
               {isCheckingPath ? "保存结果" : "保存这个模式"}
             </button>
             {shouldOfferConnectionContinuity ? (
-              <button className="button button--secondary" type="button" onClick={() => navigate("/connection-continuity")}>
+              <button
+                className="button button--secondary"
+                type="button"
+                onClick={() => navigate("/connection-continuity", branchRouteState)}
+              >
                 看连接感
               </button>
             ) : null}

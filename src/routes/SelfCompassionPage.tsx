@@ -1,6 +1,7 @@
 import { HeartHandshake, NotebookPen, Save, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
+import { BranchActivationNudge } from "../components/BranchActivationNudge";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
@@ -168,6 +169,11 @@ export function SelfCompassionPage({ navigate }: SelfCompassionPageProps) {
           onBack={goBack}
         />
         <section className="self-compassion-landing panel page-stack">
+          <BranchActivationNudge
+            onReturnToSelf={() => navigate("/return-to-self")}
+            onContinue={() => setStep("pain")}
+            continueLabel="继续自我关怀"
+          />
           <Sparkles size={26} strokeWidth={1.8} />
           <div className="section-heading">
             <h2>这很难，可以先被看见</h2>

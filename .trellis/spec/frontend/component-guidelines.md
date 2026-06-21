@@ -43,6 +43,70 @@ When a component needs route state, use the typed `AppRoute` / `RouteState` defi
 
 Prefer explicit unions over loose strings for product values. Reuse domain types from `src/domain/types.ts`.
 
+### Scenario: Transient Route-State Nudges
+
+#### 1. Scope / Trigger
+
+- Trigger: a source flow needs to pass transient UI context into another route, such as a high-activation nudge for P2 branch pages.
+- Scope: `navigate(route, routeState)` -> `window.history.state` -> presentational branch component.
+
+#### 2. Signatures
+
+```ts
+type BranchActivationContext = {
+  kind: "high_activation";
+  source: "draft_check" | "signal_check" | "emotion_calibration";
+};
+
+type RouteState = {
+  branchActivation?: BranchActivationContext;
+};
+
+function buildHighActivationBranchState(source: BranchActivationContext["source"]): RouteState;
+function getBranchActivationContext(value: unknown): BranchActivationContext | null;
+```
+
+#### 3. Contracts
+
+- Source routes may pass `buildHighActivationBranchState(source)` when the current route-local selections indicate high activation.
+- Destination branch pages may show a non-blocking nudge that puts Return-to-Self before deeper reflection.
+- The nudge must let the user continue the branch without completing Return-to-Self.
+- Route-state context must remain transient and must not be written to `AppState`, storage, discovery points, account impacts, or analytics.
+
+#### 4. Validation & Error Matrix
+
+| Condition | Expected result |
+|---|---|
+| Missing `branchActivation` | Render no nudge. |
+| Unknown `kind` or `source` | Render no nudge. |
+| Valid high-activation context | Render nudge with Return-to-Self primary action and continue action. |
+
+#### 5. Good / Base / Bad Cases
+
+- Good: Draft Check recommends `return_to_self_first`, user taps a P2 branch, branch landing shows "先回到自己" first.
+- Base: user opens `/connection-continuity` from Home or direct URL, branch renders normally without the nudge.
+- Bad: branch page persists "high activation" into `AppState` or blocks the branch until grounding is completed.
+
+#### 6. Tests Required
+
+- Unit-test route helper parsing for valid, missing, and malformed route state.
+- Smoke-test at least one source -> branch path when behavior crosses route boundaries.
+
+#### 7. Wrong vs Correct
+
+Wrong:
+
+```tsx
+actions.saveDiscoveryPoint({ title: "用户高激活", ... });
+navigate("/old-echo");
+```
+
+Correct:
+
+```tsx
+navigate("/old-echo", buildHighActivationBranchState("draft_check"));
+```
+
 ---
 
 ## Styling Patterns
