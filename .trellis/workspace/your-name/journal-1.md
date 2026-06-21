@@ -1068,7 +1068,10 @@ Marked implemented P1/P2 task PRDs complete, verified typecheck/tests/build, and
 
 ### Main Changes
 
-(Add details)
+- Added Settings controls for exporting current local state to JSON and importing a validated JSON backup.
+- Added `localDataTransfer` helpers and tests for serialization, parsing, summaries, and file naming.
+- Added a Store-level `replaceLocalData` action so imports stay behind the persistence boundary.
+- Updated README, main PRD status, and frontend state-management spec.
 
 ### Git Commits
 
@@ -1103,7 +1106,10 @@ Updated the main PRD and README so P1/P2 implementation status reflects the shar
 
 ### Main Changes
 
-(Add details)
+- Added typed high-activation route state helpers and malformed-state guards.
+- Added `BranchActivationNudge` for non-blocking Return-to-Self-first branch entry.
+- Passed route-state context from Draft Check, Signal Check, and Emotion Calibration into relevant P2 branches.
+- Updated README, main PRD status, and frontend route/state specs.
 
 ### Git Commits
 
@@ -1150,6 +1156,43 @@ Implemented local JSON export/import in Settings with validation, confirmation, 
 - [OK] `npm test` - 23 files, 166 tests
 - [OK] `npm run build`
 - [OK] `git diff --check`
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 29: High activation branch routing
+
+**Date**: 2026-06-21
+**Task**: High activation branch routing
+**Branch**: `main`
+
+### Summary
+
+Added transient high-activation route-state nudges from Draft Check, Signal Check, and Emotion Calibration into P2 branch landing pages, with docs/spec sync and verification.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `163f75c` | feat: add high activation branch routing |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test` - 23 files, 168 tests
+- [OK] `npm run build`
+- [OK] `git diff --check`
+- [OK] Browser smoke: direct branch entry hides nudge; Signal Check routed entry shows nudge and continue enters first branch step.
 
 ### Status
 
