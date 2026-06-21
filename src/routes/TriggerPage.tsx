@@ -2,6 +2,8 @@ import { useState } from "react";
 import { CompletionCard } from "../components/CompletionCard";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { StepScreen } from "../components/StepScreen";
+import { SupportBoundaryCard } from "../components/SupportBoundaryCard";
+import { getSupportBoundaryKind } from "../domain/safety";
 import type { ActivationLevel, QuickRecordPrefill } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
 import type { AppRoute, RouteState } from "../utils/route";
@@ -134,6 +136,16 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
   const [nextAction, setNextAction] = useState<OwnedAction>("delay_10_min");
   const [topicSaved, setTopicSaved] = useState(false);
   const [topicError, setTopicError] = useState<string | null>(null);
+  const supportBoundaryKind = getSupportBoundaryKind({
+    selected: [body, urge, nextAction],
+    overwhelmValues:
+      intensity === "high"
+        ? ["head_full", "sleep_ruminate", "return_to_self", "drink_water_wash_hands"]
+        : ["sleep_ruminate"],
+    violenceValues: ["attack"],
+    physicalSafetyValues: ["cut_off"],
+    dissociativeValues: ["numb"],
+  });
 
   function goNext() {
     const currentIndex = stepOrder.indexOf(step);
@@ -242,6 +254,12 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
         onBack={goBack}
       >
         <ChipGroup label="冲动" options={urgeOptions} value={urge} onChange={setUrge} />
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
         {intensity === "high" ? (
           <button
             className="button button--secondary"
@@ -285,6 +303,12 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
           value={nextAction}
           onChange={setNextAction}
         />
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
       </StepScreen>
     );
   }
@@ -300,6 +324,12 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
           { label: "下一步", value: getActionLabel(nextAction) },
         ]}
       >
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
         <button
           className="button button--primary"
           type="button"

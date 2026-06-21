@@ -4,6 +4,7 @@ import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
+import { SupportBoundaryCard } from "../components/SupportBoundaryCard";
 import {
   buildOldEchoDiscoveryPointInput,
   getOldEchoSummary,
@@ -15,6 +16,7 @@ import {
   type OldEchoProtection,
   type OldEchoResponse,
 } from "../domain/oldEcho";
+import { getSupportBoundaryKind } from "../domain/safety";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
 import type { AppRoute } from "../utils/route";
@@ -83,6 +85,14 @@ export function OldEchoPage({ navigate }: OldEchoPageProps) {
     [activeSpace?.id, innerCritic, need, presentFact, protection, response],
   );
   const summary = getOldEchoSummary(input);
+  const supportBoundaryKind = getSupportBoundaryKind({
+    selected: [need, protection, response],
+    supportValues: ["support_person"],
+    physicalSafetyValues: ["safety"],
+    violenceValues: ["attack"],
+    dissociativeValues: ["numb"],
+    overwhelmValues: ["control", "check", "prove"],
+  });
 
   function resetSaveState() {
     setHasSaved(false);
@@ -284,6 +294,12 @@ export function OldEchoPage({ navigate }: OldEchoPageProps) {
             resetSaveState();
           }}
         />
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
       </StepScreen>
     );
   }
@@ -301,6 +317,12 @@ export function OldEchoPage({ navigate }: OldEchoPageProps) {
           { label: "当下回应", value: summary.response },
         ]}
       >
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
         {message ? <p className="helper-text">{message}</p> : null}
         {error ? <p className="form-error">{error}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}

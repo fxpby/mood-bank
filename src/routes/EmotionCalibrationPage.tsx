@@ -4,6 +4,7 @@ import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
+import { SupportBoundaryCard } from "../components/SupportBoundaryCard";
 import {
   buildEmotionCalibrationDiscoveryPointInput,
   calibrationEmotionCopy,
@@ -17,6 +18,7 @@ import {
   type EmotionSignal,
   type WiseAction,
 } from "../domain/emotionCalibration";
+import { getSupportBoundaryKind } from "../domain/safety";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
 import type { AppRoute } from "../utils/route";
@@ -122,6 +124,13 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
     impulse === "over_explain" ||
     impulse === "withdraw" ||
     impulse === "freeze";
+  const supportBoundaryKind = getSupportBoundaryKind({
+    selected: [emotion, signal, impulse, wiseAction],
+    physicalSafetyValues: ["need_safety"],
+    violenceValues: ["attack_blame"],
+    dissociativeValues: ["freeze"],
+    overwhelmValues: ["control", "check_repeat", "over_explain", "withdraw", "return_to_self"],
+  });
 
   function resetSaveState() {
     setHasSaved(false);
@@ -291,6 +300,12 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
             resetSaveState();
           }}
         />
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
       </StepScreen>
     );
   }
@@ -308,6 +323,12 @@ export function EmotionCalibrationPage({ navigate }: EmotionCalibrationPageProps
           { label: "更稳的一步", value: summary.choice },
         ]}
       >
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
         {message ? <p className="helper-text">{message}</p> : null}
         {error ? <p className="form-error">{error}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}

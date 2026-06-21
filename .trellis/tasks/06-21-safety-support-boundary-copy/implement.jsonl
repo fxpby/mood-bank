@@ -1,0 +1,7 @@
+{"file":".trellis/spec/frontend/index.md","reason":"Frontend architecture and required checks for implementing shared copy/component/domain helpers."}
+{"file":".trellis/spec/frontend/directory-structure.md","reason":"Where copy, domain helpers, components, routes, and tests belong."}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"Reusable presentational component conventions and accessibility expectations."}
+{"file":".trellis/spec/frontend/state-management.md","reason":"Ensure support-boundary copy remains route-local and does not persist or create impacts."}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"Safety copy must avoid diagnostic/verdict behavior and preserve local-first constraints."}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"Use typed unions and pure helpers without any/unsafe browser assumptions."}
+{"file":".trellis/tasks/archive/2026-06/06-17-emotional-account-pwa/prd.md","reason":"Main PRD safety acceptance and P1/P2 status matrix define this backlog item."}

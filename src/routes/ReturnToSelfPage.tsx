@@ -3,8 +3,10 @@ import { MessageSquareText } from "lucide-react";
 import { CompletionCard } from "../components/CompletionCard";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { StepScreen } from "../components/StepScreen";
+import { SupportBoundaryCard } from "../components/SupportBoundaryCard";
 import { accountReasonCopy } from "../copy/accounts";
 import { anchorsCopy } from "../copy/anchors";
+import { getSupportBoundaryKind } from "../domain/safety";
 import { selectActiveSpace } from "../domain/selectors";
 import type { EnergyEffect, ReturnToSelfCompletion } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
@@ -79,6 +81,10 @@ export function ReturnToSelfPage({ navigate }: ReturnToSelfPageProps) {
       ]),
     );
   }, [routeAnchor, state.anchors]);
+  const supportBoundaryKind = getSupportBoundaryKind({
+    selected: [energyEffect, completion ?? "none"],
+    overwhelmValues: ["more_tired"],
+  });
 
   function goNext() {
     const currentIndex = stepOrder.indexOf(step);
@@ -241,6 +247,12 @@ export function ReturnToSelfPage({ navigate }: ReturnToSelfPageProps) {
         {energyEffect === "more_tired" ? (
           <p className="helper-text">更重也可以先被看见。现在不适合继续深挖。</p>
         ) : null}
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => setStep("body")}
+          />
+        ) : null}
         {saveError ? <p className="form-error">{saveError}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
       </StepScreen>
@@ -258,6 +270,12 @@ export function ReturnToSelfPage({ navigate }: ReturnToSelfPageProps) {
           { label: "连接", value: "这次不创建连接影响。" },
         ]}
       >
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => setStep("body")}
+          />
+        ) : null}
         <button className="button button--primary" type="button" onClick={() => navigate("/home")}>
           回到首页
         </button>

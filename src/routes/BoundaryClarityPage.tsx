@@ -4,6 +4,7 @@ import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
+import { SupportBoundaryCard } from "../components/SupportBoundaryCard";
 import {
   boundaryFormCopy,
   boundaryLimitCopy,
@@ -23,6 +24,7 @@ import {
   type BoundaryPractice,
   type BoundarySignal,
 } from "../domain/boundaryClarity";
+import { getSupportBoundaryKind } from "../domain/safety";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
 import type { AppRoute } from "../utils/route";
@@ -153,6 +155,12 @@ export function BoundaryClarityPage({ navigate }: BoundaryClarityPageProps) {
     [activeSpace?.id, form, limit, limitSentence, mine, nextAction, notMine, practice, signal],
   );
   const summary = getBoundaryClaritySummary(input);
+  const supportBoundaryKind = getSupportBoundaryKind({
+    selected: [signal, form, practice, nextAction],
+    supportValues: ["support", "ask_trusted_person"],
+    overwhelmValues: ["pressure", "cannot_hold_all", "need_rest", "pause_conversation"],
+    physicalSafetyValues: ["physical_distance", "leave_scene"],
+  });
 
   function resetSaveState() {
     setHasSaved(false);
@@ -394,6 +402,12 @@ export function BoundaryClarityPage({ navigate }: BoundaryClarityPageProps) {
             resetSaveState();
           }}
         />
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
       </StepScreen>
     );
   }
@@ -414,6 +428,12 @@ export function BoundaryClarityPage({ navigate }: BoundaryClarityPageProps) {
           { label: "我负责的下一步", value: summary.nextAction },
         ]}
       >
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
         {message ? <p className="helper-text">{message}</p> : null}
         {error ? <p className="form-error">{error}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}

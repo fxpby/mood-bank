@@ -1,0 +1,6 @@
+{"file":".trellis/spec/frontend/index.md","reason":"Frontend required checks."}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"Review reusable component and accessibility expectations."}
+{"file":".trellis/spec/frontend/state-management.md","reason":"Verify no persistence/account-impact changes are introduced."}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"Review safety copy for forbidden network, diagnostic, and verdict patterns."}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"Review typed helper/test patterns."}
+{"file":".trellis/tasks/06-21-safety-support-boundary-copy/prd.md","reason":"Task acceptance criteria."}

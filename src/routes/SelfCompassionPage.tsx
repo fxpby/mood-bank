@@ -4,6 +4,7 @@ import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
 import { StepScreen } from "../components/StepScreen";
+import { SupportBoundaryCard } from "../components/SupportBoundaryCard";
 import {
   buildSelfCompassionDiscoveryPointInput,
   getSelfCompassionSummary,
@@ -17,6 +18,7 @@ import {
   type SelfCompassionReminder,
   type SelfKindnessAction,
 } from "../domain/selfCompassion";
+import { getSupportBoundaryKind } from "../domain/safety";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
 import type { AppRoute } from "../utils/route";
@@ -108,6 +110,10 @@ export function SelfCompassionPage({ navigate }: SelfCompassionPageProps) {
     ],
   );
   const summary = getSelfCompassionSummary(input);
+  const supportBoundaryKind = getSupportBoundaryKind({
+    selected: [pain, kindnessAction, nextAction],
+    overwhelmValues: ["shame", "self_blame", "too_much", "return_to_self", "rest_ten_min"],
+  });
 
   function resetSaveState() {
     setHasSaved(false);
@@ -331,6 +337,12 @@ export function SelfCompassionPage({ navigate }: SelfCompassionPageProps) {
             resetSaveState();
           }}
         />
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
       </StepScreen>
     );
   }
@@ -350,6 +362,12 @@ export function SelfCompassionPage({ navigate }: SelfCompassionPageProps) {
           { label: "我负责的一小步", value: summary.nextAction },
         ]}
       >
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
         {message ? <p className="helper-text">{message}</p> : null}
         {error ? <p className="form-error">{error}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}

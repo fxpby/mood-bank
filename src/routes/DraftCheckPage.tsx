@@ -2,6 +2,7 @@ import { ArrowLeft, HeartHandshake, MessageSquareText, Save, Sparkles } from "lu
 import { useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { PageHeader } from "../components/PageHeader";
+import { SupportBoundaryCard } from "../components/SupportBoundaryCard";
 import {
   buildDraftCheckDiscoveryPointInput,
   buildDraftCheckDraftInput,
@@ -23,6 +24,7 @@ import {
   type DraftNoResponseTolerance,
   type DraftStance,
 } from "../domain/draftCheck";
+import { getSupportBoundaryKind } from "../domain/safety";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
 import type { AppRoute } from "../utils/route";
@@ -179,6 +181,11 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
     afterSend === "watch_reply" ||
     afterSend === "send_more" ||
     afterSend === "ruminate_sleep";
+  const supportBoundaryKind = getSupportBoundaryKind({
+    selected: [state, noResponseTolerance, contentRisk, afterSend],
+    overwhelmValues: ["body_overload", "collapse", "ruminate_sleep"],
+    violenceValues: ["attack_blame"],
+  });
 
   function goBack() {
     setMessage(null);
@@ -467,6 +474,12 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
             value={afterSend}
             onChange={updateAfterSend}
           />
+          {supportBoundaryKind ? (
+            <SupportBoundaryCard
+              kind={supportBoundaryKind}
+              onReturnToSelf={() => navigate("/return-to-self")}
+            />
+          ) : null}
         </DraftStep>
       ) : null}
 
@@ -500,6 +513,12 @@ export function DraftCheckPage({ navigate }: DraftCheckPageProps) {
           {message ? <p className="helper-text">{message}</p> : null}
           {error ? <p className="form-error">{error}</p> : null}
           {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
+          {supportBoundaryKind ? (
+            <SupportBoundaryCard
+              kind={supportBoundaryKind}
+              onReturnToSelf={() => navigate("/return-to-self")}
+            />
+          ) : null}
           <div className="completion-card__actions">{renderRecommendationActions(result.recommendation)}</div>
         </section>
       ) : null}
