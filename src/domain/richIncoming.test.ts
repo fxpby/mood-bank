@@ -3,11 +3,13 @@ import { deriveAllAccountSummaries } from "./accounts";
 import { createInitialState } from "./defaults";
 import {
   buildRichIncomingDiscoveryPointInputs,
+  getRichIncomingAnchorSuggestion,
   getActiveRichIncomingThreads,
   getOverflowRichIncomingThreads,
   getRichIncomingSummary,
   type RichIncomingInput,
 } from "./richIncoming";
+import { addAnchorToState } from "./anchors";
 import { addDiscoveryPointToState } from "./topics";
 
 const spaceId = "space_1";
@@ -83,6 +85,32 @@ describe("rich incoming helpers", () => {
     });
   });
 
+  it("suggests a support anchor from the selected rich incoming state", () => {
+    expect(getRichIncomingAnchorSuggestion(input())).toBe(
+      "我可以先收下被看见的部分，不急着一次回应全部。",
+    );
+
+    expect(
+      getRichIncomingAnchorSuggestion(
+        input({
+          selectedThreads: ["rumination_sleep"],
+          emotions: ["ruminate_sleep"],
+          direction: "save_without_reply",
+        }),
+      ),
+    ).toBe("这段内容可以明天再看，今晚先让身体停下来。");
+
+    expect(
+      getRichIncomingAnchorSuggestion(
+        input({
+          selectedThreads: ["clarification"],
+          emotions: ["pressure"],
+          direction: "return_to_self",
+        }),
+      ),
+    ).toBe("我可以先回到自己，再决定要不要回应。");
+  });
+
   it("saving rich incoming discovery points does not affect derived storage jar summaries", () => {
     const state = createInitialState();
     const before = deriveAllAccountSummaries(state);
@@ -93,6 +121,30 @@ describe("rich incoming helpers", () => {
     }).state;
 
     expect(next.topics).toHaveLength(1);
+    expect(deriveAllAccountSummaries(next)).toEqual(before);
+  });
+
+  it("saving a rich incoming support anchor does not affect derived storage jar summaries", () => {
+    const state = createInitialState();
+    const before = deriveAllAccountSummaries(state);
+    const next = addAnchorToState(
+      state,
+      {
+        spaceId,
+        text: getRichIncomingAnchorSuggestion(input()),
+      },
+      {
+        id: "anchor_1",
+        timestamp,
+      },
+    ).state;
+
+    expect(next.anchors).toHaveLength(1);
+    expect(next.anchors[0]).toMatchObject({
+      text: "我可以先收下被看见的部分，不急着一次回应全部。",
+      sourceType: undefined,
+      sourceId: undefined,
+    });
     expect(deriveAllAccountSummaries(next)).toEqual(before);
   });
 });

@@ -764,12 +764,12 @@ getNextPersonalActionRotation(currentIndex: number): number;
 - Unit test action-set size, deterministic rotation, and no derived storage-jar changes from helper use.
 - Browser check `/experiments` choose/complete/rotate and 360px layout.
 
-## Scenario: Rich Incoming Review Saves Selected Threads Only
+## Scenario: Rich Incoming Review Saves Selected Threads And Optional Anchor
 
 ### 1. Scope / Trigger
 
 - Trigger: `/rich-incoming` helps the user receive a long, warm, vulnerable, or dense incoming message without turning every thread into an immediate reply obligation.
-- Scope: route-local message-shape/thread/emotion/handling choices -> `buildRichIncomingDiscoveryPointInputs(...)` -> `actions.saveDiscoveryPoints(...)`.
+- Scope: route-local message-shape/thread/emotion/handling choices -> `buildRichIncomingDiscoveryPointInputs(...)` -> `actions.saveDiscoveryPoints(...)`; optional anchor text -> `actions.saveAnchor(...)`.
 
 ### 2. Signatures
 
@@ -785,17 +785,23 @@ type RichIncomingInput = {
 };
 
 buildRichIncomingDiscoveryPointInputs(input: RichIncomingInput): DiscoveryPointInput[];
+getRichIncomingAnchorSuggestion(input: RichIncomingInput): string;
 saveDiscoveryPoints(input: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoint[]>;
+saveAnchor(input: AnchorInput): StoreWriteResult<Anchor>;
 ```
 
 ### 3. Contracts
 
 - Completing Rich Incoming Review without explicit save is route-local only and must not persist data.
 - Explicit save creates one or more `DiscoveryPoint` records through a single `actions.saveDiscoveryPoints(...)` commit.
+- Explicit anchor save creates one standalone `Anchor` through `actions.saveAnchor(...)`.
 - Saved points use `sourceType: "rich_incoming"` and may use `sourceTitle: "收到很多内容"`.
+- Saved anchors from this route must stay standalone; do not widen `Anchor.sourceType` or create linked-anchor UI without a future PRD.
+- The anchor suggestion must be deterministic and based only on route-local selections, not on parsing pasted message content.
 - The route may show default handling choices, but save input must include those effective defaults so the persisted result matches the UI.
 - More than three selected threads may be reduced to three active handling cards; overflow threads may be saved as later discovery points.
-- Rich Incoming Review must not create `Episode`, `Draft`, `Anchor`, `AccountImpact`, or a durable review model by default.
+- Rich Incoming Review completion must not create `Episode`, `Draft`, `Anchor`, `AccountImpact`, or a durable review model by default.
+- Rich Incoming anchor save must not create `Episode`, `Draft`, `DiscoveryPoint`, `AccountImpact`, or source inference by itself.
 - It must not parse/summarize the incoming text with AI, infer sender psychology, generate replies, optimize for response, or integrate send/copy behavior.
 
 ### 4. Validation & Error Matrix
@@ -805,18 +811,23 @@ saveDiscoveryPoints(input: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoi
 | User completes and taps "完成" | No persisted data. |
 | User taps "把发现点存进稍后" with no later threads | No persisted data; copy says there was nothing selected for later. |
 | User taps "把发现点存进稍后" with later/overflow threads | One atomic write creates all selected discovery points. |
+| User taps "存成锚点" with non-empty anchor text | One trimmed standalone anchor is saved newest-first. |
+| User taps "存成锚点" with blank anchor text | Show validation copy; no persisted write. |
 | Storage save fails | Return/show honest failure copy and do not claim the points were saved. |
 
 ### 5. Good/Base/Bad Cases
 
 - Good: user selects five received threads, handles three active ones, saves later threads, and sees all saved points in `/topics` without storage-jar movement.
+- Good: user saves "我可以先收下被看见的部分，不急着一次回应全部。" and sees it as the newest Home anchor without storage-jar movement.
 - Base: user completes the flow and leaves; no state changes.
 - Bad: route loops `saveDiscoveryPoint(...)` for multiple points, causing later writes to overwrite earlier writes from the same render-state snapshot.
+- Bad: anchor save extends `Anchor.sourceType` to `rich_incoming`, infers meaning from message text, or treats warmth as proof of future relationship security.
 
 ### 6. Tests Required
 
 - Unit test active/overflow thread selection and discovery-point payload builders.
-- Regression test that saved rich incoming discovery points leave derived storage-jar summaries unchanged.
+- Unit test deterministic anchor suggestion copy.
+- Regression test that saved rich incoming discovery points and anchors leave derived storage-jar summaries unchanged.
 - Browser check `/rich-incoming` direct route, Record entry, Return-To-Self completion entry, save-to-topics, no-save finish, and 360px layout.
 
 ## Scenario: Emotion Calibration Saves One Discovery Point Only

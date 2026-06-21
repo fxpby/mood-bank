@@ -6,6 +6,7 @@ import {
   buildRichIncomingDiscoveryPointInputs,
   getActiveRichIncomingThreads,
   getOverflowRichIncomingThreads,
+  getRichIncomingAnchorSuggestion,
   getRichIncomingSummary,
   richIncomingDirectionCopy,
   richIncomingEmotionCopy,
@@ -105,6 +106,9 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
   const [direction, setDirection] = useState<RichIncomingDirection>("acknowledge_received");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [anchorText, setAnchorText] = useState("");
+  const [anchorMessage, setAnchorMessage] = useState<string | null>(null);
+  const [anchorError, setAnchorError] = useState<string | null>(null);
   const [hasSavedTopics, setHasSavedTopics] = useState(false);
   const activeThreads = useMemo(
     () => getActiveRichIncomingThreads(selectedThreads),
@@ -146,6 +150,7 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
     ],
   );
   const summary = getRichIncomingSummary(saveInput);
+  const anchorSuggestion = getRichIncomingAnchorSuggestion(saveInput);
   const discoveryPointInputs = activeSpace ? buildRichIncomingDiscoveryPointInputs(saveInput) : [];
   const shouldOfferSeeingEvidence =
     shapes.includes("seen") ||
@@ -203,7 +208,16 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
   function resetSaveState() {
     setMessage(null);
     setError(null);
+    setAnchorMessage(null);
+    setAnchorError(null);
     setHasSavedTopics(false);
+  }
+
+  function showCompletion() {
+    setAnchorText(anchorSuggestion);
+    setAnchorMessage(null);
+    setAnchorError(null);
+    setStep("completion");
   }
 
   function saveTopics() {
@@ -236,6 +250,37 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
     setHasSavedTopics(true);
     setError(null);
     setMessage(`已存入稍后 ${discoveryPointInputs.length} 个线索。储蓄罐没有因为这次保存而变化。`);
+  }
+
+  function saveAnchor() {
+    const trimmedAnchor = anchorText.trim();
+
+    if (!trimmedAnchor) {
+      setAnchorError("先留一句能托住自己的话。");
+      setAnchorMessage(null);
+      return;
+    }
+
+    if (!activeSpace) {
+      setAnchorError("还没有可以保存的空间。");
+      setAnchorMessage(null);
+      return;
+    }
+
+    const result = actions.saveAnchor({
+      spaceId: activeSpace.id,
+      text: trimmedAnchor,
+    });
+
+    if (!result.ok) {
+      setAnchorError(result.error ?? "这次还没有保存成功，锚点还没有写进本机。");
+      setAnchorMessage(null);
+      return;
+    }
+
+    setAnchorText(result.value?.text ?? trimmedAnchor);
+    setAnchorError(null);
+    setAnchorMessage("锚点已存下，首页会优先显示这句话。");
   }
 
   return (
@@ -355,7 +400,7 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
           progress="4/4 够小的方向"
           title="如果要回，一次够不够只回一个方向？"
           helper="回应不必覆盖所有线索，先让对方知道你收到了也可以。"
-          onNext={() => setStep("completion")}
+          onNext={showCompletion}
           onBack={goBack}
           primaryLabel="看总结"
         >
@@ -402,6 +447,31 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
           {message ? <p className="helper-text">{message}</p> : null}
           {error ? <p className="form-error">{error}</p> : null}
           {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
+          <section className="rich-incoming-anchor">
+            <div className="section-heading">
+              <h2>留一句锚点</h2>
+              <p>如果这次有一句话能托住你，可以存下给之后的自己。它不是关系证明，也不需要对方承担。</p>
+            </div>
+            <label className="field">
+              <span className="field-label">锚点内容</span>
+              <textarea
+                className="field-textarea rich-incoming-anchor__textarea"
+                value={anchorText}
+                onChange={(event) => {
+                  setAnchorText(event.target.value);
+                  setAnchorMessage(null);
+                  setAnchorError(null);
+                }}
+                rows={3}
+              />
+            </label>
+            <button className="button button--secondary" type="button" onClick={saveAnchor}>
+              <Save size={16} strokeWidth={1.8} />
+              存成锚点
+            </button>
+            {anchorMessage ? <p className="helper-text">{anchorMessage}</p> : null}
+            {anchorError ? <p className="form-error">{anchorError}</p> : null}
+          </section>
           <div className="completion-card__actions">
             <button className="button button--secondary" type="button" onClick={saveTopics}>
               <Save size={16} strokeWidth={1.8} />

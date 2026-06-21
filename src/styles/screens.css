@@ -1424,6 +1424,20 @@
     var(--account-self-bg);
 }
 
+.rich-incoming-anchor {
+  display: grid;
+  gap: var(--space-3);
+  border: 1px solid rgba(183, 204, 177, 0.74);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.66);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-inset);
+}
+
+.rich-incoming-anchor__textarea {
+  min-height: 92px;
+}
+
 .topics-toolbar {
   display: grid;
   gap: var(--space-4);

@@ -193,6 +193,52 @@ export function buildRichIncomingDiscoveryPointInputs(
   }));
 }
 
+export function getRichIncomingAnchorSuggestion(input: RichIncomingInput): string {
+  const activeThreads = getActiveRichIncomingThreads(input.selectedThreads);
+  const hasWarmth =
+    input.shapes.includes("warm") ||
+    input.shapes.includes("seen") ||
+    activeThreads.includes("being_seen") ||
+    activeThreads.includes("mutual_care") ||
+    input.emotions.includes("warm") ||
+    input.emotions.includes("seen") ||
+    input.emotions.includes("moved") ||
+    input.emotions.includes("grateful") ||
+    input.emotions.includes("settled");
+  const hasReplyPressure =
+    input.shapes.includes("fear_missing") ||
+    input.shapes.includes("want_careful_reply") ||
+    input.emotions.includes("fear_reply_badly") ||
+    input.emotions.includes("pressure") ||
+    input.emotions.includes("overloaded");
+
+  if (input.direction === "return_to_self" || input.emotions.includes("want_escape")) {
+    return "我可以先回到自己，再决定要不要回应。";
+  }
+
+  if (activeThreads.includes("rumination_sleep")) {
+    return "这段内容可以明天再看，今晚先让身体停下来。";
+  }
+
+  if (activeThreads.includes("perfectionism_delay")) {
+    return "回应不需要完美，够真诚的一小步就可以。";
+  }
+
+  if (input.direction === "save_without_reply") {
+    return "我可以先收下这段内容，不急着立刻回应。";
+  }
+
+  if (hasWarmth) {
+    return "我可以先收下被看见的部分，不急着一次回应全部。";
+  }
+
+  if (hasReplyPressure) {
+    return "我可以认真，也可以只先回应最重要的一点。";
+  }
+
+  return "我可以先收下这一刻，再慢慢选择下一步。";
+}
+
 function getThreadsForLater(input: RichIncomingInput): RichIncomingThread[] {
   const activeThreads = getActiveRichIncomingThreads(input.selectedThreads);
   const overflowThreads = getOverflowRichIncomingThreads(input.selectedThreads);
