@@ -1234,3 +1234,36 @@ Added explicit standalone anchor saving from Rich Incoming completion, with dete
 ### Next Steps
 
 - None - task complete
+
+
+## Session 31: Repair understanding check
+
+**Date**: 2026-06-21
+**Task**: Repair understanding check
+**Branch**: `main`
+
+### Summary
+
+Added a lightweight repair/understanding P2 branch that saves one relationship-learning discovery point without account impact, plus route/docs/spec/test updates.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `d52ef55` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

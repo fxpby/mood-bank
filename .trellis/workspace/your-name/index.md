@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 30
+- **Total Sessions**: 31
 - **Last Active**: 2026-06-21
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1236 | Active |
+| `journal-1.md` | ~1269 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 31 | 2026-06-21 | Repair understanding check | `d52ef55` | `main` |
 | 30 | 2026-06-21 | Rich incoming anchor save | `f52be5a` | `main` |
 | 29 | 2026-06-21 | High activation branch routing | `163f75c` | `main` |
 | 28 | 2026-06-21 | Settings local export import | `1ea541c` | `main` |
