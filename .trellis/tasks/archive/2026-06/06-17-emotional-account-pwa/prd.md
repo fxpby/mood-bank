@@ -8746,7 +8746,7 @@ Implementation guidance:
 
 ### P1 / P2 Implementation Status Matrix
 
-This matrix records the current first-release implementation state as of 2026-06-20. It is the source of truth for deciding whether the next step is product development, PRD refinement, QA, or deliberate deferral.
+This matrix records the current first-release implementation state as of 2026-06-21. It is the source of truth for deciding whether the next step is product development, PRD refinement, QA, or deliberate deferral.
 
 Status meanings:
 
@@ -8768,7 +8768,7 @@ Status meanings:
 | Personal Action Menu | Done | Experiments page and Account Detail support one recommendation plus two alternatives, refresh/skip, Quick Record prefill, conversion to a saved experiment, and explicit completion through a completed experiment attempt. | A separate persisted intention model is deliberately not in MVP. Choosing remains no-impact and local unless the user explicitly saves or completes. |
 | Experiments | Done | `/experiments` creates a small experiment from three short fields or selected personal action, can save manual practices as active or idea, filters by lifecycle status, and `/experiments/:id` records completed, partial, noticed-only, and not-suitable attempts. Detail also supports editing the three practice sentences, status changes, and saving learning as a discovery point. Attempts create transparent Self/Energy impact only when appropriate. | Keep lifecycle states low-pressure. Do not add streaks, missed-day penalties, reminders, delete flows, or partner-facing rewards. |
 | Settings | Done | `/settings` includes privacy note, active-space edit, storage status, export/import placeholders, reset/delete confirmation, and local-first framing. | Real export/import remains backlog. No login, sync, telemetry, or cloud storage in MVP. |
-| First-release safety support copy | Partial | Privacy and several P2 pages include support-boundary copy. Boundary clarity and old-echo flows can point toward human support. | Add a shared support-boundary copy/helper so self-harm, violence, coercion, stalking, physical safety, overwhelming, or dissociative content gets consistent human/professional/crisis support copy without risk scoring. |
+| First-release safety support copy | Done | Shared `SupportBoundaryCard`, `src/copy/safety.ts`, and `src/domain/safety.ts` provide consistent human-support boundary copy across Trigger, Return-to-Self, Draft Check, Boundary Clarity, Old Echo, Self-Compassion, and Emotion Calibration when relevant. | Keep it non-diagnostic and non-blocking. Do not add danger scoring, hotline directory, legal advice, safety planning, telemetry, or crisis workflow behavior. |
 
 #### P2 Light Surface Status
 
@@ -8776,13 +8776,13 @@ Status meanings:
 |---|---|---|---|
 | Emotion Calibration | Done | `/emotion-calibration` frames emotion as signal/protector, captures protected value, risky impulse, wiser action, note, saves one discovery point, and routes to Return-to-Self / old-echo / boundary / healthy-love / connection-continuity when relevant. | Do not expand into a full emotion course or forced positive reframing. |
 | Connection Continuity | Done | `/connection-continuity` separates felt disappearance from observable evidence, supports optional note/evidence split, saves one relationship-learning discovery point, and creates no account impact. | Keep it moment-level. No attachment diagnosis, object-constancy score, or connection-permanence promise. |
-| Boundary Clarity | Done | `/boundary-clarity` supports mine / not-mine responsibility split, boundary form, owned next action, difficulty, note, save as discovery point, and routes to healthy-love / Return-to-Self. | Shared safety support copy still belongs in the P1 safety backlog. Do not add legal advice, danger scoring, or coercive boundary templates. |
+| Boundary Clarity | Done | `/boundary-clarity` supports mine / not-mine responsibility split, boundary form, owned next action, difficulty, note, save as discovery point, shared support-boundary copy when relevant, and routes to healthy-love / Return-to-Self. | Do not add legal advice, danger scoring, or coercive boundary templates. |
 | Self-Compassion Pause | Done | `/self-compassion` supports pain noticing, common-humanity/self-kindness framing, inner-critic rewrite, kind and responsible next action, save as discovery point, and route to boundary / Return-to-Self. | Do not add self-esteem, self-worth, attractiveness, or likability scores. |
 | Old Echo / Inner Critic | Done | `/old-echo` uses a paced gate, present trigger, touched need, protective program, optional inner-critic note, present-self response, save as discovery point, and route to boundary / self-compassion / Return-to-Self. | Do not determine childhood source, ask for trauma details, or claim trauma treatment / IFS therapy. |
 | Empowerment Shift | Done | `/empowerment-shift` maps drama-triangle stances to Creator / 引导者 / Challenger, prompts one owned next action, saves a discovery point, and can route to boundary / Return-to-Self. | Keep labels self-facing only. Do not label the other person or bypass pain/accountability. |
 | Healthy Love Literacy | Done | `/healthy-love` covers moment phase, care-vs-control/attachment/novelty leaning, one freedom-preserving action, saves one discovery point, and routes to boundary / connection-continuity / Return-to-Self. | Do not add true-love tests, compatibility scores, stay/leave advice, or relationship verdicts. |
 | Seeing / Being Seen | Done | `/seeing-evidence` supports being-seen / seeing-other / both focus, observable evidence, micro-action, capacity check, next direction, save as discovery point, and Return-to-Self. | Do not turn this into people-reading, empathy scoring, or obligation to keep listening when capacity is low. |
-| P2 shared primitives | Partial | Branches follow the same compact pattern in copy and behavior, but implementation is still mostly page-specific. | Refactor only if duplication starts causing inconsistent behavior. A shared `SupportBoundaryCard` is higher priority than generic branch abstraction. |
+| P2 shared primitives | Partial | Branches follow the same compact pattern in copy and behavior, and support-boundary UI/copy is now shared. The branch-specific chips, summaries, and save flows remain mostly page-specific. | Refactor branch primitives only if duplication starts causing inconsistent behavior. Generic branch abstraction is not required for the MVP. |
 | High-activation routing from P2 | Partial | Most P2 branches offer Return-to-Self as a visible action. They do not yet receive a shared activation context from source flows. | If source flows pass activation into P2 routes later, high activation should bias the first CTA toward Return-to-Self instead of deeper reflection. |
 
 #### Deliberately Excluded From P1 / P2
@@ -8805,7 +8805,7 @@ The research files have been absorbed into the PRD as compact product decisions 
 
 | Research source | Absorbed into MVP | Boundary / backlog decision |
 |---|---|---|
-| `research/dbt-informed-return-to-self.md` | Return-to-Self uses DBT-informed grounding, body landing, anchor, and return-to-life action. | Do not claim DBT therapy. Keep physiological options conservative. Safety support copy remains shared backlog. |
+| `research/dbt-informed-return-to-self.md` | Return-to-Self uses DBT-informed grounding, body landing, anchor, return-to-life action, and shared support-boundary copy when the route-local state suggests more human support. | Do not claim DBT therapy. Keep physiological options conservative. Support copy must remain a boundary, not a crisis workflow or risk score. |
 | `research/emotion-language-product-mapping.md` | Emotion granularity, mixed/not-sure states, and emotion calibration are represented in Trigger, Record, Rich Incoming, and Emotion Calibration. | Do not build required 87-emotion UI, automatic emotion detection, or emotion accuracy scoring. |
 | `research/self-compassion-product-mapping.md` | Self-compassion pause includes pain noticing, common humanity, inner-critic rewrite, and kind/responsible next action. | Do not score self-worth or use forced positivity. |
 | `research/boundaries-product-mapping.md` | Boundary clarity includes responsibility split, boundary forms, saying no / receiving no framing, and user-owned next action. | Do not provide legal advice, danger scoring, punishment/control scripts, or coercive consequences. |
@@ -8818,8 +8818,10 @@ The research files have been absorbed into the PRD as compact product decisions 
 
 Recommended order:
 
-1. Run a mobile QA and persistence pass across P1/P2: narrow viewport, refresh after save, reset/delete, text wrapping, route return, storage warning states.
-2. Archive completed Trellis task folders after quality checks and commits are clean.
+1. Real export/import remains a later backlog item. It should preserve the local-first boundary and must not imply cloud backup, sync, or account login.
+2. P2 branch abstraction remains optional. Refactor only if page-specific duplication starts causing inconsistent behavior or bugs.
+3. High-activation route context remains optional. If source flows later pass activation into P2 routes, high activation should bias the first CTA toward Return-to-Self instead of deeper reflection.
+4. UI/Figma redesign work is paused and should remain separate from product behavior changes.
 
 ### Implementation Order
 
