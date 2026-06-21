@@ -1,4 +1,4 @@
-import { ArrowLeft, BookmarkPlus, NotebookPen, Save, Sparkles } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, NotebookPen, Plus, Save, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import {
@@ -7,9 +7,10 @@ import {
   discoveryPointStatusCopy,
   discoveryPointThemeCopy,
 } from "../copy/topics";
+import { buildDiscoveryPointExperimentInput } from "../domain/experiments";
 import type { DiscoveryPoint, DiscoveryPointStatus } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
-import { buildRecordRoute, getTopicRouteId, type AppRoute } from "../utils/route";
+import { buildExperimentRoute, buildRecordRoute, getTopicRouteId, type AppRoute } from "../utils/route";
 
 type TopicDetailPageProps = {
   navigate: (route: AppRoute) => void;
@@ -34,7 +35,7 @@ const detailStatusActions: Array<{ status: DiscoveryPointStatus; label: string; 
 ];
 
 export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
-  const { state, actions } = useAppStore();
+  const { state, actions, status, lastError } = useAppStore();
   const topicId = getTopicRouteId(window.location.pathname);
   const point = useMemo(
     () => state.topics.find((item) => item.id === topicId),
@@ -48,17 +49,26 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
   const [anchorText, setAnchorText] = useState("");
   const [anchorMessage, setAnchorMessage] = useState<string | null>(null);
   const [anchorError, setAnchorError] = useState<string | null>(null);
+  const [experimentFocus, setExperimentFocus] = useState("");
+  const [experimentTinyAction, setExperimentTinyAction] = useState("");
+  const [experimentMarker, setExperimentMarker] = useState("");
+  const [experimentError, setExperimentError] = useState<string | null>(null);
 
   useEffect(() => {
     const nextReviewNote = point?.note ?? "";
+    const experimentInput = point ? buildDiscoveryPointExperimentInput(point) : null;
     setReviewNote(nextReviewNote);
     setAnchorText(nextReviewNote || point?.title || "");
+    setExperimentFocus(experimentInput?.focus ?? "");
+    setExperimentTinyAction(experimentInput?.tinyAction ?? "");
+    setExperimentMarker(experimentInput?.completionMarker ?? "");
     setStatusMessage(null);
     setStatusError(null);
     setReviewMessage(null);
     setReviewError(null);
     setAnchorMessage(null);
     setAnchorError(null);
+    setExperimentError(null);
   }, [point?.id]);
 
   function updateStatus(nextStatus: DiscoveryPointStatus) {
@@ -132,6 +142,37 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
     setAnchorText(result.value?.text ?? anchorText.trim());
     setAnchorError(null);
     setAnchorMessage("锚点已存下，首页会优先显示这句话。");
+  }
+
+  function saveExperiment() {
+    if (!point) return;
+
+    if (!experimentFocus.trim() || !experimentTinyAction.trim() || !experimentMarker.trim()) {
+      setExperimentError("先把三个小问题都留一句。");
+      return;
+    }
+
+    const result = actions.savePersonalExperiment({
+      spaceId: point.spaceId,
+      focus: experimentFocus,
+      tinyAction: experimentTinyAction,
+      completionMarker: experimentMarker,
+      source: "discovery_point",
+      sourceActionId: point.id,
+    });
+
+    if (!result.ok) {
+      setExperimentError(result.error ?? "这次还没有存下，小练习还没有写进本机。");
+      return;
+    }
+
+    if (!result.value) {
+      setExperimentError("这次还没有存下，小练习还没有写进本机。");
+      return;
+    }
+
+    setExperimentError(null);
+    navigate(buildExperimentRoute(result.value.id));
   }
 
   if (!point) {
@@ -224,6 +265,44 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
         ) : (
           <p className="helper-text">这个点只留下了标题。标题本身也已经够用。</p>
         )}
+      </section>
+
+      <section className="panel page-stack">
+        <div className="section-heading">
+          <h2>转成小练习</h2>
+          <p>如果这个点已经指向一个动作，可以把它存成今天能试一次的小练习。</p>
+        </div>
+        <label className="field">
+          <span className="field-label">我想练习什么</span>
+          <input
+            className="field-input"
+            value={experimentFocus}
+            onChange={(event) => setExperimentFocus(event.target.value)}
+          />
+        </label>
+        <label className="field">
+          <span className="field-label">小到今天能试一次的动作</span>
+          <input
+            className="field-input"
+            value={experimentTinyAction}
+            onChange={(event) => setExperimentTinyAction(event.target.value)}
+          />
+        </label>
+        <label className="field">
+          <span className="field-label">什么算练习过一次</span>
+          <input
+            className="field-input"
+            value={experimentMarker}
+            onChange={(event) => setExperimentMarker(event.target.value)}
+          />
+        </label>
+        <button className="button button--primary" type="button" onClick={saveExperiment}>
+          <Plus size={16} strokeWidth={1.8} />
+          {status === "saving" ? "正在存下" : "存成小练习"}
+        </button>
+        <p className="helper-text">创建小练习本身不会改变储蓄罐；只有之后记录一次练习，才可能产生透明影响。</p>
+        {experimentError ? <p className="form-error">{experimentError}</p> : null}
+        {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
       </section>
 
       <section className="panel page-stack">

@@ -181,7 +181,7 @@ export type ReservedItem = {
   updatedAt: string;
 };
 
-export type PersonalExperimentSource = "manual" | "personal_action";
+export type PersonalExperimentSource = "manual" | "personal_action" | "discovery_point";
 
 export type PersonalExperimentAttemptOutcome =
   | "completed"

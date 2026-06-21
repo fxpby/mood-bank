@@ -2,6 +2,7 @@ import { accountReasonCopy } from "../copy/accounts";
 import type {
   AccountImpact,
   AppState,
+  DiscoveryPoint,
   PersonalExperiment,
   PersonalExperimentAttempt,
   PersonalExperimentAttemptInput,
@@ -98,6 +99,22 @@ export function buildPersonalExperiment(
   };
 }
 
+export function buildDiscoveryPointExperimentInput(point: DiscoveryPoint): PersonalExperimentInput {
+  const title = point.title.trim() || "一个发现点";
+  const note = point.note?.trim();
+  const exploreQuestion = point.exploreQuestion?.trim();
+  const sourceSnippet = point.sourceSnippet?.trim();
+
+  return {
+    spaceId: point.spaceId,
+    focus: `练习回应：${title}`,
+    tinyAction: getDiscoveryPointTinyAction(point, note, exploreQuestion, sourceSnippet),
+    completionMarker: "我试过一次，或只是看见自己愿不愿意试，就算练习过。",
+    source: "discovery_point",
+    sourceActionId: point.id,
+  };
+}
+
 export function buildExperimentAttempt(
   input: PersonalExperimentAttemptInput,
   options: ExperimentAttemptBuildOptions,
@@ -179,4 +196,35 @@ export function getExperimentById(
 function cleanOptional(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
+}
+
+function getDiscoveryPointTinyAction(
+  point: DiscoveryPoint,
+  note: string | undefined,
+  exploreQuestion: string | undefined,
+  sourceSnippet: string | undefined,
+): string {
+  if (point.kind === "question" && exploreQuestion) {
+    return `只写一句：${exploreQuestion}`;
+  }
+
+  if (point.kind === "action_idea" && note) {
+    return firstSentence(note);
+  }
+
+  if (note) {
+    return `围绕这个点写一句可执行的小动作：${firstSentence(note)}`;
+  }
+
+  if (sourceSnippet) {
+    return `先重读这一句，再写一个我能做的小动作：${firstSentence(sourceSnippet)}`;
+  }
+
+  return "围绕这个发现点，写一个今天能试一次的小动作。";
+}
+
+function firstSentence(value: string): string {
+  const trimmed = value.trim();
+  const [firstLine] = trimmed.split(/\n+/);
+  return firstLine?.trim() || trimmed;
 }

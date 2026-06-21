@@ -82,6 +82,37 @@ describe("validateMinimumAppState", () => {
     }
   });
 
+  it("keeps discovery-point sourced experiments readable", () => {
+    const raw = {
+      ...createInitialState(),
+      experiments: [
+        {
+          id: "experiment_from_topic",
+          spaceId: "space_1",
+          focus: "练习回应一个发现点",
+          tinyAction: "写一句可执行的小动作",
+          completionMarker: "写出来就算",
+          source: "discovery_point",
+          sourceActionId: "topic_1",
+          attempts: [],
+          createdAt: "2026-06-18T10:00:00.000Z",
+          updatedAt: "2026-06-18T10:00:00.000Z",
+        },
+      ],
+    };
+
+    const result = validateMinimumAppState(raw);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.state.experiments[0]).toMatchObject({
+        id: "experiment_from_topic",
+        source: "discovery_point",
+        sourceActionId: "topic_1",
+      });
+    }
+  });
+
   it("rejects missing schemaVersion as corrupted shape", () => {
     const raw = createInitialState() as Record<string, unknown>;
     delete raw.schemaVersion;

@@ -8763,7 +8763,7 @@ Status meanings:
 | Draft Self-Check | Done | `/draft-check` supports draft input, state check, motivation, no-response tolerance, content risk, stance check, after-send preview, deterministic recommendation, save draft, save discovery point, private record conversion, Return-to-Self, boundary clarity, and contextual P2 branch entry. | Preserve the no-rewrite rule. Any future "lighten it" support should stay as direction/chips, not generated reply wording. |
 | Rich Incoming Review | Done | `/rich-incoming` uses manual message shape, thread selection, mixed emotion, per-thread handling, enough-for-now direction, and batch-saves discovery points. It does not auto-summarize, infer sender psychology, or require replying to every thread. | Direct "save anchor" from this flow is optional backlog only; current discovery-point save covers the MVP need. |
 | Topics List | Done | `/topics` shows discovery points, questions, topics, action ideas, filters, low-pressure status copy, manual creation, and inline status changes. | Keep avoiding due dates, overdue states, streaks, or unfinished-debt language. |
-| Topic Detail | Partial | `/topics/:id` shows source context, detail rows, review note, anchor save, and low-pressure status actions. | Add "turn into small practice" from a discovery point. Preserve no account impact for saving/reviewing by default. |
+| Topic Detail | Done | `/topics/:id` shows source context, detail rows, review note, anchor save, low-pressure status actions, and can turn a discovery point into a small practice with `source: "discovery_point"`. | Preserve no account impact for saving/reviewing/converting by default. Do not add due dates, task debt, or automatic status changes. |
 | Account Detail | Partial | `/accounts/:account` shows qualitative status, numeric value as secondary detail, recent sources, readable reasons, evidence labels, and a lightweight personal action menu. | Account-detail action selection is currently route-local. If completing an action from this page is added, it must create only transparent Self/Energy impact and must not feel like earning balance. |
 | Personal Action Menu | Partial | Experiments page supports one recommendation plus two alternatives, refresh, skip, selected-action completion state, and conversion to a saved experiment. Account detail supports choose/refresh without durable write. | Decide whether "intention" should become a persisted object. Until there is a durable intention model, choosing remains no-impact and local. |
 | Experiments | Done | `/experiments` creates a small experiment from three short fields or selected personal action. `/experiments/:id` records completed, partial, noticed-only, and not-suitable attempts. Attempts create transparent Self/Energy impact only when appropriate. | Pause, retire, edit, and "save as idea" are backlog. Do not add streaks, missed-day penalties, or partner-facing rewards. |
@@ -8818,12 +8818,10 @@ The research files have been absorbed into the PRD as compact product decisions 
 
 Recommended order:
 
-1. Add shared safety / human-support boundary copy and reusable UI so support language is consistent across Trigger, Return-to-Self, Draft Check, Boundary Clarity, Old Echo, Self-Compassion, and high-overload P2 routes.
-2. Add Topic Detail -> Small Practice conversion. Source should be `discovery_point`; creating the experiment creates no account impact.
-3. Close the Account Detail personal action completion loop, or explicitly keep account-detail actions as non-persistent selection only. If completion is added, it may create small Self/Energy impact with transparent reason copy.
-4. Add experiment pause / retire / edit / save-as-idea controls without streaks or penalties.
-5. Run a mobile QA and persistence pass across P1/P2: narrow viewport, refresh after save, reset/delete, text wrapping, route return, storage warning states.
-6. Archive completed Trellis task folders after quality checks and commits are clean.
+1. Close the Account Detail personal action completion loop, or explicitly keep account-detail actions as non-persistent selection only. If completion is added, it may create small Self/Energy impact with transparent reason copy.
+2. Add experiment pause / retire / edit / save-as-idea controls without streaks or penalties.
+3. Run a mobile QA and persistence pass across P1/P2: narrow viewport, refresh after save, reset/delete, text wrapping, route return, storage warning states.
+4. Archive completed Trellis task folders after quality checks and commits are clean.
 
 ### Implementation Order
 

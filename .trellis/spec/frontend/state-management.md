@@ -220,6 +220,12 @@ Creating a small practice must not change Connection / Self / Energy summaries. 
 - `noticed`: Self +1
 - `not_suitable`: no impact
 
+Supported `PersonalExperiment.source` values are:
+
+- `manual`: created from the Experiments manual three-field form.
+- `personal_action`: created from a recommended personal action; `sourceActionId` may store the action id.
+- `discovery_point`: created from Topic Detail; `sourceActionId` stores the source discovery point id.
+
 Experiment attempts must not create Connection impact, streaks, due dates, scores, punishment, or partner-behavior rewards.
 
 ### Scenario: Record Detail Saves An Episode-Linked Anchor

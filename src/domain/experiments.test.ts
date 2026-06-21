@@ -4,10 +4,12 @@ import { createInitialState } from "./defaults";
 import {
   addExperimentAttemptToState,
   addExperimentToState,
+  buildDiscoveryPointExperimentInput,
   buildExperimentAttemptImpacts,
   getExperimentById,
   getExperimentsNewestFirst,
 } from "./experiments";
+import type { DiscoveryPoint } from "./types";
 
 describe("personal experiments", () => {
   it("adds a small practice newest first without account impacts", () => {
@@ -39,6 +41,48 @@ describe("personal experiments", () => {
       "experiment_1",
     ]);
     expect(deriveAllAccountSummaries(first.state)).toEqual(before);
+  });
+
+  it("builds a small practice input from a discovery point", () => {
+    const point = createDiscoveryPoint({
+      id: "topic_1",
+      title: "我会在解释里越写越多",
+      kind: "question",
+      note: "我想练习先停一下。",
+      exploreQuestion: "我能不能只写一句事实？",
+    });
+
+    expect(buildDiscoveryPointExperimentInput(point)).toEqual({
+      spaceId: "space_1",
+      focus: "练习回应：我会在解释里越写越多",
+      tinyAction: "只写一句：我能不能只写一句事实？",
+      completionMarker: "我试过一次，或只是看见自己愿不愿意试，就算练习过。",
+      source: "discovery_point",
+      sourceActionId: "topic_1",
+    });
+  });
+
+  it("creates discovery-point sourced experiments without account impacts", () => {
+    const state = createInitialState();
+    const before = deriveAllAccountSummaries(state);
+    const result = addExperimentToState(
+      state,
+      buildDiscoveryPointExperimentInput(
+        createDiscoveryPoint({
+          id: "topic_2",
+          title: "边界可以更轻一点",
+          kind: "action_idea",
+          note: "今天只说一句真实限度。",
+        }),
+      ),
+      { id: "experiment_1", timestamp: "2026-06-20T09:00:00.000Z" },
+    );
+
+    expect(result.experiment).toMatchObject({
+      source: "discovery_point",
+      sourceActionId: "topic_2",
+    });
+    expect(deriveAllAccountSummaries(result.state)).toEqual(before);
   });
 
   it("records attempts newest first", () => {
@@ -106,3 +150,17 @@ describe("personal experiments", () => {
     ).toEqual([]);
   });
 });
+
+function createDiscoveryPoint(overrides: Partial<DiscoveryPoint>): DiscoveryPoint {
+  return {
+    id: "topic_1",
+    spaceId: "space_1",
+    title: "一个发现点",
+    kind: "discovery",
+    status: "stored_for_later",
+    sourceType: "manual",
+    createdAt: "2026-06-20T09:00:00.000Z",
+    updatedAt: "2026-06-20T09:00:00.000Z",
+    ...overrides,
+  };
+}

@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend architecture and required checks."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Where route, domain, store-facing types, tests, and styles belong."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Experiment and discovery-point write contracts; no account impact on creation."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Local-first, no diagnostic/verdict/task-debt copy, required checks."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Typed source extension, validation, route-safe navigation."}
+{"file": ".trellis/tasks/archive/2026-06/06-17-emotional-account-pwa/prd.md", "reason": "Main PRD status matrix and backlog define Topic Detail to Small Practice conversion."}

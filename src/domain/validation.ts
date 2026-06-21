@@ -202,7 +202,11 @@ function asDiscoveryPointTheme(value: unknown): DiscoveryPointTheme | undefined 
 }
 
 function asPersonalExperimentSource(value: unknown): PersonalExperimentSource {
-  return value === "personal_action" ? "personal_action" : "manual";
+  if (value === "personal_action" || value === "discovery_point") {
+    return value;
+  }
+
+  return "manual";
 }
 
 function asExperimentAttemptOutcome(value: unknown): PersonalExperimentAttemptOutcome {

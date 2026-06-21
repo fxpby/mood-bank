@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify discovery-point and experiment persistence contracts."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify no forbidden network/storage/verdict/task-debt patterns."}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Required frontend checks."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Review route UI and form accessibility."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Review type and validation changes."}
