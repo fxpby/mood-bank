@@ -1961,6 +1961,40 @@
   gap: var(--space-2);
 }
 
+.calm-closure-panel {
+  display: grid;
+  gap: var(--space-3);
+  border: 1px solid rgba(215, 188, 144, 0.46);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(255, 248, 236, 0.88), rgba(255, 255, 255, 0.72)),
+    var(--color-surface);
+  padding: var(--space-4);
+}
+
+.calm-closure-panel__copy {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.calm-closure-panel__copy h3,
+.calm-closure-panel__copy p {
+  margin: 0;
+}
+
+.calm-closure-panel__copy h3 {
+  color: var(--color-text);
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.calm-closure-panel__copy p {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
 .support-boundary-card {
   display: grid;
   gap: var(--space-3);

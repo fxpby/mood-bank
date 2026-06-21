@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, BookOpen, Home, ListChecks, Save, Sparkles } from "lucide-react";
 import { CompletionCard } from "../components/CompletionCard";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { accountReasonCopy } from "../copy/accounts";
@@ -13,10 +13,15 @@ import type {
   QuickRecordPrefill,
 } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute } from "../utils/route";
+import { buildRecordRoute, type AppRoute, type RouteState } from "../utils/route";
 
 type QuickRecordPageProps = {
-  navigate: (route: AppRoute) => void;
+  navigate: (route: AppRoute, state?: RouteState) => void;
+};
+
+type SavedQuickRecord = {
+  id: string;
+  title: string;
 };
 
 type EmotionChip =
@@ -155,7 +160,7 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
   const [draftStatus, setDraftStatus] = useState<string | null>(
     initialDraft ? "已恢复一条未完成记录。" : null,
   );
-  const [savedTitle, setSavedTitle] = useState<string | null>(null);
+  const [savedEpisode, setSavedEpisode] = useState<SavedQuickRecord | null>(null);
   const didMountDraftEffect = useRef(false);
   const lastSavedDraftSignature = useRef(
     initialDraft ? getDraftSignature(initialDraft.spaceId, initialDraft.data) : "",
@@ -241,7 +246,7 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
       return;
     }
 
-    if (!activeSpace || savedTitle || !hasMeaningfulDraftData(currentDraftData)) {
+    if (!activeSpace || savedEpisode || !hasMeaningfulDraftData(currentDraftData)) {
       return;
     }
 
@@ -269,7 +274,7 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
     }, 900);
 
     return () => window.clearTimeout(timer);
-  }, [actions, activeSpace, currentDraftData, draftId, savedTitle]);
+  }, [actions, activeSpace, currentDraftData, draftId, savedEpisode]);
 
   function save() {
     if (!activeSpace) {
@@ -314,7 +319,10 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
     }
 
     setError(null);
-    setSavedTitle(result.value?.title ?? title);
+    setSavedEpisode({
+      id: result.value?.id ?? "",
+      title: result.value?.title ?? (title.trim() || "一次互动"),
+    });
   }
 
   function saveDraftAndClose() {
@@ -344,37 +352,94 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
     navigate("/home");
   }
 
-  if (savedTitle) {
+  if (savedEpisode) {
+    const highActivation = isLevelAtLeast(activationLevel, 3);
+    const warmEnoughToReceive =
+      emotion === "被看见/很暖" || isLevelAtLeast(connectionLevel, 3);
+    const returnToSelfState: RouteState = {
+      returnToSelfAnchor: "这次记录先到这里。我可以晚点再回来，不用现在想完。",
+    };
+
     return (
       <section className="quick-record-page page-stack">
         <CompletionCard
           title="已经存下"
-          body="这次不用现在整理完。你之后可以回来慢慢看。"
+          body="这次记录先到这里就够了。没想完的部分可以留给稍后，不用现在把关系、感受和下一步都整理清楚。"
           rows={[
-            { label: "标题", value: savedTitle },
+            { label: "标题", value: savedEpisode.title },
             { label: "事实", value: facts },
             { label: "下一步", value: getNextActionLabel(nextAction) },
           ]}
         >
-          <button className="button button--primary" type="button" onClick={() => navigate("/home")}>
-            回到首页
-          </button>
-          <button
-            className="button button--secondary"
-            type="button"
-            onClick={() => navigate("/accounts/self")}
-          >
-            打开明细
-          </button>
-          {parseLevel(activationLevel) === 3 || parseLevel(activationLevel) === 4 ? (
-            <button
-              className="button button--ghost"
-              type="button"
-              onClick={() => navigate("/return-to-self")}
-            >
-              继续回到自己
-            </button>
-          ) : null}
+          <section className="calm-closure-panel" aria-labelledby="calm-closure-title">
+            <div className="calm-closure-panel__copy">
+              <h3 id="calm-closure-title">给这次一个安静的收尾</h3>
+              <p>
+                可以只做一个小动作：回到生活、打开这条记录，或先让身体落地。
+              </p>
+            </div>
+
+            {highActivation ? (
+              <button
+                className="button button--primary"
+                type="button"
+                onClick={() => navigate("/return-to-self", returnToSelfState)}
+              >
+                <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
+                先回到自己
+              </button>
+            ) : (
+              <button className="button button--primary" type="button" onClick={() => navigate("/home")}>
+                <Home size={16} strokeWidth={1.8} aria-hidden="true" />
+                回到首页
+              </button>
+            )}
+
+            {savedEpisode.id ? (
+              <button
+                className="button button--secondary"
+                type="button"
+                onClick={() => navigate(buildRecordRoute(savedEpisode.id))}
+              >
+                <BookOpen size={16} strokeWidth={1.8} aria-hidden="true" />
+                打开这条记录
+              </button>
+            ) : null}
+
+            {nextAction === "save_later_topic" ? (
+              <button className="button button--secondary" type="button" onClick={() => navigate("/topics")}>
+                <ListChecks size={16} strokeWidth={1.8} aria-hidden="true" />
+                去看稍后话题
+              </button>
+            ) : null}
+
+            {warmEnoughToReceive ? (
+              <button
+                className="button button--secondary"
+                type="button"
+                onClick={() => navigate("/seeing-evidence")}
+              >
+                <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
+                看见这份温暖
+              </button>
+            ) : null}
+
+            {highActivation ? (
+              <button className="button button--ghost" type="button" onClick={() => navigate("/home")}>
+                <Home size={16} strokeWidth={1.8} aria-hidden="true" />
+                先回到首页
+              </button>
+            ) : (
+              <button
+                className="button button--ghost"
+                type="button"
+                onClick={() => navigate("/return-to-self", returnToSelfState)}
+              >
+                <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
+                做一个五感落地
+              </button>
+            )}
+          </section>
         </CompletionCard>
       </section>
     );
@@ -589,6 +654,11 @@ function normalizeNextAction(value: string | undefined): NextAction {
 
 function parseLevel(value: string): ConnectionLevel | ActivationLevel {
   return value === "not_sure" ? "not_sure" : (Number(value) as 0 | 1 | 2 | 3 | 4);
+}
+
+function isLevelAtLeast(value: string, threshold: number): boolean {
+  const parsed = parseLevel(value);
+  return typeof parsed === "number" && parsed >= threshold;
 }
 
 function getNextActionLabel(value: NextAction): string {
