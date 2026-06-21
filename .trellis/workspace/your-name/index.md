@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 25
+- **Total Sessions**: 26
 - **Last Active**: 2026-06-21
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1053 | Active |
+| `journal-1.md` | ~1088 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 26 | 2026-06-21 | Close completed P1 P2 tasks | `ff22ab0`, `94bced9`, `24d18e7` | `main` |
 | 25 | 2026-06-21 | P1 P2 mobile persistence QA | `e7d43bc` | `main` |
 | 24 | 2026-06-19 | Return-To-Self anchor prefill | `bc38288` | `main` |
 | 23 | 2026-06-19 | Home anchor return action | `fa30214` | `main` |

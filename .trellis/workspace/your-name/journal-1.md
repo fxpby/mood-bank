@@ -1051,3 +1051,38 @@ Ran 360px browser QA for representative P1/P2 routes, verified topic and experim
 ### Next Steps
 
 - None - task complete
+
+
+## Session 26: Close completed P1 P2 tasks
+
+**Date**: 2026-06-21
+**Task**: Close completed P1 P2 tasks
+**Branch**: `main`
+
+### Summary
+
+Marked implemented P1/P2 task PRDs complete, verified typecheck/tests/build, and archived completed Trellis tasks while leaving the paused Figma UI task active.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `ff22ab0` | (see git log) |
+| `94bced9` | (see git log) |
+| `24d18e7` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
