@@ -8766,7 +8766,7 @@ Status meanings:
 | Topic Detail | Done | `/topics/:id` shows source context, detail rows, review note, anchor save, low-pressure status actions, and can turn a discovery point into a small practice with `source: "discovery_point"`. | Preserve no account impact for saving/reviewing/converting by default. Do not add due dates, task debt, or automatic status changes. |
 | Account Detail | Done | `/accounts/:account` shows qualitative status, numeric value as secondary detail, recent sources, readable reasons, evidence labels, and a lightweight personal action menu. Selection remains route-local; "存成小练习" creates a practice without impact; "完成一点" creates a practice plus one completed attempt through the experiment rules. | Keep any future additions source-owned and transparent. Do not turn account detail into earning balance, reward redemption, or relationship scoring. |
 | Personal Action Menu | Done | Experiments page and Account Detail support one recommendation plus two alternatives, refresh/skip, Quick Record prefill, conversion to a saved experiment, and explicit completion through a completed experiment attempt. | A separate persisted intention model is deliberately not in MVP. Choosing remains no-impact and local unless the user explicitly saves or completes. |
-| Experiments | Done | `/experiments` creates a small experiment from three short fields or selected personal action. `/experiments/:id` records completed, partial, noticed-only, and not-suitable attempts. Attempts create transparent Self/Energy impact only when appropriate. | Pause, retire, edit, and "save as idea" are backlog. Do not add streaks, missed-day penalties, or partner-facing rewards. |
+| Experiments | Done | `/experiments` creates a small experiment from three short fields or selected personal action, can save manual practices as active or idea, filters by lifecycle status, and `/experiments/:id` records completed, partial, noticed-only, and not-suitable attempts. Detail also supports editing the three practice sentences, status changes, and saving learning as a discovery point. Attempts create transparent Self/Energy impact only when appropriate. | Keep lifecycle states low-pressure. Do not add streaks, missed-day penalties, reminders, delete flows, or partner-facing rewards. |
 | Settings | Done | `/settings` includes privacy note, active-space edit, storage status, export/import placeholders, reset/delete confirmation, and local-first framing. | Real export/import remains backlog. No login, sync, telemetry, or cloud storage in MVP. |
 | First-release safety support copy | Partial | Privacy and several P2 pages include support-boundary copy. Boundary clarity and old-echo flows can point toward human support. | Add a shared support-boundary copy/helper so self-harm, violence, coercion, stalking, physical safety, overwhelming, or dissociative content gets consistent human/professional/crisis support copy without risk scoring. |
 
@@ -8818,9 +8818,8 @@ The research files have been absorbed into the PRD as compact product decisions 
 
 Recommended order:
 
-1. Add experiment pause / retire / edit / save-as-idea controls without streaks or penalties.
-2. Run a mobile QA and persistence pass across P1/P2: narrow viewport, refresh after save, reset/delete, text wrapping, route return, storage warning states.
-3. Archive completed Trellis task folders after quality checks and commits are clean.
+1. Run a mobile QA and persistence pass across P1/P2: narrow viewport, refresh after save, reset/delete, text wrapping, route return, storage warning states.
+2. Archive completed Trellis task folders after quality checks and commits are clean.
 
 ### Implementation Order
 

@@ -189,6 +189,8 @@ export type PersonalExperimentAttemptOutcome =
   | "noticed"
   | "not_suitable";
 
+export type PersonalExperimentStatus = "idea" | "active" | "paused" | "retired";
+
 export type PersonalExperimentAttempt = {
   id: string;
   outcome: PersonalExperimentAttemptOutcome;
@@ -204,6 +206,7 @@ export type PersonalExperiment = {
   focus: string;
   tinyAction: string;
   completionMarker: string;
+  status: PersonalExperimentStatus;
   source: PersonalExperimentSource;
   sourceActionId?: string;
   attempts: PersonalExperimentAttempt[];
@@ -360,8 +363,21 @@ export type PersonalExperimentInput = {
   focus: string;
   tinyAction: string;
   completionMarker: string;
+  status?: PersonalExperimentStatus;
   source?: PersonalExperimentSource;
   sourceActionId?: string;
+};
+
+export type PersonalExperimentUpdateInput = {
+  id: string;
+  focus: string;
+  tinyAction: string;
+  completionMarker: string;
+};
+
+export type PersonalExperimentStatusInput = {
+  id: string;
+  status: PersonalExperimentStatus;
 };
 
 export type PersonalExperimentAttemptInput = {

@@ -2608,6 +2608,7 @@
 }
 
 .experiment-card span,
+.experiment-card small,
 .experiment-attempt-card time {
   color: var(--color-text-soft);
   font-size: var(--text-xs);
@@ -2649,6 +2650,24 @@
   font-size: var(--text-xl);
   line-height: 1.22;
   overflow-wrap: anywhere;
+}
+
+.experiment-detail-hero p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.experiment-status-pill {
+  justify-self: start;
+  border: 1px solid rgba(183, 204, 177, 0.68);
+  border-radius: var(--radius-pill);
+  background: rgba(233, 240, 229, 0.72);
+  padding: 6px 10px;
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 
 .experiment-outcome-grid {

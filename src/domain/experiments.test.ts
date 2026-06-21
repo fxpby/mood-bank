@@ -5,9 +5,13 @@ import {
   addExperimentAttemptToState,
   addExperimentToState,
   buildDiscoveryPointExperimentInput,
+  buildExperimentDiscoveryPointInput,
   buildExperimentAttemptImpacts,
   getExperimentById,
+  getExperimentsByStatus,
   getExperimentsNewestFirst,
+  updateExperimentInState,
+  updateExperimentStatusInState,
 } from "./experiments";
 import { buildPersonalActionExperimentInput, personalActions } from "./personalActions";
 import type { DiscoveryPoint } from "./types";
@@ -41,7 +45,27 @@ describe("personal experiments", () => {
       "experiment_2",
       "experiment_1",
     ]);
+    expect(first.experiment.status).toBe("active");
     expect(deriveAllAccountSummaries(first.state)).toEqual(before);
+  });
+
+  it("can save a small practice as an idea without account impacts", () => {
+    const state = createInitialState();
+    const before = deriveAllAccountSummaries(state);
+    const result = addExperimentToState(
+      state,
+      {
+        spaceId: "space_1",
+        focus: "练习先暂停",
+        tinyAction: "写一句事实",
+        completionMarker: "写出来就算",
+        status: "idea",
+      },
+      { id: "experiment_idea", timestamp: "2026-06-20T09:00:00.000Z" },
+    );
+
+    expect(result.experiment.status).toBe("idea");
+    expect(deriveAllAccountSummaries(result.state)).toEqual(before);
   });
 
   it("builds a small practice input from a discovery point", () => {
@@ -146,6 +170,117 @@ describe("personal experiments", () => {
       "attempt_2",
       "attempt_1",
     ]);
+  });
+
+  it("updates small-practice text without changing account summaries", () => {
+    const created = addExperimentToState(
+      createInitialState(),
+      {
+        spaceId: "space_1",
+        focus: "旧练习",
+        tinyAction: "旧动作",
+        completionMarker: "旧标准",
+      },
+      { id: "experiment_1", timestamp: "2026-06-20T09:00:00.000Z" },
+    );
+    const before = deriveAllAccountSummaries(created.state);
+    const updated = updateExperimentInState(
+      created.state,
+      {
+        id: "experiment_1",
+        focus: "练习慢一点回复",
+        tinyAction: "先写一句事实",
+        completionMarker: "写一句就算",
+      },
+      "2026-06-20T10:00:00.000Z",
+    );
+
+    expect(updated.experiment).toMatchObject({
+      focus: "练习慢一点回复",
+      tinyAction: "先写一句事实",
+      completionMarker: "写一句就算",
+      updatedAt: "2026-06-20T10:00:00.000Z",
+    });
+    expect(deriveAllAccountSummaries(updated.state)).toEqual(before);
+  });
+
+  it("updates lifecycle status without creating impacts", () => {
+    const created = addExperimentToState(
+      createInitialState(),
+      {
+        spaceId: "space_1",
+        focus: "练习边界",
+        tinyAction: "写一句我能做什么",
+        completionMarker: "写一句就算",
+      },
+      { id: "experiment_1", timestamp: "2026-06-20T09:00:00.000Z" },
+    );
+    const before = deriveAllAccountSummaries(created.state);
+    const paused = updateExperimentStatusInState(
+      created.state,
+      { id: "experiment_1", status: "paused" },
+      "2026-06-20T10:00:00.000Z",
+    );
+
+    expect(paused.experiment?.status).toBe("paused");
+    expect(deriveAllAccountSummaries(paused.state)).toEqual(before);
+  });
+
+  it("filters practices by lifecycle status after status-priority sorting", () => {
+    const state = [
+      ["experiment_retired", "retired", "2026-06-20T12:00:00.000Z"],
+      ["experiment_active", "active", "2026-06-20T09:00:00.000Z"],
+      ["experiment_idea", "idea", "2026-06-20T11:00:00.000Z"],
+      ["experiment_paused", "paused", "2026-06-20T10:00:00.000Z"],
+    ].reduce(
+      (currentState, [id, status, timestamp]) =>
+        addExperimentToState(
+          currentState,
+          {
+            spaceId: "space_1",
+            focus: id,
+            tinyAction: "试一次",
+            completionMarker: "试过就算",
+            status: status as "active" | "idea" | "paused" | "retired",
+          },
+          { id, timestamp },
+        ).state,
+      createInitialState(),
+    );
+
+    expect(getExperimentsNewestFirst(state).map((experiment) => experiment.id)).toEqual([
+      "experiment_active",
+      "experiment_idea",
+      "experiment_paused",
+      "experiment_retired",
+    ]);
+    expect(getExperimentsByStatus(state, "idea").map((experiment) => experiment.id)).toEqual([
+      "experiment_idea",
+    ]);
+  });
+
+  it("builds a no-impact discovery point input from experiment learning", () => {
+    const created = addExperimentToState(
+      createInitialState(),
+      {
+        spaceId: "space_1",
+        focus: "练习收下照顾",
+        tinyAction: "停一下说我收到了",
+        completionMarker: "停一下就算",
+      },
+      { id: "experiment_1", timestamp: "2026-06-20T09:00:00.000Z" },
+    );
+
+    expect(buildExperimentDiscoveryPointInput(created.experiment, "我发现收到照顾时会想立刻回报。")).toEqual({
+      spaceId: "space_1",
+      title: "小练习：练习收下照顾",
+      kind: "discovery",
+      theme: "action_experiment",
+      note: "我发现收到照顾时会想立刻回报。",
+      sourceType: "manual",
+      sourceTitle: "练习收下照顾",
+      sourceSnippet: "停一下说我收到了",
+    });
   });
 
   it("creates transparent self and energy impacts for completed attempts", () => {

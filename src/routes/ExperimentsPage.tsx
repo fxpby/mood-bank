@@ -7,8 +7,13 @@ import {
   RefreshCcw,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { PageHeader } from "../components/PageHeader";
-import { getExperimentsNewestFirst } from "../domain/experiments";
+import {
+  experimentStatusCopy,
+  experimentStatusHelper,
+  getExperimentsByStatus,
+} from "../domain/experiments";
 import {
   buildPersonalActionQuickRecordPrefill,
   getNextPersonalActionRotation,
@@ -22,6 +27,7 @@ import {
   selectTodayMarketLabel,
   selectTodayMarketNote,
 } from "../domain/selectors";
+import type { PersonalExperimentStatus } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
 import { buildExperimentRoute, type AppRoute, type RouteState } from "../utils/route";
 
@@ -30,6 +36,16 @@ type ExperimentsPageProps = {
 };
 
 type CompletionState = "choosing" | "selected" | "completed";
+
+type ExperimentFilter = PersonalExperimentStatus | "all";
+
+const experimentFilterOptions: ChipOption<ExperimentFilter>[] = [
+  { value: "active", label: experimentStatusCopy.active },
+  { value: "idea", label: experimentStatusCopy.idea },
+  { value: "paused", label: experimentStatusCopy.paused },
+  { value: "retired", label: experimentStatusCopy.retired },
+  { value: "all", label: "全部" },
+];
 
 export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
   const { state, actions, status, lastError } = useAppStore();
@@ -43,6 +59,7 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
   const [focus, setFocus] = useState("");
   const [tinyAction, setTinyAction] = useState("");
   const [completionMarker, setCompletionMarker] = useState("");
+  const [filter, setFilter] = useState<ExperimentFilter>("active");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const actionSet = useMemo(
@@ -50,7 +67,7 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
     [market, rotationIndex],
   );
   const visibleActions = [actionSet.recommended, ...actionSet.alternatives];
-  const savedExperiments = getExperimentsNewestFirst(state);
+  const savedExperiments = getExperimentsByStatus(state, filter);
 
   function chooseAction(action: PersonalAction) {
     setSelectedAction(action);
@@ -108,7 +125,7 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
     navigate(buildExperimentRoute(result.value.id));
   }
 
-  function saveManualExperiment() {
+  function saveManualExperiment(nextStatus: PersonalExperimentStatus) {
     if (!activeSpace) {
       setError("还没有可以保存的空间。");
       setFeedback(null);
@@ -126,6 +143,7 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
       focus,
       tinyAction,
       completionMarker,
+      status: nextStatus,
       source: "manual",
     });
 
@@ -145,7 +163,7 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
     setTinyAction("");
     setCompletionMarker("");
     setError(null);
-    setFeedback("小练习已存下。");
+    setFeedback(nextStatus === "idea" ? "已先存成一个小想法。" : "小练习已存下。");
     navigate(buildExperimentRoute(result.value.id));
   }
 
@@ -304,10 +322,15 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
             placeholder="例如：写出来就算"
           />
         </label>
-        <button className="button button--primary" type="button" onClick={saveManualExperiment}>
-          <Plus size={16} strokeWidth={1.8} />
-          存下小练习
-        </button>
+        <div className="experiments-inline-actions">
+          <button className="button button--primary" type="button" onClick={() => saveManualExperiment("active")}>
+            <Plus size={16} strokeWidth={1.8} />
+            存下小练习
+          </button>
+          <button className="button button--secondary" type="button" onClick={() => saveManualExperiment("idea")}>
+            先存成想法
+          </button>
+        </div>
         {feedback ? <p className="helper-text">{feedback}</p> : null}
         {error ? <p className="form-error">{error}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
@@ -318,13 +341,16 @@ export function ExperimentsPage({ navigate }: ExperimentsPageProps) {
           <h2>已经存下的小练习</h2>
           <p>只是给之后的自己留一个入口。</p>
         </div>
+        <ChipGroup label="筛选" options={experimentFilterOptions} value={filter} onChange={setFilter} />
         {savedExperiments.length ? (
           <div className="experiment-list">
             {savedExperiments.map((experiment) => (
               <article className="experiment-card" key={experiment.id}>
-                <span>{experiment.attempts.length ? `记录过 ${experiment.attempts.length} 次` : "还没记录"}</span>
+                <span>{experimentStatusCopy[experiment.status]}</span>
+                <small>{experiment.attempts.length ? `记录过 ${experiment.attempts.length} 次` : "还没记录"}</small>
                 <h3>{experiment.focus}</h3>
                 <p>{experiment.tinyAction}</p>
+                <p>{experimentStatusHelper[experiment.status]}</p>
                 <button
                   className="button button--secondary"
                   type="button"

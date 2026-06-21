@@ -25,6 +25,8 @@ import type {
   PersonalExperimentAttempt,
   PersonalExperimentAttemptInput,
   PersonalExperimentInput,
+  PersonalExperimentStatusInput,
+  PersonalExperimentUpdateInput,
   QuickRecordInput,
   ReturnToSelfInput,
   ReturnToSelfPractice,
@@ -49,7 +51,13 @@ import {
   updateDiscoveryPointNoteInState,
   updateDiscoveryPointStatusInState,
 } from "../domain/topics";
-import { addExperimentAttemptToState, addExperimentToState } from "../domain/experiments";
+import {
+  addExperimentAttemptToState,
+  addExperimentToState,
+  buildExperimentDiscoveryPointInput,
+  updateExperimentInState,
+  updateExperimentStatusInState,
+} from "../domain/experiments";
 import { updateActiveSpaceInState } from "../domain/spaces";
 
 export type AppStoreStatus =
@@ -74,6 +82,12 @@ export type AppActions = {
   updateDiscoveryPointStatus(input: DiscoveryPointStatusInput): StoreWriteResult<DiscoveryPoint>;
   updateDiscoveryPointReviewNote(input: DiscoveryPointReviewNoteInput): StoreWriteResult<DiscoveryPoint>;
   savePersonalExperiment(input: PersonalExperimentInput): StoreWriteResult<PersonalExperiment>;
+  updatePersonalExperiment(input: PersonalExperimentUpdateInput): StoreWriteResult<PersonalExperiment>;
+  updatePersonalExperimentStatus(input: PersonalExperimentStatusInput): StoreWriteResult<PersonalExperiment>;
+  savePersonalExperimentDiscoveryPoint(input: {
+    experimentId: string;
+    note: string;
+  }): StoreWriteResult<DiscoveryPoint>;
   savePersonalExperimentAttempt(
     input: PersonalExperimentAttemptInput,
   ): StoreWriteResult<PersonalExperimentAttempt>;
@@ -407,7 +421,69 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
       return result.ok ? { ...result, value: experiment } : result;
     },
-    [commitState, state],
+    [commitState],
+  );
+
+  const updatePersonalExperiment = useCallback(
+    (input: PersonalExperimentUpdateInput): StoreWriteResult<PersonalExperiment> => {
+      const timestamp = nowIso();
+      const { state: nextState, experiment } = updateExperimentInState(
+        stateRef.current,
+        input,
+        timestamp,
+      );
+
+      if (!experiment) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const result = commitState(nextState);
+      return result.ok ? { ...result, value: experiment } : result;
+    },
+    [commitState],
+  );
+
+  const updatePersonalExperimentStatus = useCallback(
+    (input: PersonalExperimentStatusInput): StoreWriteResult<PersonalExperiment> => {
+      const timestamp = nowIso();
+      const { state: nextState, experiment } = updateExperimentStatusInState(
+        stateRef.current,
+        input,
+        timestamp,
+      );
+
+      if (!experiment) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const result = commitState(nextState);
+      return result.ok ? { ...result, value: experiment } : result;
+    },
+    [commitState],
+  );
+
+  const savePersonalExperimentDiscoveryPoint = useCallback(
+    (input: { experimentId: string; note: string }): StoreWriteResult<DiscoveryPoint> => {
+      const timestamp = nowIso();
+      const experiment = stateRef.current.experiments.find((item) => item.id === input.experimentId);
+
+      if (!experiment) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const { state: nextState, point } = addDiscoveryPointToState(
+        stateRef.current,
+        buildExperimentDiscoveryPointInput(experiment, input.note),
+        {
+          id: createId("topic"),
+          timestamp,
+        },
+      );
+      const result = commitState(nextState);
+
+      return result.ok ? { ...result, value: point } : result;
+    },
+    [commitState],
   );
 
   const savePersonalExperimentAttempt = useCallback(
@@ -425,7 +501,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       const result = commitState(nextState);
       return result.ok ? { ...result, value: attempt } : result;
     },
-    [commitState, state],
+    [commitState],
   );
 
   const deleteDraft = useCallback(
@@ -490,6 +566,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       updateDiscoveryPointStatus,
       updateDiscoveryPointReviewNote,
       savePersonalExperiment,
+      updatePersonalExperiment,
+      updatePersonalExperimentStatus,
+      savePersonalExperimentDiscoveryPoint,
       savePersonalExperimentAttempt,
       saveDraft,
       deleteDraft,
@@ -507,6 +586,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveDiscoveryPoints,
       saveQuickRecord,
       savePersonalExperiment,
+      updatePersonalExperiment,
+      updatePersonalExperimentStatus,
+      savePersonalExperimentDiscoveryPoint,
       savePersonalExperimentAttempt,
       saveReturnToSelfPractice,
       updateActiveSpace,

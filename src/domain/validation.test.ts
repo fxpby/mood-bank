@@ -76,6 +76,7 @@ describe("validateMinimumAppState", () => {
         focus: "一个小练习",
         tinyAction: "做一个今天能完成的小动作",
         completionMarker: "我试过一次就算",
+        status: "active",
         source: "manual",
         attempts: [],
       });
@@ -92,6 +93,7 @@ describe("validateMinimumAppState", () => {
           focus: "练习回应一个发现点",
           tinyAction: "写一句可执行的小动作",
           completionMarker: "写出来就算",
+          status: "paused",
           source: "discovery_point",
           sourceActionId: "topic_1",
           attempts: [],
@@ -107,6 +109,7 @@ describe("validateMinimumAppState", () => {
     if (result.ok) {
       expect(result.state.experiments[0]).toMatchObject({
         id: "experiment_from_topic",
+        status: "paused",
         source: "discovery_point",
         sourceActionId: "topic_1",
       });

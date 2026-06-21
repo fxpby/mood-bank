@@ -1,16 +1,20 @@
-import { ArrowRight, HeartHandshake, NotebookPen } from "lucide-react";
+import { ArrowRight, HeartHandshake, NotebookPen, Save } from "lucide-react";
 import { useState } from "react";
+import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { PageHeader } from "../components/PageHeader";
 import {
   experimentOutcomeCopy,
   experimentOutcomeHelper,
+  experimentStatusCopy,
+  experimentStatusHelper,
   getExperimentById,
 } from "../domain/experiments";
-import type { PersonalExperimentAttemptOutcome } from "../domain/types";
+import type { PersonalExperimentAttemptOutcome, PersonalExperimentStatus } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
 import {
   buildExperimentRoute,
   getExperimentRouteId,
+  buildTopicRoute,
   type AppRoute,
   type RouteState,
 } from "../utils/route";
@@ -26,6 +30,13 @@ const outcomeOptions: PersonalExperimentAttemptOutcome[] = [
   "not_suitable",
 ];
 
+const statusOptions: ChipOption<PersonalExperimentStatus>[] = [
+  { value: "active", label: experimentStatusCopy.active, helper: experimentStatusHelper.active },
+  { value: "idea", label: experimentStatusCopy.idea, helper: experimentStatusHelper.idea },
+  { value: "paused", label: experimentStatusCopy.paused, helper: experimentStatusHelper.paused },
+  { value: "retired", label: experimentStatusCopy.retired, helper: experimentStatusHelper.retired },
+];
+
 export function ExperimentDetailPage({ navigate }: ExperimentDetailPageProps) {
   const { state, actions, status, lastError } = useAppStore();
   const experimentId = getExperimentRouteId(window.location.pathname);
@@ -35,6 +46,11 @@ export function ExperimentDetailPage({ navigate }: ExperimentDetailPageProps) {
   const [latestOutcome, setLatestOutcome] = useState<PersonalExperimentAttemptOutcome | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFocus, setEditFocus] = useState("");
+  const [editTinyAction, setEditTinyAction] = useState("");
+  const [editMarker, setEditMarker] = useState("");
+  const [learningNote, setLearningNote] = useState("");
 
   if (!experiment) {
     return (
@@ -56,8 +72,83 @@ export function ExperimentDetailPage({ navigate }: ExperimentDetailPageProps) {
   }
 
   const currentExperiment = experiment;
+  const canRecordAttempt = currentExperiment.status === "active";
+
+  function beginEdit() {
+    setEditFocus(currentExperiment.focus);
+    setEditTinyAction(currentExperiment.tinyAction);
+    setEditMarker(currentExperiment.completionMarker);
+    setIsEditing(true);
+    setError(null);
+    setFeedback(null);
+  }
+
+  function saveEdit() {
+    if (!editFocus.trim() || !editTinyAction.trim() || !editMarker.trim()) {
+      setError("先把三个小问题都留一句。");
+      setFeedback(null);
+      return;
+    }
+
+    const result = actions.updatePersonalExperiment({
+      id: currentExperiment.id,
+      focus: editFocus,
+      tinyAction: editTinyAction,
+      completionMarker: editMarker,
+    });
+
+    if (!result.ok) {
+      setError(result.error ?? "这次还没有保存成功。");
+      setFeedback(null);
+      return;
+    }
+
+    setIsEditing(false);
+    setError(null);
+    setFeedback("小练习已更新。");
+  }
+
+  function updateStatus(nextStatus: PersonalExperimentStatus) {
+    const result = actions.updatePersonalExperimentStatus({
+      id: currentExperiment.id,
+      status: nextStatus,
+    });
+
+    if (!result.ok) {
+      setError(result.error ?? "这次还没有更新成功。");
+      setFeedback(null);
+      return;
+    }
+
+    setError(null);
+    setFeedback(`已调整为：${experimentStatusCopy[nextStatus]}。`);
+  }
+
+  function saveLearningAsDiscoveryPoint() {
+    const result = actions.savePersonalExperimentDiscoveryPoint({
+      experimentId: currentExperiment.id,
+      note: learningNote,
+    });
+
+    if (!result.ok || !result.value) {
+      setError(result.ok ? "这次还没有存下。" : result.error ?? "这次还没有存下。");
+      setFeedback(null);
+      return;
+    }
+
+    setLearningNote("");
+    setError(null);
+    setFeedback("已存进稍后，可以之后再看。");
+    navigate(buildTopicRoute(result.value.id));
+  }
 
   function saveAttempt() {
+    if (!canRecordAttempt) {
+      setError("这个小练习现在不在进行中。先把状态调回「正在练」，再记录一次。");
+      setFeedback(null);
+      return;
+    }
+
     const result = actions.savePersonalExperimentAttempt({
       experimentId: currentExperiment.id,
       outcome,
@@ -99,7 +190,9 @@ export function ExperimentDetailPage({ navigate }: ExperimentDetailPageProps) {
 
       <section className="experiment-detail-hero panel page-stack">
         <span className="eyebrow">练习意图</span>
+        <span className="experiment-status-pill">{experimentStatusCopy[currentExperiment.status]}</span>
         <h1>{experiment.focus}</h1>
+        <p>{experimentStatusHelper[currentExperiment.status]}</p>
         <dl className="completion-card__rows">
           <div>
             <dt>微小动作</dt>
@@ -114,8 +207,61 @@ export function ExperimentDetailPage({ navigate }: ExperimentDetailPageProps) {
 
       <section className="panel page-stack">
         <div className="section-heading">
+          <h2>整理这个小练习</h2>
+          <p>可以改轻一点，也可以先停下。状态变化不会影响储蓄罐。</p>
+        </div>
+        <ChipGroup label="状态" options={statusOptions} value={currentExperiment.status} onChange={updateStatus} />
+        {isEditing ? (
+          <div className="page-stack">
+            <label className="field">
+              <span className="field-label">我想练习什么</span>
+              <input
+                className="field-input"
+                value={editFocus}
+                onChange={(event) => setEditFocus(event.target.value)}
+              />
+            </label>
+            <label className="field">
+              <span className="field-label">小到今天能试一次的动作</span>
+              <input
+                className="field-input"
+                value={editTinyAction}
+                onChange={(event) => setEditTinyAction(event.target.value)}
+              />
+            </label>
+            <label className="field">
+              <span className="field-label">什么算练习过一次</span>
+              <input
+                className="field-input"
+                value={editMarker}
+                onChange={(event) => setEditMarker(event.target.value)}
+              />
+            </label>
+            <div className="experiments-inline-actions">
+              <button className="button button--primary" type="button" onClick={saveEdit}>
+                <Save size={16} strokeWidth={1.8} />
+                保存修改
+              </button>
+              <button className="button button--ghost" type="button" onClick={() => setIsEditing(false)}>
+                取消
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button className="button button--secondary" type="button" onClick={beginEdit}>
+            编辑三句话
+          </button>
+        )}
+      </section>
+
+      <section className="panel page-stack">
+        <div className="section-heading">
           <h2>记录一次练习</h2>
-          <p>完成、完成一部分、只是看见，都会被温柔地记录。不适合也有信息。</p>
+          <p>
+            {canRecordAttempt
+              ? "完成、完成一部分、只是看见，都会被温柔地记录。不适合也有信息。"
+              : "这个小练习现在先放着。需要记录时，先把状态调回正在练。"}
+          </p>
         </div>
         <div className="experiment-outcome-grid" role="group" aria-label="练习结果">
           {outcomeOptions.map((option) => (
@@ -152,6 +298,26 @@ export function ExperimentDetailPage({ navigate }: ExperimentDetailPageProps) {
         ) : null}
         {error ? <p className="form-error">{error}</p> : null}
         {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
+      </section>
+
+      <section className="panel page-stack">
+        <div className="section-heading">
+          <h2>把一个学习点放进稍后</h2>
+          <p>如果这次练习让你看见了什么，可以先存起来，不需要现在分析完。</p>
+        </div>
+        <label className="field">
+          <span className="field-label">我想稍后再看的点，可空着</span>
+          <textarea
+            className="field-textarea"
+            value={learningNote}
+            rows={3}
+            onChange={(event) => setLearningNote(event.target.value)}
+            placeholder="例如：我发现自己收到照顾时会立刻想回报。"
+          />
+        </label>
+        <button className="button button--secondary" type="button" onClick={saveLearningAsDiscoveryPoint}>
+          存进稍后
+        </button>
       </section>
 
       <section className="panel page-stack">

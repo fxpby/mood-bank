@@ -210,6 +210,9 @@ Rules:
 
 ```ts
 actions.savePersonalExperiment(input);
+actions.updatePersonalExperiment(input);
+actions.updatePersonalExperimentStatus(input);
+actions.savePersonalExperimentDiscoveryPoint(input);
 actions.savePersonalExperimentAttempt(input);
 ```
 
@@ -225,6 +228,22 @@ Supported `PersonalExperiment.source` values are:
 - `manual`: created from the Experiments manual three-field form.
 - `personal_action`: created from a recommended personal action; `sourceActionId` may store the action id.
 - `discovery_point`: created from Topic Detail; `sourceActionId` stores the source discovery point id.
+
+Supported `PersonalExperiment.status` values are:
+
+- `idea`: saved for later, not currently being practiced.
+- `active`: available for recording attempts.
+- `paused`: intentionally resting; no penalty.
+- `retired`: no longer needed, still readable with history.
+
+Lifecycle rules:
+
+- New practices default to `active`, unless the creation input explicitly uses `status: "idea"`.
+- Legacy records without status validate as `active`.
+- Editing `focus`, `tinyAction`, or `completionMarker` must not create account impacts.
+- Status changes must not create account impacts, penalties, due dates, reminders, or hidden deletion.
+- Non-active practices should nudge the user to resume before recording an attempt, instead of recording silently.
+- Saving a practice learning point to Topics must create a normal `DiscoveryPoint` with `theme: "action_experiment"` and no account impact.
 
 Experiment attempts must not create Connection impact, streaks, due dates, scores, punishment, or partner-behavior rewards.
 

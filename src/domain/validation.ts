@@ -9,6 +9,7 @@ import type {
   PersonalExperimentAttempt,
   PersonalExperimentAttemptOutcome,
   PersonalExperimentSource,
+  PersonalExperimentStatus,
 } from "./types";
 import { SCHEMA_VERSION } from "./types";
 
@@ -72,6 +73,7 @@ function normalizePersonalExperiments(value: unknown): PersonalExperiment[] {
       focus: getString(item.focus) ?? getString(item.title) ?? "一个小练习",
       tinyAction: getString(item.tinyAction) ?? getString(item.label) ?? "做一个今天能完成的小动作",
       completionMarker: getString(item.completionMarker) ?? "我试过一次就算",
+      status: asPersonalExperimentStatus(item.status),
       source: asPersonalExperimentSource(item.source),
       sourceActionId: getString(item.sourceActionId),
       attempts: normalizeExperimentAttempts(item.attempts),
@@ -207,6 +209,14 @@ function asPersonalExperimentSource(value: unknown): PersonalExperimentSource {
   }
 
   return "manual";
+}
+
+function asPersonalExperimentStatus(value: unknown): PersonalExperimentStatus {
+  if (value === "idea" || value === "active" || value === "paused" || value === "retired") {
+    return value;
+  }
+
+  return "active";
 }
 
 function asExperimentAttemptOutcome(value: unknown): PersonalExperimentAttemptOutcome {

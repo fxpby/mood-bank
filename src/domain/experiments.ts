@@ -3,11 +3,15 @@ import type {
   AccountImpact,
   AppState,
   DiscoveryPoint,
+  DiscoveryPointInput,
   PersonalExperiment,
   PersonalExperimentAttempt,
   PersonalExperimentAttemptInput,
   PersonalExperimentAttemptOutcome,
   PersonalExperimentInput,
+  PersonalExperimentStatus,
+  PersonalExperimentStatusInput,
+  PersonalExperimentUpdateInput,
 } from "./types";
 
 export type ExperimentBuildOptions = {
@@ -33,6 +37,27 @@ export const experimentOutcomeHelper: Record<PersonalExperimentAttemptOutcome, s
   noticed: "看见也是练习的一种，不急着做到。",
   not_suitable: "不适合也有信息，是这次多了解了自己一点。",
 };
+
+export const experimentStatusCopy: Record<PersonalExperimentStatus, string> = {
+  idea: "先存着",
+  active: "正在练",
+  paused: "先暂停",
+  retired: "已收起",
+};
+
+export const experimentStatusHelper: Record<PersonalExperimentStatus, string> = {
+  idea: "只是一个之后可以试的小想法，不急着开始。",
+  active: "可以记录一次练习，也可以随时停一停。",
+  paused: "它正在休息，不代表失败。",
+  retired: "已经不需要继续练，但历史还在。",
+};
+
+export const experimentStatusOrder: PersonalExperimentStatus[] = [
+  "active",
+  "idea",
+  "paused",
+  "retired",
+];
 
 export function addExperimentToState(
   state: AppState,
@@ -91,6 +116,7 @@ export function buildPersonalExperiment(
     focus: input.focus.trim() || "练习一个小动作",
     tinyAction: input.tinyAction.trim() || "做一个今天能完成的小动作",
     completionMarker: input.completionMarker.trim() || "我试过一次就算",
+    status: input.status ?? "active",
     source: input.source ?? "manual",
     sourceActionId: cleanOptional(input.sourceActionId),
     attempts: [],
@@ -112,6 +138,84 @@ export function buildDiscoveryPointExperimentInput(point: DiscoveryPoint): Perso
     completionMarker: "我试过一次，或只是看见自己愿不愿意试，就算练习过。",
     source: "discovery_point",
     sourceActionId: point.id,
+  };
+}
+
+export function updateExperimentInState(
+  state: AppState,
+  input: PersonalExperimentUpdateInput,
+  timestamp: string,
+): { state: AppState; experiment?: PersonalExperiment } {
+  let updatedExperiment: PersonalExperiment | undefined;
+  const experiments = state.experiments.map((experiment) => {
+    if (experiment.id !== input.id) {
+      return experiment;
+    }
+
+    updatedExperiment = {
+      ...experiment,
+      focus: input.focus.trim() || experiment.focus,
+      tinyAction: input.tinyAction.trim() || experiment.tinyAction,
+      completionMarker: input.completionMarker.trim() || experiment.completionMarker,
+      updatedAt: timestamp,
+    };
+    return updatedExperiment;
+  });
+
+  return {
+    experiment: updatedExperiment,
+    state: {
+      ...state,
+      experiments,
+    },
+  };
+}
+
+export function updateExperimentStatusInState(
+  state: AppState,
+  input: PersonalExperimentStatusInput,
+  timestamp: string,
+): { state: AppState; experiment?: PersonalExperiment } {
+  let updatedExperiment: PersonalExperiment | undefined;
+  const experiments = state.experiments.map((experiment) => {
+    if (experiment.id !== input.id) {
+      return experiment;
+    }
+
+    updatedExperiment = {
+      ...experiment,
+      status: input.status,
+      updatedAt: timestamp,
+    };
+    return updatedExperiment;
+  });
+
+  return {
+    experiment: updatedExperiment,
+    state: {
+      ...state,
+      experiments,
+    },
+  };
+}
+
+export function buildExperimentDiscoveryPointInput(
+  experiment: PersonalExperiment,
+  note: string,
+): DiscoveryPointInput {
+  const trimmedNote = note.trim();
+
+  return {
+    spaceId: experiment.spaceId,
+    title: `小练习：${experiment.focus}`,
+    kind: trimmedNote ? "discovery" : "action_idea",
+    theme: "action_experiment",
+    note:
+      trimmedNote ||
+      `我想稍后再看这个小练习：${experiment.tinyAction}。什么算练习过一次：${experiment.completionMarker}`,
+    sourceType: "manual",
+    sourceTitle: experiment.focus,
+    sourceSnippet: experiment.tinyAction,
   };
 }
 
@@ -179,7 +283,16 @@ export function buildExperimentAttemptImpacts(
 }
 
 export function getExperimentsNewestFirst(state: AppState): PersonalExperiment[] {
-  return [...state.experiments].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return [...state.experiments].sort(sortExperiments);
+}
+
+export function getExperimentsByStatus(
+  state: AppState,
+  status: PersonalExperimentStatus | "all",
+): PersonalExperiment[] {
+  return getExperimentsNewestFirst(state).filter((experiment) =>
+    status === "all" ? true : experiment.status === status,
+  );
 }
 
 export function getExperimentById(
@@ -191,6 +304,16 @@ export function getExperimentById(
   }
 
   return state.experiments.find((experiment) => experiment.id === experimentId) ?? null;
+}
+
+function sortExperiments(a: PersonalExperiment, b: PersonalExperiment): number {
+  const statusDifference = experimentStatusOrder.indexOf(a.status) - experimentStatusOrder.indexOf(b.status);
+
+  if (statusDifference !== 0) {
+    return statusDifference;
+  }
+
+  return b.createdAt.localeCompare(a.createdAt);
 }
 
 function cleanOptional(value: string | undefined): string | undefined {
