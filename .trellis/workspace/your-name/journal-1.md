@@ -1086,3 +1086,36 @@ Marked implemented P1/P2 task PRDs complete, verified typecheck/tests/build, and
 ### Next Steps
 
 - None - task complete
+
+
+## Session 27: Sync P1 P2 status docs
+
+**Date**: 2026-06-21
+**Task**: Sync P1 P2 status docs
+**Branch**: `main`
+
+### Summary
+
+Updated the main PRD and README so P1/P2 implementation status reflects the shared support-boundary component, completed QA/archive work, and remaining backlog boundaries.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `8a96fff` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
