@@ -1032,7 +1032,10 @@ Ran 360px browser QA for representative P1/P2 routes, verified topic and experim
 
 ### Main Changes
 
-(Add details)
+- Added Settings local JSON export and import controls.
+- Added pure helpers for serializing, validating, summarizing, and naming local backup files.
+- Added `replaceLocalData` Store action so imports replace state through the existing persistence boundary.
+- Updated README, main PRD status, and frontend state-management spec for the local file-transfer contract.
 
 ### Git Commits
 
@@ -1111,6 +1114,42 @@ Updated the main PRD and README so P1/P2 implementation status reflects the shar
 ### Testing
 
 - [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 28: Settings local export import
+
+**Date**: 2026-06-21
+**Task**: Settings local export import
+**Branch**: `main`
+
+### Summary
+
+Implemented local JSON export/import in Settings with validation, confirmation, Store write boundary, docs/spec sync, and verification.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `1ea541c` | feat: add local settings export import |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test` - 23 files, 166 tests
+- [OK] `npm run build`
+- [OK] `git diff --check`
 
 ### Status
 
