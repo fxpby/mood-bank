@@ -174,9 +174,15 @@ const result = actions.saveQuickRecord(input);
 actions.saveDiscoveryPoint(input);
 actions.updateDiscoveryPointStatus({ id, status });
 actions.updateDiscoveryPointReviewNote({ id, note });
+actions.updateDiscoveryPoint({ id, title, kind, theme, note, exploreQuestion });
+actions.deleteDiscoveryPoint({ id });
 ```
 
-Saving or reviewing a discovery point must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Tests should assert that topic helpers leave derived storage-jar summaries unchanged.
+Saving, reviewing, editing, or deleting a discovery point must not change Connection / Self / Energy summaries unless a future PRD adds an explicit account-impact rule. Tests should assert that topic helpers leave derived storage-jar summaries unchanged.
+
+Editing a discovery point may change only user-editable topic fields: `title`, `kind`, `theme`, `note`, and `exploreQuestion`. It must preserve source metadata (`sourceType`, `sourceId`, `sourceTitle`, `sourceSnippet`), `spaceId`, `status`, `createdAt`, and linked-source behavior. Blank titles fall back to `一个稍后再看的点`; blank optional text fields clear to `undefined`.
+
+Deleting a discovery point removes only that item from `state.topics`. It must not delete source episodes, return-to-self practices, anchors, drafts, personal experiments, experiment attempts, or account impacts. Unknown ids return no-op success.
 
 ### P2 Branch Output Contract
 

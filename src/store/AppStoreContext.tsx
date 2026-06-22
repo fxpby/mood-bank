@@ -13,11 +13,13 @@ import type {
   AnchorInput,
   AppState,
   DailyMarketInput,
+  DeleteDiscoveryPointInput,
   DeleteEpisodeInput,
   DiscoveryPoint,
   DiscoveryPointInput,
   DiscoveryPointReviewNoteInput,
   DiscoveryPointStatusInput,
+  DiscoveryPointUpdateInput,
   Draft,
   DraftInput,
   Episode,
@@ -49,6 +51,8 @@ import {
   addDiscoveryPointToState,
   addDiscoveryPointsToState,
   buildDiscoveryPoint,
+  deleteDiscoveryPointFromState,
+  updateDiscoveryPointInState,
   updateDiscoveryPointNoteInState,
   updateDiscoveryPointStatusInState,
 } from "../domain/topics";
@@ -81,8 +85,10 @@ export type AppActions = {
   saveAnchor(input: AnchorInput): StoreWriteResult<Anchor>;
   saveDiscoveryPoint(input: DiscoveryPointInput): StoreWriteResult<DiscoveryPoint>;
   saveDiscoveryPoints(input: DiscoveryPointInput[]): StoreWriteResult<DiscoveryPoint[]>;
+  updateDiscoveryPoint(input: DiscoveryPointUpdateInput): StoreWriteResult<DiscoveryPoint>;
   updateDiscoveryPointStatus(input: DiscoveryPointStatusInput): StoreWriteResult<DiscoveryPoint>;
   updateDiscoveryPointReviewNote(input: DiscoveryPointReviewNoteInput): StoreWriteResult<DiscoveryPoint>;
+  deleteDiscoveryPoint(input: DeleteDiscoveryPointInput): StoreWriteResult;
   savePersonalExperiment(input: PersonalExperimentInput): StoreWriteResult<PersonalExperiment>;
   updatePersonalExperiment(input: PersonalExperimentUpdateInput): StoreWriteResult<PersonalExperiment>;
   updatePersonalExperimentStatus(input: PersonalExperimentStatusInput): StoreWriteResult<PersonalExperiment>;
@@ -399,6 +405,21 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [commitState, state],
   );
 
+  const updateDiscoveryPoint = useCallback(
+    (input: DiscoveryPointUpdateInput): StoreWriteResult<DiscoveryPoint> => {
+      const timestamp = nowIso();
+      const { state: nextState, point } = updateDiscoveryPointInState(state, input, timestamp);
+
+      if (!point) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const result = commitState(nextState);
+      return result.ok ? { ...result, value: point } : result;
+    },
+    [commitState, state],
+  );
+
   const updateDiscoveryPointReviewNote = useCallback(
     (input: DiscoveryPointReviewNoteInput): StoreWriteResult<DiscoveryPoint> => {
       const timestamp = nowIso();
@@ -410,6 +431,19 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
       const result = commitState(nextState);
       return result.ok ? { ...result, value: point } : result;
+    },
+    [commitState, state],
+  );
+
+  const deleteDiscoveryPoint = useCallback(
+    (input: DeleteDiscoveryPointInput): StoreWriteResult => {
+      const { state: nextState, point } = deleteDiscoveryPointFromState(state, input);
+
+      if (!point) {
+        return { ok: true, savedAt: nowIso() };
+      }
+
+      return commitState(nextState);
     },
     [commitState, state],
   );
@@ -585,8 +619,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveAnchor,
       saveDiscoveryPoint,
       saveDiscoveryPoints,
+      updateDiscoveryPoint,
       updateDiscoveryPointStatus,
       updateDiscoveryPointReviewNote,
+      deleteDiscoveryPoint,
       savePersonalExperiment,
       updatePersonalExperiment,
       updatePersonalExperimentStatus,
@@ -607,9 +643,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveAnchor,
       saveDraft,
       deleteDraft,
+      deleteDiscoveryPoint,
       deleteEpisode,
       saveDiscoveryPoint,
       saveDiscoveryPoints,
+      updateDiscoveryPoint,
       saveQuickRecord,
       savePersonalExperiment,
       updatePersonalExperiment,

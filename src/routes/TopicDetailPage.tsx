@@ -1,5 +1,15 @@
-import { ArrowLeft, BookmarkPlus, NotebookPen, Plus, Save, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  BookmarkPlus,
+  NotebookPen,
+  Pencil,
+  Plus,
+  Save,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { PageHeader } from "../components/PageHeader";
 import {
   discoveryPointKindCopy,
@@ -9,7 +19,12 @@ import {
 } from "../copy/topics";
 import { buildDiscoveryPointExperimentInput } from "../domain/experiments";
 import { selectDiscoveryPointSourceDetail } from "../domain/selectors";
-import type { DiscoveryPoint, DiscoveryPointStatus } from "../domain/types";
+import type {
+  DiscoveryPoint,
+  DiscoveryPointKind,
+  DiscoveryPointStatus,
+  DiscoveryPointTheme,
+} from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
 import { buildExperimentRoute, buildRecordRoute, getTopicRouteId, type AppRoute } from "../utils/route";
 
@@ -35,6 +50,23 @@ const detailStatusActions: Array<{ status: DiscoveryPointStatus; label: string; 
   },
 ];
 
+const discoveryPointKindOptions: DiscoveryPointKind[] = [
+  "topic",
+  "discovery",
+  "question",
+  "action_idea",
+];
+
+const discoveryPointThemeOptions: DiscoveryPointTheme[] = [
+  "emotion",
+  "boundary",
+  "old_echo",
+  "relationship_learning",
+  "expression",
+  "self_care",
+  "action_experiment",
+];
+
 export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
   const { state, actions, status, lastError } = useAppStore();
   const topicId = getTopicRouteId(window.location.pathname);
@@ -54,6 +86,15 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
   const [experimentTinyAction, setExperimentTinyAction] = useState("");
   const [experimentMarker, setExperimentMarker] = useState("");
   const [experimentError, setExperimentError] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editKind, setEditKind] = useState<DiscoveryPointKind>("discovery");
+  const [editTheme, setEditTheme] = useState<DiscoveryPointTheme | "">("");
+  const [editNote, setEditNote] = useState("");
+  const [editQuestion, setEditQuestion] = useState("");
+  const [editMessage, setEditMessage] = useState<string | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     const nextReviewNote = point?.note ?? "";
@@ -63,6 +104,11 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
     setExperimentFocus(experimentInput?.focus ?? "");
     setExperimentTinyAction(experimentInput?.tinyAction ?? "");
     setExperimentMarker(experimentInput?.completionMarker ?? "");
+    setEditTitle(point?.title ?? "");
+    setEditKind(point?.kind ?? "discovery");
+    setEditTheme(point?.theme ?? "");
+    setEditNote(nextReviewNote);
+    setEditQuestion(point?.exploreQuestion ?? "");
     setStatusMessage(null);
     setStatusError(null);
     setReviewMessage(null);
@@ -70,6 +116,10 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
     setAnchorMessage(null);
     setAnchorError(null);
     setExperimentError(null);
+    setEditMessage(null);
+    setEditError(null);
+    setIsDeleteConfirmOpen(false);
+    setDeleteError(null);
   }, [point?.id]);
 
   function updateStatus(nextStatus: DiscoveryPointStatus) {
@@ -109,6 +159,51 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
         ? "补记已存下，只更新了这个发现点。"
         : "补记已清空，只更新了这个发现点。",
     );
+  }
+
+  function savePointEdit() {
+    if (!point) return;
+
+    const result = actions.updateDiscoveryPoint({
+      id: point.id,
+      title: editTitle,
+      kind: editKind,
+      theme: editTheme || undefined,
+      note: editNote,
+      exploreQuestion: editQuestion,
+    });
+
+    if (!result.ok) {
+      setEditError(result.error ?? "这次还没有保存成功，发现点还没有写进本机。");
+      setEditMessage(null);
+      return;
+    }
+
+    const savedNote = result.value?.note ?? "";
+    setEditTitle(result.value?.title ?? (editTitle.trim() || "一个稍后再看的点"));
+    setEditKind(result.value?.kind ?? editKind);
+    setEditTheme(result.value?.theme ?? "");
+    setEditNote(savedNote);
+    setReviewNote(savedNote);
+    setEditQuestion(result.value?.exploreQuestion ?? "");
+    setEditError(null);
+    setEditMessage("发现点已更新，只整理了这个点本身。");
+  }
+
+  function deletePoint() {
+    if (!point) return;
+
+    const result = actions.deleteDiscoveryPoint({ id: point.id });
+
+    if (!result.ok) {
+      setDeleteError(result.error ?? "这次没有删除成功，发现点还留在本机。");
+      setIsDeleteConfirmOpen(false);
+      return;
+    }
+
+    setDeleteError(null);
+    setIsDeleteConfirmOpen(false);
+    navigate("/topics");
   }
 
   function useReviewNoteAsAnchor() {
@@ -255,6 +350,81 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
 
       <section className="panel page-stack">
         <div className="section-heading">
+          <h2>整理这个点</h2>
+          <p>只修改稍后再看里的文字和分类，不会改来源记录、小练习或储蓄罐明细。</p>
+        </div>
+        <label className="field">
+          <span className="field-label">标题</span>
+          <input
+            className="field-input"
+            value={editTitle}
+            onChange={(event) => setEditTitle(event.target.value)}
+            placeholder="一个稍后再看的点"
+          />
+        </label>
+        <div className="topic-detail-edit-grid">
+          <label className="field">
+            <span className="field-label">类型</span>
+            <select
+              className="field-input"
+              value={editKind}
+              onChange={(event) => setEditKind(event.target.value as DiscoveryPointKind)}
+            >
+              {discoveryPointKindOptions.map((kind) => (
+                <option key={kind} value={kind}>
+                  {discoveryPointKindCopy[kind]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span className="field-label">主题，可空着</span>
+            <select
+              className="field-input"
+              value={editTheme}
+              onChange={(event) =>
+                setEditTheme(event.target.value ? (event.target.value as DiscoveryPointTheme) : "")
+              }
+            >
+              <option value="">暂不分类</option>
+              {discoveryPointThemeOptions.map((theme) => (
+                <option key={theme} value={theme}>
+                  {discoveryPointThemeCopy[theme]}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <label className="field">
+          <span className="field-label">备注，可空着</span>
+          <textarea
+            className="field-textarea"
+            value={editNote}
+            rows={4}
+            onChange={(event) => setEditNote(event.target.value)}
+            placeholder="例如：这个点提醒我先慢一点。"
+          />
+        </label>
+        <label className="field">
+          <span className="field-label">想探寻的问题，可空着</span>
+          <textarea
+            className="field-textarea"
+            value={editQuestion}
+            rows={3}
+            onChange={(event) => setEditQuestion(event.target.value)}
+            placeholder="例如：我现在真正想保护什么？"
+          />
+        </label>
+        <button className="button button--primary" type="button" onClick={savePointEdit}>
+          <Pencil size={16} strokeWidth={1.8} />
+          {status === "saving" ? "正在存下" : "存下整理"}
+        </button>
+        {editMessage ? <p className="helper-text">{editMessage}</p> : null}
+        {editError ? <p className="form-error">{editError}</p> : null}
+      </section>
+
+      <section className="panel page-stack">
+        <div className="section-heading">
           <h2>这次看见了什么</h2>
           <p>可以只停在原来的文字上。回看不是复盘考试。</p>
         </div>
@@ -391,10 +561,38 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
         {statusError ? <p className="form-error">{statusError}</p> : null}
       </section>
 
+      <section className="danger-zone page-stack">
+        <div className="section-heading">
+          <h2>移出稍后再看</h2>
+          <p>只删除这个发现点。来源记录、已保存的锚点和已经创建的小练习都会保留。</p>
+        </div>
+        <button
+          className="button button--danger"
+          type="button"
+          onClick={() => setIsDeleteConfirmOpen(true)}
+        >
+          <Trash2 size={16} strokeWidth={1.8} />
+          删除这个发现点
+        </button>
+        {deleteError ? <p className="form-error" role="alert">{deleteError}</p> : null}
+      </section>
+
       <button className="button button--secondary" type="button" onClick={() => navigate("/topics")}>
         <Sparkles size={16} strokeWidth={1.8} />
         回到稍后
       </button>
+
+      {isDeleteConfirmOpen ? (
+        <ConfirmDialog
+          title="删除这个发现点？"
+          body="删除后，它只会从“稍后再看”里移除。来源记录、锚点、已经创建的小练习和储蓄罐明细都会保留。"
+          confirmLabel="删除发现点"
+          busyLabel="正在删除"
+          isBusy={status === "saving"}
+          onConfirm={deletePoint}
+          onCancel={() => setIsDeleteConfirmOpen(false)}
+        />
+      ) : null}
     </section>
   );
 }

@@ -6,8 +6,10 @@ import {
   addDiscoveryPointToState,
   addDiscoveryPointsToState,
   buildDiscoveryPoint,
+  deleteDiscoveryPointFromState,
   filterDiscoveryPoints,
   matchesTopicFilters,
+  updateDiscoveryPointInState,
   updateDiscoveryPointNoteInState,
   updateDiscoveryPointStatusInState,
 } from "./topics";
@@ -224,6 +226,265 @@ describe("discovery point state helpers", () => {
 
     expect(updated.point?.note).toBe("新的看见");
     expect(deriveAllAccountSummaries(updated.state)).toEqual(before);
+  });
+
+  it("updates only editable discovery point fields while preserving source and status", () => {
+    const withTopics = [
+      buildDiscoveryPoint(
+        {
+          spaceId,
+          title: "语言切换像缓冲",
+          kind: "discovery",
+          sourceType: "episode",
+          sourceId: "episode_1",
+          sourceTitle: "一次互动",
+          sourceSnippet: "英文像一层缓冲",
+          theme: "emotion",
+          note: "旧备注",
+          exploreQuestion: "旧问题",
+        },
+        { id: "topic_1", timestamp },
+      ),
+      buildDiscoveryPoint(
+        {
+          spaceId,
+          title: "失眠里的复盘",
+          kind: "question",
+          sourceType: "manual",
+          theme: "old_echo",
+          note: "保持不变",
+        },
+        { id: "topic_2", timestamp },
+      ),
+    ].reduce<AppState>(
+      (state, point) => ({
+        ...state,
+        topics: [...state.topics, point],
+      }),
+      createInitialState(),
+    );
+    const reviewed = updateDiscoveryPointStatusInState(
+      withTopics,
+      { id: "topic_1", status: "want_to_understand" },
+      "2026-06-18T13:00:00.000Z",
+    ).state;
+
+    const updated = updateDiscoveryPointInState(
+      reviewed,
+      {
+        id: "topic_1",
+        title: "  语言切换保护了节奏  ",
+        kind: "topic",
+        theme: "relationship_learning",
+        note: "  新备注  ",
+        exploreQuestion: "  我在保护什么？  ",
+      },
+      "2026-06-18T14:00:00.000Z",
+    );
+
+    expect(updated.point).toMatchObject({
+      id: "topic_1",
+      title: "语言切换保护了节奏",
+      kind: "topic",
+      status: "want_to_understand",
+      sourceType: "episode",
+      sourceId: "episode_1",
+      sourceTitle: "一次互动",
+      sourceSnippet: "英文像一层缓冲",
+      theme: "relationship_learning",
+      note: "新备注",
+      exploreQuestion: "我在保护什么？",
+      createdAt: timestamp,
+      updatedAt: "2026-06-18T14:00:00.000Z",
+    });
+    expect(updated.state.topics.find((point) => point.id === "topic_2")?.note).toBe("保持不变");
+  });
+
+  it("cleans blank discovery point edit fields and falls back blank title", () => {
+    const withTopic = addDiscoveryPointToState(
+      createInitialState(),
+      {
+        spaceId,
+        title: "语言切换像缓冲",
+        kind: "discovery",
+        theme: "emotion",
+        note: "旧备注",
+        exploreQuestion: "旧问题",
+      },
+      { id: "topic_1", timestamp },
+    ).state;
+
+    const updated = updateDiscoveryPointInState(
+      withTopic,
+      {
+        id: "topic_1",
+        title: "   ",
+        kind: "action_idea",
+        theme: undefined,
+        note: "   ",
+        exploreQuestion: "",
+      },
+      "2026-06-18T14:00:00.000Z",
+    );
+
+    expect(updated.point).toMatchObject({
+      title: "一个稍后再看的点",
+      kind: "action_idea",
+      updatedAt: "2026-06-18T14:00:00.000Z",
+    });
+    expect(updated.point?.theme).toBeUndefined();
+    expect(updated.point?.note).toBeUndefined();
+    expect(updated.point?.exploreQuestion).toBeUndefined();
+  });
+
+  it("discovery point edits do not affect derived storage jar summaries", () => {
+    const stateWithTopic = addDiscoveryPointToState(
+      createInitialState(),
+      {
+        spaceId,
+        title: "语言切换像缓冲",
+        kind: "discovery",
+        sourceType: "trigger",
+        note: "旧备注",
+      },
+      { id: "topic_1", timestamp },
+    ).state;
+    const before = deriveAllAccountSummaries(stateWithTopic);
+
+    const updated = updateDiscoveryPointInState(
+      stateWithTopic,
+      {
+        id: "topic_1",
+        title: "语言切换保护了节奏",
+        kind: "topic",
+        theme: "relationship_learning",
+        note: "新的看见",
+      },
+      "2026-06-18T14:00:00.000Z",
+    );
+
+    expect(updated.point?.title).toBe("语言切换保护了节奏");
+    expect(deriveAllAccountSummaries(updated.state)).toEqual(before);
+  });
+
+  it("returns no-op success shape for missing discovery point edits", () => {
+    const state = addDiscoveryPointToState(
+      createInitialState(),
+      { spaceId, title: "语言切换像缓冲", kind: "discovery" },
+      { id: "topic_1", timestamp },
+    ).state;
+
+    const updated = updateDiscoveryPointInState(
+      state,
+      { id: "missing", title: "不存在", kind: "topic" },
+      "2026-06-18T14:00:00.000Z",
+    );
+
+    expect(updated.point).toBeUndefined();
+    expect(updated.state).toEqual(state);
+  });
+
+  it("deletes only the selected discovery point", () => {
+    const state = [
+      ["topic_1", "语言切换像缓冲"],
+      ["topic_2", "失眠里的复盘"],
+    ].reduce(
+      (current, [id, title]) =>
+        addDiscoveryPointToState(
+          current,
+          { spaceId, title, kind: "discovery" },
+          { id, timestamp },
+        ).state,
+      createInitialState(),
+    );
+
+    const deleted = deleteDiscoveryPointFromState(state, { id: "topic_1" });
+
+    expect(deleted.point?.id).toBe("topic_1");
+    expect(deleted.state.topics.map((point) => point.id)).toEqual(["topic_2"]);
+  });
+
+  it("deleting a discovery point leaves source records, experiments, and summaries untouched", () => {
+    const accountImpacts = buildQuickRecordImpacts(
+      {
+        spaceId,
+        spaceType: "interpersonal",
+        facts: "对方具体回应了我的勇气",
+        connectionEvidence: "对方具体回应了我的勇气",
+        nextAction: "record_facts",
+        energyEffect: "lighter",
+      },
+      { sourceId: "episode_1", createdAt: timestamp },
+    );
+    const episode: Episode = {
+      id: "episode_1",
+      spaceId,
+      source: "quick_record",
+      title: "一次互动",
+      facts: "对方具体回应了我的勇气",
+      interpretation: "",
+      emotions: [],
+      bodySensations: [],
+      connectionLevel: "not_sure",
+      activationLevel: "not_sure",
+      nextAction: "record_facts",
+      accountImpacts,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    };
+    const point = buildDiscoveryPoint(
+      {
+        spaceId,
+        title: "温暖证据",
+        kind: "discovery",
+        sourceType: "episode",
+        sourceId: episode.id,
+        sourceTitle: episode.title,
+        sourceSnippet: episode.facts,
+      },
+      { id: "topic_1", timestamp },
+    );
+    const state: AppState = {
+      ...createInitialState(),
+      episodes: [episode],
+      topics: [point],
+      experiments: [
+        {
+          id: "experiment_1",
+          spaceId,
+          focus: "练习慢一点回应",
+          tinyAction: "只回应一个重点",
+          completionMarker: "写完后停三次呼吸",
+          status: "active",
+          source: "discovery_point",
+          sourceActionId: point.id,
+          attempts: [],
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+      ],
+    };
+    const before = deriveAllAccountSummaries(state);
+
+    const deleted = deleteDiscoveryPointFromState(state, { id: point.id });
+
+    expect(deleted.state.topics).toEqual([]);
+    expect(deleted.state.episodes).toEqual([episode]);
+    expect(deleted.state.experiments).toEqual(state.experiments);
+    expect(deriveAllAccountSummaries(deleted.state)).toEqual(before);
+  });
+
+  it("returns unchanged state when deleting a missing discovery point", () => {
+    const state = addDiscoveryPointToState(
+      createInitialState(),
+      { spaceId, title: "语言切换像缓冲", kind: "discovery" },
+      { id: "topic_1", timestamp },
+    ).state;
+
+    const deleted = deleteDiscoveryPointFromState(state, { id: "missing" });
+
+    expect(deleted.point).toBeUndefined();
+    expect(deleted.state).toBe(state);
   });
 
   it("does not affect derived storage jar summaries", () => {

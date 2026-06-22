@@ -1,5 +1,6 @@
 import type {
   AppState,
+  DeleteDiscoveryPointInput,
   DiscoveryPoint,
   DiscoveryPointInput,
   DiscoveryPointKind,
@@ -7,6 +8,7 @@ import type {
   DiscoveryPointSourceType,
   DiscoveryPointStatusInput,
   DiscoveryPointTheme,
+  DiscoveryPointUpdateInput,
 } from "./types";
 
 export type DiscoveryPointBuildOptions = {
@@ -152,6 +154,57 @@ export function updateDiscoveryPointNoteInState(
     state: {
       ...state,
       topics,
+    },
+  };
+}
+
+export function updateDiscoveryPointInState(
+  state: AppState,
+  input: DiscoveryPointUpdateInput,
+  timestamp: string,
+): { state: AppState; point?: DiscoveryPoint } {
+  let updatedPoint: DiscoveryPoint | undefined;
+  const topics = state.topics.map((point) => {
+    if (point.id !== input.id) {
+      return point;
+    }
+
+    updatedPoint = {
+      ...point,
+      title: input.title.trim() || "一个稍后再看的点",
+      kind: input.kind,
+      theme: input.theme,
+      note: cleanOptional(input.note),
+      exploreQuestion: cleanOptional(input.exploreQuestion),
+      updatedAt: timestamp,
+    };
+    return updatedPoint;
+  });
+
+  return {
+    point: updatedPoint,
+    state: {
+      ...state,
+      topics,
+    },
+  };
+}
+
+export function deleteDiscoveryPointFromState(
+  state: AppState,
+  input: DeleteDiscoveryPointInput,
+): { state: AppState; point?: DiscoveryPoint } {
+  const deletedPoint = state.topics.find((point) => point.id === input.id);
+
+  if (!deletedPoint) {
+    return { state };
+  }
+
+  return {
+    point: deletedPoint,
+    state: {
+      ...state,
+      topics: state.topics.filter((point) => point.id !== input.id),
     },
   };
 }

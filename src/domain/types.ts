@@ -351,6 +351,19 @@ export type DiscoveryPointReviewNoteInput = {
   note: string;
 };
 
+export type DiscoveryPointUpdateInput = {
+  id: string;
+  title: string;
+  kind: DiscoveryPointKind;
+  theme?: DiscoveryPointTheme;
+  note?: string;
+  exploreQuestion?: string;
+};
+
+export type DeleteDiscoveryPointInput = {
+  id: string;
+};
+
 export type AnchorInput = {
   spaceId: string;
   text: string;
