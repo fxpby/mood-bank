@@ -1306,3 +1306,36 @@ Added a calm-closure completion landing after Quick Record save, including saved
 ### Next Steps
 
 - None - task complete
+
+
+## Session 33: Record detail delete episode
+
+**Date**: 2026-06-22
+**Task**: Record detail delete episode
+**Branch**: `main`
+
+### Summary
+
+Added confirmed Record Detail deletion, preserving linked discovery points while removing episode-linked anchors and derived account impacts.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `246df4c` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

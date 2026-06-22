@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 32
-- **Last Active**: 2026-06-21
+- **Total Sessions**: 33
+- **Last Active**: 2026-06-22
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1302 | Active |
+| `journal-1.md` | ~1341 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 33 | 2026-06-22 | Record detail delete episode | `246df4c` | `main` |
 | 32 | 2026-06-21 | Quick record calm closure | `bbbac34` | `main` |
 | 31 | 2026-06-21 | Repair understanding check | `d52ef55` | `main` |
 | 30 | 2026-06-21 | Rich incoming anchor save | `f52be5a` | `main` |
