@@ -8,6 +8,14 @@ import {
   discoveryPointStatusCopy,
   discoveryPointThemeCopy,
 } from "../copy/topics";
+import {
+  filterDiscoveryPoints,
+  type TopicFilters,
+  type TopicKindFilter,
+  type TopicSourceFilter,
+  type TopicStatusFilter,
+  type TopicThemeFilter,
+} from "../domain/topics";
 import type {
   DiscoveryPoint,
   DiscoveryPointKind,
@@ -22,23 +30,42 @@ type TopicsPageProps = {
   navigate: (route: AppRoute) => void;
 };
 
-type TopicFilter =
-  | "all"
-  | "discovery"
-  | "want_to_understand"
-  | "want_to_share"
-  | "leave_for_now"
-  | "reviewed"
-  | "no_longer_needed";
+const kindFilterOptions: ChipOption<TopicKindFilter>[] = [
+  { value: "all", label: "全部类型" },
+  { value: "topic", label: discoveryPointKindCopy.topic },
+  { value: "discovery", label: discoveryPointKindCopy.discovery },
+  { value: "question", label: discoveryPointKindCopy.question },
+  { value: "action_idea", label: discoveryPointKindCopy.action_idea },
+];
 
-const filterOptions: ChipOption<TopicFilter>[] = [
-  { value: "all", label: "全部" },
-  { value: "discovery", label: "发现点" },
+const statusFilterOptions: ChipOption<TopicStatusFilter>[] = [
+  { value: "all", label: "全部状态" },
   { value: "want_to_understand", label: "想理解" },
   { value: "want_to_share", label: "想分享" },
   { value: "leave_for_now", label: "先放着" },
   { value: "reviewed", label: "已回看" },
   { value: "no_longer_needed", label: "不用了" },
+];
+
+const themeFilterOptions: ChipOption<TopicThemeFilter>[] = [
+  { value: "all", label: "全部主题" },
+  { value: "emotion", label: discoveryPointThemeCopy.emotion },
+  { value: "boundary", label: discoveryPointThemeCopy.boundary },
+  { value: "old_echo", label: discoveryPointThemeCopy.old_echo },
+  { value: "relationship_learning", label: discoveryPointThemeCopy.relationship_learning },
+  { value: "expression", label: discoveryPointThemeCopy.expression },
+  { value: "self_care", label: discoveryPointThemeCopy.self_care },
+  { value: "action_experiment", label: discoveryPointThemeCopy.action_experiment },
+];
+
+const sourceFilterOptions: ChipOption<TopicSourceFilter>[] = [
+  { value: "all", label: "全部来源" },
+  { value: "manual", label: discoveryPointSourceCopy.manual },
+  { value: "episode", label: discoveryPointSourceCopy.episode },
+  { value: "return_to_self", label: discoveryPointSourceCopy.return_to_self },
+  { value: "trigger", label: discoveryPointSourceCopy.trigger },
+  { value: "draft_check", label: discoveryPointSourceCopy.draft_check },
+  { value: "rich_incoming", label: discoveryPointSourceCopy.rich_incoming },
 ];
 
 const kindOptions: ChipOption<DiscoveryPointKind>[] = [
@@ -69,7 +96,12 @@ const rowStatusActions: Array<{ status: DiscoveryPointStatus; label: string }> =
 export function TopicsPage({ navigate }: TopicsPageProps) {
   const { state, actions, status, lastError } = useAppStore();
   const activeSpace = selectActiveSpace(state);
-  const [filter, setFilter] = useState<TopicFilter>("all");
+  const [filters, setFilters] = useState<TopicFilters>({
+    kind: "all",
+    status: "all",
+    theme: "all",
+    source: "all",
+  });
   const [isCreating, setIsCreating] = useState(false);
   const [title, setTitle] = useState("");
   const [kind, setKind] = useState<DiscoveryPointKind>("discovery");
@@ -81,8 +113,8 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
   const [latestCreatedPoint, setLatestCreatedPoint] = useState<DiscoveryPoint | null>(null);
 
   const filteredTopics = useMemo(
-    () => state.topics.filter((point) => matchesFilter(point, filter)),
-    [filter, state.topics],
+    () => filterDiscoveryPoints(state.topics, filters),
+    [filters, state.topics],
   );
 
   function savePoint() {
@@ -209,7 +241,32 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
       ) : null}
 
       <section className="panel page-stack">
-        <ChipGroup label="筛选" options={filterOptions} value={filter} onChange={setFilter} />
+        <div className="topic-filter-grid">
+          <ChipGroup
+            label="类型"
+            options={kindFilterOptions}
+            value={filters.kind}
+            onChange={(kind) => setFilters((value) => ({ ...value, kind }))}
+          />
+          <ChipGroup
+            label="状态"
+            options={statusFilterOptions}
+            value={filters.status}
+            onChange={(status) => setFilters((value) => ({ ...value, status }))}
+          />
+          <ChipGroup
+            label="主题"
+            options={themeFilterOptions}
+            value={filters.theme}
+            onChange={(theme) => setFilters((value) => ({ ...value, theme }))}
+          />
+          <ChipGroup
+            label="来源"
+            options={sourceFilterOptions}
+            value={filters.source}
+            onChange={(source) => setFilters((value) => ({ ...value, source }))}
+          />
+        </div>
 
         {message ? (
           <div className="topic-feedback">
@@ -244,7 +301,7 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
             <h2>{state.topics.length ? "这个筛选下暂时没有内容" : "先存一个很小的发现点"}</h2>
             <p>
               {state.topics.length
-                ? "可以切回全部，或先让这个点继续放着。"
+                ? "可以换一个筛选组合，或先让这些点继续安静放着。"
                 : "比如一句话、一个问题、一个以后想理解的线索。"}
             </p>
             <button className="button button--secondary" type="button" onClick={() => navigate("/record")}>
@@ -299,13 +356,6 @@ function DiscoveryPointRow({
       </div>
     </article>
   );
-}
-
-function matchesFilter(point: DiscoveryPoint, filter: TopicFilter): boolean {
-  if (filter === "all") return true;
-  if (filter === "discovery") return point.kind === "discovery";
-  if (filter === "reviewed") return point.status === "reviewed" || point.status === "naturally_reached";
-  return point.status === filter;
 }
 
 function formatDate(value: string): string {

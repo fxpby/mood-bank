@@ -2,13 +2,34 @@ import type {
   AppState,
   DiscoveryPoint,
   DiscoveryPointInput,
+  DiscoveryPointKind,
   DiscoveryPointReviewNoteInput,
+  DiscoveryPointSourceType,
   DiscoveryPointStatusInput,
+  DiscoveryPointTheme,
 } from "./types";
 
 export type DiscoveryPointBuildOptions = {
   id: string;
   timestamp: string;
+};
+
+export type TopicKindFilter = "all" | DiscoveryPointKind;
+export type TopicStatusFilter =
+  | "all"
+  | "want_to_understand"
+  | "want_to_share"
+  | "leave_for_now"
+  | "reviewed"
+  | "no_longer_needed";
+export type TopicThemeFilter = "all" | DiscoveryPointTheme;
+export type TopicSourceFilter = "all" | DiscoveryPointSourceType;
+
+export type TopicFilters = {
+  kind: TopicKindFilter;
+  status: TopicStatusFilter;
+  theme: TopicThemeFilter;
+  source: TopicSourceFilter;
 };
 
 export function addDiscoveryPointToState(
@@ -46,6 +67,37 @@ export function addDiscoveryPointsToState(
       topics: [...points, ...state.topics],
     },
   };
+}
+
+export function filterDiscoveryPoints(
+  points: DiscoveryPoint[],
+  filters: TopicFilters,
+): DiscoveryPoint[] {
+  return points.filter((point) => matchesTopicFilters(point, filters));
+}
+
+export function matchesTopicFilters(point: DiscoveryPoint, filters: TopicFilters): boolean {
+  if (filters.kind !== "all" && point.kind !== filters.kind) {
+    return false;
+  }
+
+  if (filters.status === "reviewed") {
+    if (point.status !== "reviewed" && point.status !== "naturally_reached") {
+      return false;
+    }
+  } else if (filters.status !== "all" && point.status !== filters.status) {
+    return false;
+  }
+
+  if (filters.theme !== "all" && point.theme !== filters.theme) {
+    return false;
+  }
+
+  if (filters.source !== "all" && point.sourceType !== filters.source) {
+    return false;
+  }
+
+  return true;
 }
 
 export function updateDiscoveryPointStatusInState(

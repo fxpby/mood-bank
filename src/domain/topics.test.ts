@@ -6,10 +6,12 @@ import {
   addDiscoveryPointToState,
   addDiscoveryPointsToState,
   buildDiscoveryPoint,
+  filterDiscoveryPoints,
+  matchesTopicFilters,
   updateDiscoveryPointNoteInState,
   updateDiscoveryPointStatusInState,
 } from "./topics";
-import type { AppState, Episode } from "./types";
+import type { AppState, DiscoveryPoint, Episode } from "./types";
 
 const timestamp = "2026-06-18T12:00:00.000Z";
 const spaceId = "space_1";
@@ -277,5 +279,93 @@ describe("discovery point state helpers", () => {
 
     expect(deriveAllAccountSummaries(after)).toEqual(before);
     expect(before[0]?.reason).toBe(accountReasonCopy.observable_connection_evidence);
+  });
+});
+
+describe("topic filters", () => {
+  function point(id: string, overrides: Partial<DiscoveryPoint> = {}): DiscoveryPoint {
+    return {
+      id,
+      spaceId,
+      title: `发现点 ${id}`,
+      kind: "discovery",
+      status: "stored_for_later",
+      sourceType: "manual",
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      ...overrides,
+    };
+  }
+
+  it("matches all filters by default", () => {
+    expect(
+      matchesTopicFilters(point("topic_1"), {
+        kind: "all",
+        status: "all",
+        theme: "all",
+        source: "all",
+      }),
+    ).toBe(true);
+  });
+
+  it("combines kind, status, theme, and source with AND semantics", () => {
+    const points = [
+      point("topic_1", {
+        kind: "topic",
+        status: "want_to_understand",
+        theme: "relationship_learning",
+        sourceType: "episode",
+      }),
+      point("topic_2", {
+        kind: "topic",
+        status: "want_to_understand",
+        theme: "emotion",
+        sourceType: "episode",
+      }),
+      point("topic_3", {
+        kind: "question",
+        status: "want_to_understand",
+        theme: "relationship_learning",
+        sourceType: "episode",
+      }),
+      point("topic_4", {
+        kind: "topic",
+        status: "reviewed",
+        theme: "relationship_learning",
+        sourceType: "episode",
+      }),
+      point("topic_5", {
+        kind: "topic",
+        status: "want_to_understand",
+        theme: "relationship_learning",
+        sourceType: "manual",
+      }),
+    ];
+
+    expect(
+      filterDiscoveryPoints(points, {
+        kind: "topic",
+        status: "want_to_understand",
+        theme: "relationship_learning",
+        source: "episode",
+      }).map((item) => item.id),
+    ).toEqual(["topic_1"]);
+  });
+
+  it("treats naturally reached as reviewed in the status filter", () => {
+    const points = [
+      point("reviewed", { status: "reviewed" }),
+      point("naturally_reached", { status: "naturally_reached" }),
+      point("stored", { status: "stored_for_later" }),
+    ];
+
+    expect(
+      filterDiscoveryPoints(points, {
+        kind: "all",
+        status: "reviewed",
+        theme: "all",
+        source: "all",
+      }).map((item) => item.id),
+    ).toEqual(["reviewed", "naturally_reached"]);
   });
 });

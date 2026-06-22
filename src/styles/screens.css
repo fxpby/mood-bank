@@ -1521,6 +1521,11 @@
   justify-self: start;
 }
 
+.topic-filter-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
 .topic-card {
   display: grid;
   gap: var(--space-3);
