@@ -1339,3 +1339,36 @@ Added confirmed Record Detail deletion, preserving linked discovery points while
 ### Next Steps
 
 - None - task complete
+
+
+## Session 34: Topics filter combinations
+
+**Date**: 2026-06-22
+**Task**: Topics filter combinations
+**Branch**: `main`
+
+### Summary
+
+Added route-local type, status, theme, and source filters for Topics with pure domain filter helpers and tests.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `9c345db` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
