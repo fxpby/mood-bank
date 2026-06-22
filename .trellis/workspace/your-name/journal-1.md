@@ -1372,3 +1372,36 @@ Added route-local type, status, theme, and source filters for Topics with pure d
 ### Next Steps
 
 - None - task complete
+
+
+## Session 35: Topic detail edit and delete
+
+**Date**: 2026-06-22
+**Task**: Topic detail edit and delete
+**Branch**: `main`
+
+### Summary
+
+Added Topic Detail editing and delete confirmation for discovery points, with no account-impact side effects and updated docs/specs.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `78981ae` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
