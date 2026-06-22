@@ -8,6 +8,7 @@ import {
   discoveryPointThemeCopy,
 } from "../copy/topics";
 import { buildDiscoveryPointExperimentInput } from "../domain/experiments";
+import { selectDiscoveryPointSourceDetail } from "../domain/selectors";
 import type { DiscoveryPoint, DiscoveryPointStatus } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
 import { buildExperimentRoute, buildRecordRoute, getTopicRouteId, type AppRoute } from "../utils/route";
@@ -197,8 +198,9 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
 
   const sourceRows = buildSourceRows(point);
   const detailRows = buildDetailRows(point);
+  const sourceDetail = selectDiscoveryPointSourceDetail(state, point);
   const sourceRecordRoute =
-    point.sourceType === "episode" && point.sourceId ? buildRecordRoute(point.sourceId) : null;
+    sourceDetail.canOpenSourceRecord && point.sourceId ? buildRecordRoute(point.sourceId) : null;
 
   return (
     <section className="topic-detail-page page-stack">
@@ -235,6 +237,9 @@ export function TopicDetailPage({ navigate }: TopicDetailPageProps) {
               </div>
             ))}
           </div>
+          {sourceDetail.isDeletedEpisodeSource ? (
+            <p className="source-missing-note">来源记录已删除。这个点会继续保留在稍后再看里。</p>
+          ) : null}
           {sourceRecordRoute ? (
             <button
               className="button button--secondary"

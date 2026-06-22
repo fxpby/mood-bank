@@ -1,5 +1,6 @@
-import { ArrowLeft, BookmarkPlus, NotebookPen, Sparkles } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, NotebookPen, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { PageHeader } from "../components/PageHeader";
 import { accountCopy, getAccountEvidenceCopy } from "../copy/accounts";
 import { episodeSourceCopy } from "../copy/episodes";
@@ -18,17 +19,21 @@ type RecordDetailPageProps = {
 };
 
 export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
-  const { state, actions } = useAppStore();
+  const { state, actions, status, lastError } = useAppStore();
   const episodeId = getRecordRouteId(window.location.pathname);
   const detail = useMemo(() => selectEpisodeDetail(state, episodeId), [episodeId, state]);
   const [anchorText, setAnchorText] = useState("");
   const [anchorMessage, setAnchorMessage] = useState<string | null>(null);
   const [anchorError, setAnchorError] = useState<string | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     setAnchorText(detail ? getInitialAnchorText(detail.episode, detail.linkedAnchors[0]) : "");
     setAnchorMessage(null);
     setAnchorError(null);
+    setIsDeleteConfirmOpen(false);
+    setDeleteError(null);
   }, [detail?.episode.id]);
 
   function saveRecordAnchor() {
@@ -56,6 +61,25 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
     setAnchorText(result.value?.text ?? anchorText.trim());
     setAnchorError(null);
     setAnchorMessage("锚点已存下，首页会优先显示这句话。");
+  }
+
+  function deleteRecord() {
+    if (!detail) return;
+
+    const result = actions.deleteEpisode({
+      id: detail.episode.id,
+      deleteLinkedAnchors: true,
+    });
+
+    if (!result.ok) {
+      setDeleteError(result.error ?? "这次没有删除成功，记录还留在本机。");
+      setIsDeleteConfirmOpen(false);
+      return;
+    }
+
+    setDeleteError(null);
+    setIsDeleteConfirmOpen(false);
+    navigate("/record");
   }
 
   if (!detail) {
@@ -200,6 +224,35 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
           <p className="helper-text">这条记录暂时没有关联的发现点。之后可以在稍后再看里继续存。</p>
         )}
       </section>
+
+      <section className="danger-zone page-stack">
+        <div className="section-heading">
+          <h2>删除这条记录</h2>
+          <p>删除后，这条记录和它带来的储蓄罐明细会一起移除。已保存的稍后话题会继续保留。</p>
+        </div>
+        <button
+          className="button button--danger"
+          type="button"
+          onClick={() => setIsDeleteConfirmOpen(true)}
+        >
+          <Trash2 size={16} strokeWidth={1.8} />
+          删除记录
+        </button>
+        {deleteError ? <p className="form-error" role="alert">{deleteError}</p> : null}
+        {lastError && status === "save_error" ? <p className="form-error">{lastError}</p> : null}
+      </section>
+
+      {isDeleteConfirmOpen ? (
+        <ConfirmDialog
+          title="删除这条记录？"
+          body="删除后，这条记录和它带来的储蓄罐明细会一起移除；这条记录保存过的锚点也会移除。已保存的稍后话题会保留，并显示来源记录已删除。"
+          confirmLabel="删除记录"
+          busyLabel="正在删除"
+          isBusy={status === "saving"}
+          onConfirm={deleteRecord}
+          onCancel={() => setIsDeleteConfirmOpen(false)}
+        />
+      ) : null}
     </section>
   );
 }

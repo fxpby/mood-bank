@@ -3,11 +3,12 @@ import { accountReasonCopy } from "../copy/accounts";
 import { createInitialState } from "./defaults";
 import {
   selectAccountDetail,
+  selectDiscoveryPointSourceDetail,
   selectAccountSummaries,
   selectEpisodeDetail,
   selectEpisodesNewestFirst,
 } from "./selectors";
-import type { AccountImpact, Anchor, AppState, Episode } from "./types";
+import type { AccountImpact, Anchor, AppState, DiscoveryPoint, Episode } from "./types";
 
 const spaceId = "space_1";
 const olderAt = "2026-06-18T08:00:00.000Z";
@@ -58,6 +59,23 @@ function anchor(id: string, overrides: Partial<Anchor> = {}): Anchor {
     text: "我可以先回到事实。",
     sourceType: "episode",
     sourceId: "episode_1",
+    createdAt: olderAt,
+    updatedAt: olderAt,
+    ...overrides,
+  };
+}
+
+function discoveryPoint(overrides: Partial<DiscoveryPoint> = {}): DiscoveryPoint {
+  return {
+    id: "topic_1",
+    spaceId,
+    title: "一个稍后再看的点",
+    kind: "topic",
+    status: "stored_for_later",
+    sourceType: "episode",
+    sourceId: "episode_1",
+    sourceTitle: "收到一封邮件",
+    sourceSnippet: "对方具体回应了我的勇气",
     createdAt: olderAt,
     updatedAt: olderAt,
     ...overrides,
@@ -295,5 +313,42 @@ describe("episode selectors", () => {
 
     expect(selectEpisodeDetail(state, null)).toBeNull();
     expect(selectEpisodeDetail(state, "missing")).toBeNull();
+  });
+});
+
+describe("selectDiscoveryPointSourceDetail", () => {
+  it("marks an episode source as openable when the source record still exists", () => {
+    const state: AppState = {
+      ...createInitialState(),
+      episodes: [episode("episode_1")],
+    };
+
+    expect(selectDiscoveryPointSourceDetail(state, discoveryPoint())).toEqual({
+      isDeletedEpisodeSource: false,
+      canOpenSourceRecord: true,
+    });
+  });
+
+  it("marks a preserved discovery point as missing source when its episode is deleted", () => {
+    const state = createInitialState();
+
+    expect(selectDiscoveryPointSourceDetail(state, discoveryPoint())).toEqual({
+      isDeletedEpisodeSource: true,
+      canOpenSourceRecord: false,
+    });
+  });
+
+  it("does not mark manual discovery points as deleted episode sources", () => {
+    const state = createInitialState();
+
+    expect(
+      selectDiscoveryPointSourceDetail(
+        state,
+        discoveryPoint({ sourceType: "manual", sourceId: undefined }),
+      ),
+    ).toEqual({
+      isDeletedEpisodeSource: false,
+      canOpenSourceRecord: false,
+    });
   });
 });

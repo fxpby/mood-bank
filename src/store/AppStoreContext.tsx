@@ -13,6 +13,7 @@ import type {
   AnchorInput,
   AppState,
   DailyMarketInput,
+  DeleteEpisodeInput,
   DiscoveryPoint,
   DiscoveryPointInput,
   DiscoveryPointReviewNoteInput,
@@ -51,6 +52,7 @@ import {
   updateDiscoveryPointNoteInState,
   updateDiscoveryPointStatusInState,
 } from "../domain/topics";
+import { deleteEpisodeFromState } from "../domain/episodes";
 import {
   addExperimentAttemptToState,
   addExperimentToState,
@@ -93,6 +95,7 @@ export type AppActions = {
   ): StoreWriteResult<PersonalExperimentAttempt>;
   saveDraft(input: DraftInput): StoreWriteResult<Draft>;
   deleteDraft(draftId: string): StoreWriteResult;
+  deleteEpisode(input: DeleteEpisodeInput): StoreWriteResult;
   replaceLocalData(state: AppState): StoreWriteResult;
   resetLocalData(): StoreWriteResult;
   acknowledgeStorageWarning(): void;
@@ -519,6 +522,19 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [commitState, state],
   );
 
+  const deleteEpisode = useCallback(
+    (input: DeleteEpisodeInput): StoreWriteResult => {
+      const { state: nextState, episode } = deleteEpisodeFromState(state, input);
+
+      if (!episode) {
+        return { ok: true, savedAt: nowIso() };
+      }
+
+      return commitState(nextState);
+    },
+    [commitState, state],
+  );
+
   const resetLocalData = useCallback((): StoreWriteResult => {
     setStatus("resetting");
     const resetResult = adapterRef.current.reset();
@@ -578,6 +594,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       savePersonalExperimentAttempt,
       saveDraft,
       deleteDraft,
+      deleteEpisode,
       replaceLocalData,
       resetLocalData,
       acknowledgeStorageWarning,
@@ -590,6 +607,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveAnchor,
       saveDraft,
       deleteDraft,
+      deleteEpisode,
       saveDiscoveryPoint,
       saveDiscoveryPoints,
       saveQuickRecord,

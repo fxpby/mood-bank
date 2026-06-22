@@ -68,6 +68,7 @@ Required action behavior:
 | `updateActiveSpace` | Yes | Updates the active emotional space name/description only. Blank name falls back to the default space name. Missing/stale active space ids return no-op success. |
 | `updateDailyMarket` | Yes | Upserts today's market by date key. |
 | `saveQuickRecord` | Yes | Creates an episode and clears a matching draft id after successful state construction. May also create one source-linked discovery point when `nextAction === "save_later_topic"`; this must happen in the same `commitState` call. |
+| `deleteEpisode` | Yes | Removes one saved episode. Record Detail uses it with linked-anchor deletion enabled; linked discovery points must be preserved and later shown with missing-source copy. |
 | `saveReturnToSelfPractice` | Yes | Creates a practice and optional anchor. Never creates connection impact. |
 | `saveTriggerCompletion` | No in P0 | Returns no-write result so Trigger -> Quick Record does not double-count Self. |
 | `saveAnchor` | Yes | Creates one standalone support anchor. Blank text returns no-op success. Must not create account impacts. |
@@ -380,6 +381,97 @@ const result = actions.saveAnchor({
   sourceType: "episode",
   sourceId: episode.id,
 });
+```
+
+### Scenario: Record Detail Deletes A Saved Episode
+
+#### 1. Scope / Trigger
+
+- Trigger: `/record/<episodeId>` lets the user delete one saved interaction record after explicit confirmation.
+- Scope: route confirmation -> `actions.deleteEpisode(...)` -> one persisted `AppState` update.
+
+#### 2. Signatures
+
+```ts
+type DeleteEpisodeInput = {
+  id: string;
+  deleteLinkedAnchors?: boolean;
+};
+
+deleteEpisode(input: DeleteEpisodeInput): StoreWriteResult;
+
+deleteEpisodeFromState(
+  state: AppState,
+  input: DeleteEpisodeInput,
+): { state: AppState; episode?: Episode };
+
+selectDiscoveryPointSourceDetail(
+  state: AppState,
+  point: DiscoveryPoint | null | undefined,
+): {
+  isDeletedEpisodeSource: boolean;
+  canOpenSourceRecord: boolean;
+};
+```
+
+#### 3. Contracts
+
+- Durable deletion must go through `actions.deleteEpisode(...)`; routes must not edit storage or `AppState` directly.
+- The pure helper removes the matching item from `state.episodes`.
+- Record Detail must call `deleteEpisode({ id, deleteLinkedAnchors: true })` so episode-linked anchors are removed with the record.
+- `deleteLinkedAnchors === false` preserves anchors for future UI variants, but the first Record Detail UI does not expose that option.
+- Deleting an episode must preserve linked `DiscoveryPoint` records in `state.topics`.
+- Derived account summaries and account detail rows must change only because the episode source is gone; do not persist recalculated summaries.
+- Topic Detail must use `selectDiscoveryPointSourceDetail(...)` to hide "打开来源记录" when the linked episode no longer exists and show "来源记录已删除" while keeping stored `sourceTitle` / `sourceSnippet`.
+- Deletion must not create topics, experiments, account impacts, drafts, telemetry, network calls, or recovery records.
+
+#### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| Existing episode id | Remove that episode and persist the next state. |
+| Existing episode id + default options | Remove episode-linked anchors where `sourceType === "episode"` and `sourceId === id`. |
+| Existing episode id + `deleteLinkedAnchors: false` | Remove the episode but preserve anchors. |
+| Linked discovery points exist | Preserve them unchanged; Topic Detail treats their source as deleted. |
+| Unknown episode id | Return no-op success and do not write storage. |
+| Storage save fails | Return `ok: false`; Record Detail stays on the page and shows honest failure copy. |
+
+#### 5. Good/Base/Bad Cases
+
+- Good: user deletes a record, returns to `/record`, the record is gone, linked anchors are gone, and linked topics remain with missing-source copy.
+- Base: user opens delete confirmation and cancels; no state changes.
+- Bad: deletion silently deletes linked discovery points, leaves a broken source-record button, or claims success after storage failure.
+
+#### 6. Tests Required
+
+- Unit test that `deleteEpisodeFromState(...)` removes the episode and linked anchors while preserving linked discovery points.
+- Unit test that `deleteEpisodeFromState(...)` can preserve linked anchors when requested.
+- Unit test that unknown ids are no-op success from the helper/store layer.
+- Selector test that a discovery point with an existing source episode can open the source record.
+- Selector test that a preserved discovery point whose source episode is deleted returns `isDeletedEpisodeSource: true` and `canOpenSourceRecord: false`.
+- Regression test that derived account summaries drop the deleted episode's impacts without persisted summary writes.
+
+#### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+state.episodes = state.episodes.filter((episode) => episode.id !== id);
+state.topics = state.topics.filter((point) => point.sourceId !== id);
+navigate("/record");
+```
+
+#### Correct
+
+```ts
+const result = actions.deleteEpisode({
+  id: detail.episode.id,
+  deleteLinkedAnchors: true,
+});
+
+if (result.ok) {
+  navigate("/record");
+}
 ```
 
 ### Scenario: Topic Detail Saves A Support Anchor

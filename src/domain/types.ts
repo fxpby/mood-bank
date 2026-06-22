@@ -393,6 +393,11 @@ export type DraftInput = {
   data: QuickRecordDraftData;
 };
 
+export type DeleteEpisodeInput = {
+  id: string;
+  deleteLinkedAnchors?: boolean;
+};
+
 export type StoreWriteResult<T = void> =
   | { ok: true; value?: T; savedAt: string }
   | { ok: false; status: StorageStatus; error?: string; inMemoryOnly?: boolean };

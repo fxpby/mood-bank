@@ -844,6 +844,17 @@
   justify-self: start;
 }
 
+.source-missing-note {
+  margin: 0;
+  border: 1px solid rgba(125, 90, 30, 0.22);
+  border-radius: var(--radius-md);
+  background: var(--state-warning-bg);
+  padding: var(--space-3);
+  color: var(--state-warning);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
 .settings-list {
   margin-top: 0;
 }

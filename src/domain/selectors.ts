@@ -73,6 +73,11 @@ export type EpisodeDetail = {
   linkedTopics: DiscoveryPoint[];
 };
 
+export type DiscoveryPointSourceDetail = {
+  isDeletedEpisodeSource: boolean;
+  canOpenSourceRecord: boolean;
+};
+
 export function selectAccountDetail(state: AppState, account: AccountId): AccountDetail {
   const impacts = selectAccountImpacts(state).filter((impact) => impact.account === account);
 
@@ -111,6 +116,25 @@ export function selectEpisodeDetail(state: AppState, episodeId: string | null): 
     linkedTopics: state.topics
       .filter((point) => point.sourceType === "episode" && point.sourceId === episode.id)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+  };
+}
+
+export function selectDiscoveryPointSourceDetail(
+  state: AppState,
+  point: DiscoveryPoint | null | undefined,
+): DiscoveryPointSourceDetail {
+  if (!point || point.sourceType !== "episode" || !point.sourceId) {
+    return {
+      isDeletedEpisodeSource: false,
+      canOpenSourceRecord: false,
+    };
+  }
+
+  const sourceExists = state.episodes.some((episode) => episode.id === point.sourceId);
+
+  return {
+    isDeletedEpisodeSource: !sourceExists,
+    canOpenSourceRecord: sourceExists,
   };
 }
 
