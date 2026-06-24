@@ -701,4 +701,74 @@ describe("topic filters", () => {
       }).map((item) => item.id),
     ).toEqual(["reviewed", "naturally_reached"]);
   });
+
+  it("searches title, note, explore question, source title, and source snippet", () => {
+    const points = [
+      point("title", { title: "语言切换像缓冲" }),
+      point("note", { title: "另一个点", note: "英文像一层 Buffer" }),
+      point("question", { title: "夜里复盘", exploreQuestion: "我在夜里反复想保护什么？" }),
+      point("source_title", { title: "收到内容", sourceTitle: "亮闪闪的勇气" }),
+      point("source_snippet", { title: "温暖证据", sourceSnippet: "really lucky to receive this" }),
+      point("miss", { title: "边界提醒", note: "我能负责我的部分" }),
+    ];
+
+    const baseFilters = {
+      kind: "all",
+      status: "all",
+      theme: "all",
+      source: "all",
+    } as const;
+
+    expect(filterDiscoveryPoints(points, { ...baseFilters, query: "缓冲" }).map((item) => item.id)).toEqual([
+      "title",
+    ]);
+    expect(filterDiscoveryPoints(points, { ...baseFilters, query: "  buffer  " }).map((item) => item.id)).toEqual([
+      "note",
+    ]);
+    expect(filterDiscoveryPoints(points, { ...baseFilters, query: "保护什么" }).map((item) => item.id)).toEqual([
+      "question",
+    ]);
+    expect(filterDiscoveryPoints(points, { ...baseFilters, query: "勇气" }).map((item) => item.id)).toEqual([
+      "source_title",
+    ]);
+    expect(
+      filterDiscoveryPoints(points, { ...baseFilters, query: "REALLY lucky" }).map((item) => item.id),
+    ).toEqual(["source_snippet"]);
+  });
+
+  it("combines text search with facet filters", () => {
+    const points = [
+      point("matching", {
+        kind: "topic",
+        status: "want_to_understand",
+        theme: "relationship_learning",
+        sourceType: "episode",
+        sourceSnippet: "英文像一层缓冲",
+      }),
+      point("wrong_kind", {
+        kind: "question",
+        status: "want_to_understand",
+        theme: "relationship_learning",
+        sourceType: "episode",
+        sourceSnippet: "英文像一层缓冲",
+      }),
+      point("wrong_text", {
+        kind: "topic",
+        status: "want_to_understand",
+        theme: "relationship_learning",
+        sourceType: "episode",
+        sourceSnippet: "我能负责我的部分",
+      }),
+    ];
+
+    expect(
+      filterDiscoveryPoints(points, {
+        kind: "topic",
+        status: "want_to_understand",
+        theme: "relationship_learning",
+        source: "episode",
+        query: "缓冲",
+      }).map((item) => item.id),
+    ).toEqual(["matching"]);
+  });
 });

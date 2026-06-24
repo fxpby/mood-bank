@@ -1,4 +1,4 @@
-import { Plus, RotateCcw } from "lucide-react";
+import { Plus, RotateCcw, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { PageHeader } from "../components/PageHeader";
@@ -101,6 +101,7 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
     status: "all",
     theme: "all",
     source: "all",
+    query: "",
   });
   const [isCreating, setIsCreating] = useState(false);
   const [title, setTitle] = useState("");
@@ -116,6 +117,12 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
     () => filterDiscoveryPoints(state.topics, filters),
     [filters, state.topics],
   );
+  const hasSearchQuery = Boolean(filters.query?.trim());
+  const hasFacetFilters =
+    filters.kind !== "all" ||
+    filters.status !== "all" ||
+    filters.theme !== "all" ||
+    filters.source !== "all";
 
   function savePoint() {
     if (!activeSpace) {
@@ -242,6 +249,28 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
 
       <section className="panel page-stack">
         <div className="topic-filter-grid">
+          <label className="topic-search field">
+            <span className="field-label">搜索已存下的点</span>
+            <span className="topic-search__control">
+              <Search size={17} strokeWidth={1.8} aria-hidden="true" />
+              <input
+                className="field-input"
+                value={filters.query ?? ""}
+                onChange={(event) => setFilters((value) => ({ ...value, query: event.target.value }))}
+                placeholder="搜标题、备注、问题或来源片段"
+              />
+              {hasSearchQuery ? (
+                <button
+                  className="topic-search__clear"
+                  type="button"
+                  aria-label="清空搜索"
+                  onClick={() => setFilters((value) => ({ ...value, query: "" }))}
+                >
+                  <X size={16} strokeWidth={1.8} aria-hidden="true" />
+                </button>
+              ) : null}
+            </span>
+          </label>
           <ChipGroup
             label="类型"
             options={kindFilterOptions}
@@ -298,20 +327,69 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
           </div>
         ) : (
           <div className="topics-empty">
-            <h2>{state.topics.length ? "这个筛选下暂时没有内容" : "先存一个很小的发现点"}</h2>
+            <h2>{getEmptyTitle(state.topics.length, hasSearchQuery)}</h2>
             <p>
-              {state.topics.length
-                ? "可以换一个筛选组合，或先让这些点继续安静放着。"
-                : "比如一句话、一个问题、一个以后想理解的线索。"}
+              {getEmptyDescription(state.topics.length, hasSearchQuery)}
             </p>
-            <button className="button button--secondary" type="button" onClick={() => navigate("/record")}>
-              去记录一次
-            </button>
+            {state.topics.length ? (
+              <div className="topics-empty__actions">
+                {hasSearchQuery ? (
+                  <button
+                    className="button button--secondary"
+                    type="button"
+                    onClick={() => setFilters((value) => ({ ...value, query: "" }))}
+                  >
+                    清空搜索
+                  </button>
+                ) : null}
+                {hasFacetFilters ? (
+                  <button
+                    className="button button--secondary"
+                    type="button"
+                    onClick={() =>
+                      setFilters((value) => ({
+                        ...value,
+                        kind: "all",
+                        status: "all",
+                        theme: "all",
+                        source: "all",
+                      }))
+                    }
+                  >
+                    清空筛选
+                  </button>
+                ) : null}
+              </div>
+            ) : (
+              <button className="button button--secondary" type="button" onClick={() => navigate("/record")}>
+                去记录一次
+              </button>
+            )}
           </div>
         )}
       </section>
     </section>
   );
+}
+
+function getEmptyTitle(topicCount: number, hasSearchQuery: boolean): string {
+  if (!topicCount) {
+    return "先存一个很小的发现点";
+  }
+
+  return hasSearchQuery ? "没有找到这个词相关的点" : "这个筛选下暂时没有内容";
+}
+
+function getEmptyDescription(topicCount: number, hasSearchQuery: boolean): string {
+  if (!topicCount) {
+    return "比如一句话、一个问题、一个以后想理解的线索。";
+  }
+
+  if (hasSearchQuery) {
+    return "可以换一个词，或清空搜索再慢慢翻看。没找到不代表这个点不重要。";
+  }
+
+  return "可以换一个筛选组合，或先让这些点继续安静放着。";
 }
 
 function DiscoveryPointRow({

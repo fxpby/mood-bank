@@ -202,6 +202,8 @@ Editing a discovery point may change only user-editable topic fields: `title`, `
 
 Deleting a discovery point removes only that item from `state.topics`. It must not delete source episodes, return-to-self practices, anchors, drafts, personal experiments, experiment attempts, or account impacts. Unknown ids return no-op success.
 
+Topics list search is route-local derived state. `TopicFilters.query` may be passed into `filterDiscoveryPoints(...)` to match visible point text (`title`, `note`, `exploreQuestion`, `sourceTitle`, `sourceSnippet`), but the query must not be written to `AppState`, storage, discovery points, account impacts, telemetry, or search history. It is simple local text matching, not AI analysis, semantic ranking, automatic theme inference, or relationship insight generation.
+
 ### P2 Branch Output Contract
 
 First-release P2 branches may save compact structured reflections as `DiscoveryPoint` records instead of adding dedicated persisted models. This is allowed when the branch is optional, low-risk, and does not need later editing beyond the normal Topics flow.

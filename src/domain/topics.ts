@@ -32,6 +32,7 @@ export type TopicFilters = {
   status: TopicStatusFilter;
   theme: TopicThemeFilter;
   source: TopicSourceFilter;
+  query?: string;
 };
 
 export function addDiscoveryPointToState(
@@ -99,7 +100,31 @@ export function matchesTopicFilters(point: DiscoveryPoint, filters: TopicFilters
     return false;
   }
 
+  if (!matchesTopicSearch(point, filters.query)) {
+    return false;
+  }
+
   return true;
+}
+
+function matchesTopicSearch(point: DiscoveryPoint, query: string | undefined): boolean {
+  const normalizedQuery = normalizeSearchText(query);
+
+  if (!normalizedQuery) {
+    return true;
+  }
+
+  return [
+    point.title,
+    point.note,
+    point.exploreQuestion,
+    point.sourceTitle,
+    point.sourceSnippet,
+  ].some((value) => normalizeSearchText(value).includes(normalizedQuery));
+}
+
+function normalizeSearchText(value: string | undefined): string {
+  return value?.trim().replace(/\s+/g, " ").toLocaleLowerCase("zh-CN") ?? "";
 }
 
 export function updateDiscoveryPointStatusInState(
