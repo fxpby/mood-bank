@@ -1222,7 +1222,10 @@ Added explicit standalone anchor saving from Rich Incoming completion, with dete
 
 ### Main Changes
 
-(Add details)
+- Added a Trigger Support state-check step between body/emotion and urge.
+- Routed connection alarm, old echo, inner judge, boundary pressure, and body overload toward existing branch pages without persisting diagnosis-like state.
+- Added `trigger_support` as a valid transient high-activation branch source and updated branch nudge copy.
+- Updated frontend specs, README stale notes, and task PRD acceptance status.
 
 ### Git Commits
 
@@ -1309,7 +1312,13 @@ Added a calm-closure completion landing after Quick Record save, including saved
 
 ### Testing
 
-- [OK] (Add test results)
+- [OK] `git diff --check`
+- [OK] `npm run typecheck`
+- [OK] `npm test`
+- [OK] `npm run build`
+- [OK] Browser smoke: Trigger -> connection alarm -> Connection Continuity nudge.
+- [OK] Browser smoke: Trigger -> body overload -> Return-to-Self.
+- [OK] Browser smoke: direct Connection Continuity entry has no activation nudge.
 
 ### Status
 
@@ -1620,6 +1629,39 @@ Extended transient high-activation branch routing to Rich Incoming and Quick Rec
 | Hash | Message |
 |------|---------|
 | `9ee56c9` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 39: Trigger state routing
+
+**Date**: 2026-06-25
+**Task**: Trigger state routing
+**Branch**: `main`
+
+### Summary
+
+Added Trigger Support state-check routing between body/emotion and urge, expanded high-activation route-state source handling, updated README/spec/PRD, and verified branch smoke paths plus typecheck/tests/build.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `c65d5e2` | (see git log) |
 
 ### Testing
 
