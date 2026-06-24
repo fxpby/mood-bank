@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 35
-- **Last Active**: 2026-06-22
+- **Total Sessions**: 36
+- **Last Active**: 2026-06-24
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1407 | Active |
+| `journal-1.md` | ~1440 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 36 | 2026-06-24 | Record detail editing | `4bbc678` | `main` |
 | 35 | 2026-06-22 | Topic detail edit and delete | `78981ae` | `main` |
 | 34 | 2026-06-22 | Topics filter combinations | `9c345db` | `main` |
 | 33 | 2026-06-22 | Record detail delete episode | `246df4c` | `main` |

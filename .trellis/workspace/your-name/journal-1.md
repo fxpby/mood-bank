@@ -1405,3 +1405,36 @@ Added Topic Detail editing and delete confirmation for discovery points, with no
 ### Next Steps
 
 - None - task complete
+
+
+## Session 36: Record detail editing
+
+**Date**: 2026-06-24
+**Task**: Record detail editing
+**Branch**: `main`
+
+### Summary
+
+Added Record Detail editing with episode impact recomputation, localized unsure evidence copy, and docs/spec updates.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `4bbc678` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
