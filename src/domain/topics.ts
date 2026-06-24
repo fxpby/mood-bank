@@ -44,6 +44,10 @@ export type BatchDiscoveryPointDraft = {
   sourceSnippet?: string;
 };
 
+export type BatchDiscoveryPointDefaults = Partial<
+  Pick<DiscoveryPointInput, "sourceType" | "sourceId" | "sourceTitle" | "sourceSnippet">
+>;
+
 export const MAX_BATCH_DISCOVERY_POINTS = 8;
 
 export function addDiscoveryPointToState(
@@ -86,6 +90,7 @@ export function addDiscoveryPointsToState(
 export function buildBatchDiscoveryPointInputs(
   spaceId: string,
   drafts: BatchDiscoveryPointDraft[],
+  defaults: BatchDiscoveryPointDefaults = {},
 ): DiscoveryPointInput[] {
   return drafts.slice(0, MAX_BATCH_DISCOVERY_POINTS).reduce<DiscoveryPointInput[]>(
     (inputs, draft) => {
@@ -95,6 +100,8 @@ export function buildBatchDiscoveryPointInputs(
         return inputs;
       }
 
+      const sourceId = cleanOptional(defaults.sourceId);
+      const sourceTitle = cleanOptional(defaults.sourceTitle);
       inputs.push({
         spaceId,
         title,
@@ -102,7 +109,10 @@ export function buildBatchDiscoveryPointInputs(
         theme: draft.theme,
         note: cleanOptional(draft.note),
         exploreQuestion: cleanOptional(draft.exploreQuestion),
-        sourceSnippet: cleanOptional(draft.sourceSnippet),
+        ...(defaults.sourceType ? { sourceType: defaults.sourceType } : {}),
+        ...(sourceId ? { sourceId } : {}),
+        ...(sourceTitle ? { sourceTitle } : {}),
+        sourceSnippet: cleanOptional(draft.sourceSnippet) ?? cleanOptional(defaults.sourceSnippet),
       });
 
       return inputs;

@@ -205,7 +205,97 @@ Deleting a discovery point removes only that item from `state.topics`. It must n
 
 Topics list search is route-local derived state. `TopicFilters.query` may be passed into `filterDiscoveryPoints(...)` to match visible point text (`title`, `note`, `exploreQuestion`, `sourceTitle`, `sourceSnippet`), but the query must not be written to `AppState`, storage, discovery points, account impacts, telemetry, or search history. It is simple local text matching, not AI analysis, semantic ranking, automatic theme inference, or relationship insight generation.
 
-Topics batch capture is also route-local until the user explicitly saves. Use `buildBatchDiscoveryPointInputs(spaceId, drafts)` to trim row text, ignore blank-title rows, default missing row kind to `discovery`, and cap the batch at `MAX_BATCH_DISCOVERY_POINTS` before calling `actions.saveDiscoveryPoints(...)`. The route must call the multi-point action once rather than looping over `saveDiscoveryPoint(...)`, so storage success/failure copy describes one atomic user action. Batch capture must not create account impacts, due dates, reminders, inferred themes, AI extraction, or search history.
+Topics batch capture is also route-local until the user explicitly saves. Use `buildBatchDiscoveryPointInputs(spaceId, drafts, defaults?)` to trim row text, ignore blank-title rows, default missing row kind to `discovery`, apply optional source metadata defaults, and cap the batch at `MAX_BATCH_DISCOVERY_POINTS` before calling `actions.saveDiscoveryPoints(...)`. The route must call the multi-point action once rather than looping over `saveDiscoveryPoint(...)`, so storage success/failure copy describes one atomic user action. Batch capture must not create account impacts, due dates, reminders, inferred themes, AI extraction, or search history.
+
+Record Detail batch capture uses the same helper with episode source defaults. Every point batch-saved from `/record/:id` must preserve `sourceType: "episode"`, the episode id, episode title, and episode facts as the source snapshot unless a row explicitly supplies a narrower source snippet. Record Detail should not expose row-level source editing in the first build; the route-local rows capture title, kind, theme, note, and explore question only.
+
+### Scenario: Record Detail Batch-Saves Episode-Linked Discovery Points
+
+#### 1. Scope / Trigger
+
+- Trigger: `/record/:episodeId` lets the user save multiple "这次看见的点" from one saved episode.
+- Scope: route-local batch rows -> `buildBatchDiscoveryPointInputs(...)` with episode source defaults -> one `actions.saveDiscoveryPoints(...)` call.
+
+#### 2. Signatures
+
+```ts
+type BatchDiscoveryPointDraft = {
+  title: string;
+  kind?: DiscoveryPointKind;
+  theme?: DiscoveryPointTheme;
+  note?: string;
+  exploreQuestion?: string;
+  sourceSnippet?: string;
+};
+
+type BatchDiscoveryPointDefaults = Partial<
+  Pick<DiscoveryPointInput, "sourceType" | "sourceId" | "sourceTitle" | "sourceSnippet">
+>;
+
+buildBatchDiscoveryPointInputs(
+  spaceId: string,
+  drafts: BatchDiscoveryPointDraft[],
+  defaults?: BatchDiscoveryPointDefaults,
+): DiscoveryPointInput[];
+```
+
+#### 3. Contracts
+
+- Record Detail rows are route-local until the user explicitly saves.
+- The route must pass episode source defaults:
+  - `sourceType: "episode"`
+  - `sourceId: episode.id`
+  - `sourceTitle: episode.title`
+  - `sourceSnippet: episode.facts`
+- Blank-title rows are ignored; missing row kind defaults to `discovery`.
+- The helper caps inputs at `MAX_BATCH_DISCOVERY_POINTS`.
+- The UI must call `actions.saveDiscoveryPoints(inputs)` once, not loop over single-save calls.
+- Saving discovery points must not create account impacts, due dates, reminders, AI extraction, inferred themes, or search history.
+
+#### 4. Validation & Error Matrix
+
+| Condition | Expected Result |
+|---|---|
+| Existing episode + one or more titled rows | Save all titled rows with episode source metadata. |
+| Existing episode + all blank rows | Show route validation copy; do not call storage write. |
+| More than `MAX_BATCH_DISCOVERY_POINTS` rows | Save at most the first capped rows from the helper. |
+| Storage save fails | Show honest failure copy; do not show success copy. |
+| Missing episode id | Show existing Record Detail not-found state; no write. |
+
+#### 5. Good / Base / Bad Cases
+
+- Good: one record reveals three separate clues, and the user saves all three with one batch action.
+- Base: user saves one clue through the existing single-save path.
+- Bad: batch save creates account impact rows, rewrites source metadata after episode edit, or treats saved points as tasks.
+
+#### 6. Tests Required
+
+- Unit-test `buildBatchDiscoveryPointInputs(...)` source-default behavior.
+- Unit-test that batch discovery point saves leave derived storage-jar summaries unchanged.
+- Smoke-test Record Detail batch mode: add rows, save, verify linked list and Topic Detail source context.
+
+#### 7. Wrong vs Correct
+
+Wrong:
+
+```ts
+batchRows.forEach((row) => {
+  actions.saveDiscoveryPoint({ spaceId, title: row.title, kind: row.kind ?? "discovery" });
+});
+```
+
+Correct:
+
+```ts
+const inputs = buildBatchDiscoveryPointInputs(spaceId, batchRows, {
+  sourceType: "episode",
+  sourceId: episode.id,
+  sourceTitle: episode.title,
+  sourceSnippet: episode.facts,
+});
+
+actions.saveDiscoveryPoints(inputs);
+```
 
 ### P2 Branch Output Contract
 

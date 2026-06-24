@@ -12,6 +12,11 @@ import {
 } from "../copy/topics";
 import { buildQuickRecordImpacts } from "../domain/accounts";
 import { selectEpisodeDetail, type AccountDetailSourceRow } from "../domain/selectors";
+import {
+  buildBatchDiscoveryPointInputs,
+  MAX_BATCH_DISCOVERY_POINTS,
+  type BatchDiscoveryPointDraft,
+} from "../domain/topics";
 import type {
   ActivationLevel,
   ConnectionLevel,
@@ -26,6 +31,12 @@ import { buildTopicRoute, getRecordRouteId, type AppRoute } from "../utils/route
 
 type RecordDetailPageProps = {
   navigate: (route: AppRoute) => void;
+};
+
+type TopicCreateMode = "single" | "batch";
+
+type BatchTopicRow = BatchDiscoveryPointDraft & {
+  id: string;
 };
 
 type EmotionChip =
@@ -133,6 +144,17 @@ const discoveryPointThemeOptions: ChipOption<DiscoveryPointTheme>[] = [
   { value: "action_experiment", label: discoveryPointThemeCopy.action_experiment },
 ];
 
+function createBatchTopicRow(): BatchTopicRow {
+  return {
+    id: `record_batch_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    title: "",
+    kind: "discovery",
+    theme: undefined,
+    note: "",
+    exploreQuestion: "",
+  };
+}
+
 export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
   const { state, actions, status, lastError } = useAppStore();
   const episodeId = getRecordRouteId(window.location.pathname);
@@ -159,10 +181,12 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
   const [editMessage, setEditMessage] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
   const [topicTitle, setTopicTitle] = useState("");
+  const [topicCreateMode, setTopicCreateMode] = useState<TopicCreateMode>("single");
   const [topicKind, setTopicKind] = useState<DiscoveryPointKind>("discovery");
   const [topicTheme, setTopicTheme] = useState<DiscoveryPointTheme | undefined>();
   const [topicNote, setTopicNote] = useState("");
   const [topicQuestion, setTopicQuestion] = useState("");
+  const [batchTopicRows, setBatchTopicRows] = useState<BatchTopicRow[]>(() => [createBatchTopicRow()]);
   const [topicMessage, setTopicMessage] = useState<string | null>(null);
   const [topicError, setTopicError] = useState<string | null>(null);
   const [latestCreatedTopic, setLatestCreatedTopic] = useState<DiscoveryPoint | null>(null);
@@ -226,10 +250,12 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
     setEditMessage(null);
     setEditError(null);
     setTopicTitle("");
+    setTopicCreateMode("single");
     setTopicKind("discovery");
     setTopicTheme(undefined);
     setTopicNote("");
     setTopicQuestion("");
+    setBatchTopicRows([createBatchTopicRow()]);
     setTopicMessage(null);
     setTopicError(null);
     setLatestCreatedTopic(null);
@@ -368,6 +394,56 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
     setTopicError(null);
     setTopicMessage("已存入稍后，并和这条记录关联。之后可以慢慢回看。");
     setLatestCreatedTopic(result.value ?? null);
+  }
+
+  function addBatchTopicRow() {
+    setBatchTopicRows((rows) =>
+      rows.length >= MAX_BATCH_DISCOVERY_POINTS ? rows : [...rows, createBatchTopicRow()],
+    );
+  }
+
+  function updateBatchTopicRow(id: string, fields: Partial<BatchTopicRow>) {
+    setBatchTopicRows((rows) => rows.map((row) => (row.id === id ? { ...row, ...fields } : row)));
+  }
+
+  function removeBatchTopicRow(id: string) {
+    setBatchTopicRows((rows) => {
+      const nextRows = rows.filter((row) => row.id !== id);
+      return nextRows.length ? nextRows : [createBatchTopicRow()];
+    });
+  }
+
+  function saveRecordTopicsBatch() {
+    if (!detail) return;
+
+    const inputs = buildBatchDiscoveryPointInputs(detail.episode.spaceId, batchTopicRows, {
+      sourceType: "episode",
+      sourceId: detail.episode.id,
+      sourceTitle: detail.episode.title,
+      sourceSnippet: detail.episode.facts,
+    });
+
+    if (!inputs.length) {
+      setTopicError("至少给一个看见的点写下短标题。");
+      setTopicMessage(null);
+      setLatestCreatedTopic(null);
+      return;
+    }
+
+    const result = actions.saveDiscoveryPoints(inputs);
+
+    if (!result.ok) {
+      setTopicError(result.error ?? "这次还没有存下，发现点还没有写进本机。");
+      setTopicMessage(null);
+      setLatestCreatedTopic(null);
+      return;
+    }
+
+    const savedCount = result.value?.length ?? inputs.length;
+    setBatchTopicRows([createBatchTopicRow()]);
+    setTopicError(null);
+    setTopicMessage(`已存入稍后 ${savedCount} 个点，并和这条记录关联。之后可以慢慢回看。`);
+    setLatestCreatedTopic(result.value?.[0] ?? null);
   }
 
   if (!detail) {
@@ -612,55 +688,119 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
         </div>
         <section className="record-topic-compose" aria-label="从这条记录存一个看见的点">
           <div className="section-heading">
-            <h3>存一个看见的点</h3>
-            <p>先留一个标题就够了，它会带着这条记录的来源一起进入稍后再看。</p>
+            <h3>存下看见的点</h3>
+            <p>先留标题就够了，它会带着这条记录的来源一起进入稍后再看。</p>
           </div>
-          <label className="field">
-            <span className="field-label">短标题</span>
-            <input
-              className="field-input"
-              value={topicTitle}
-              onChange={(event) => setTopicTitle(event.target.value)}
-              placeholder="例如：我想解释很多，是怕被误解"
-            />
-          </label>
-          <ChipGroup
-            label="类型"
-            options={discoveryPointKindOptions}
-            value={topicKind}
-            onChange={setTopicKind}
-          />
-          <ChipGroup
-            label="主题，可不选"
-            options={discoveryPointThemeOptions}
-            value={topicTheme}
-            onChange={setTopicTheme}
-          />
-          <label className="field">
-            <span className="field-label">一句备注，可空着</span>
-            <textarea
-              className="field-textarea"
-              value={topicNote}
-              rows={2}
-              onChange={(event) => setTopicNote(event.target.value)}
-              placeholder="它为什么被我看见了？"
-            />
-          </label>
-          <label className="field">
-            <span className="field-label">想探寻的问题，可空着</span>
-            <textarea
-              className="field-textarea"
-              value={topicQuestion}
-              rows={2}
-              onChange={(event) => setTopicQuestion(event.target.value)}
-              placeholder="例如：我在保护什么？"
-            />
-          </label>
-          <div className="inline-actions">
-            <button className="button button--secondary" type="button" onClick={saveRecordTopic}>
-              <Plus size={16} strokeWidth={1.8} />
-              {status === "saving" ? "正在存下" : "存入稍后"}
+          <div className="topic-create-mode" role="group" aria-label="保存方式">
+            <button
+              className="topic-status-button"
+              type="button"
+              aria-pressed={topicCreateMode === "single"}
+              onClick={() => {
+                setTopicCreateMode("single");
+                setTopicError(null);
+                setTopicMessage(null);
+                setLatestCreatedTopic(null);
+              }}
+            >
+              存一个
             </button>
+            <button
+              className="topic-status-button"
+              type="button"
+              aria-pressed={topicCreateMode === "batch"}
+              onClick={() => {
+                setTopicCreateMode("batch");
+                setTopicError(null);
+                setTopicMessage(null);
+                setLatestCreatedTopic(null);
+              }}
+            >
+              批量保存
+            </button>
+          </div>
+          {topicCreateMode === "single" ? (
+            <>
+              <label className="field">
+                <span className="field-label">短标题</span>
+                <input
+                  className="field-input"
+                  value={topicTitle}
+                  onChange={(event) => setTopicTitle(event.target.value)}
+                  placeholder="例如：我想解释很多，是怕被误解"
+                />
+              </label>
+              <ChipGroup
+                label="类型"
+                options={discoveryPointKindOptions}
+                value={topicKind}
+                onChange={setTopicKind}
+              />
+              <ChipGroup
+                label="主题，可不选"
+                options={discoveryPointThemeOptions}
+                value={topicTheme}
+                onChange={setTopicTheme}
+              />
+              <label className="field">
+                <span className="field-label">一句备注，可空着</span>
+                <textarea
+                  className="field-textarea"
+                  value={topicNote}
+                  rows={2}
+                  onChange={(event) => setTopicNote(event.target.value)}
+                  placeholder="它为什么被我看见了？"
+                />
+              </label>
+              <label className="field">
+                <span className="field-label">想探寻的问题，可空着</span>
+                <textarea
+                  className="field-textarea"
+                  value={topicQuestion}
+                  rows={2}
+                  onChange={(event) => setTopicQuestion(event.target.value)}
+                  placeholder="例如：我在保护什么？"
+                />
+              </label>
+              <button className="button button--secondary" type="button" onClick={saveRecordTopic}>
+                <Plus size={16} strokeWidth={1.8} />
+                {status === "saving" ? "正在存下" : "存入稍后"}
+              </button>
+            </>
+          ) : (
+            <div className="topic-batch page-stack">
+              <p className="helper-text">
+                一次最多存 {MAX_BATCH_DISCOVERY_POINTS} 个。空白行不会保存，每个点都会带上这条记录的来源。
+              </p>
+              <div className="topic-batch__rows">
+                {batchTopicRows.map((row, index) => (
+                  <RecordBatchTopicRow
+                    key={row.id}
+                    index={index}
+                    row={row}
+                    canRemove={batchTopicRows.length > 1}
+                    onChange={(fields) => updateBatchTopicRow(row.id, fields)}
+                    onRemove={() => removeBatchTopicRow(row.id)}
+                  />
+                ))}
+              </div>
+              <div className="inline-actions">
+                <button
+                  className="button button--secondary"
+                  type="button"
+                  onClick={addBatchTopicRow}
+                  disabled={batchTopicRows.length >= MAX_BATCH_DISCOVERY_POINTS}
+                >
+                  <Plus size={16} strokeWidth={1.8} />
+                  再加一个
+                </button>
+                <button className="button button--secondary" type="button" onClick={saveRecordTopicsBatch}>
+                  {status === "saving" ? "正在存下" : "批量存入稍后"}
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="inline-actions">
             {latestCreatedTopic ? (
               <button
                 className="button button--ghost"
@@ -775,6 +915,77 @@ function PreviewRow({ label, reason }: { label: string; reason: string }) {
       <strong>{label}</strong>
       <span>{reason}</span>
     </div>
+  );
+}
+
+function RecordBatchTopicRow({
+  index,
+  row,
+  canRemove,
+  onChange,
+  onRemove,
+}: {
+  index: number;
+  row: BatchTopicRow;
+  canRemove: boolean;
+  onChange: (fields: Partial<BatchTopicRow>) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <article className="topic-batch-row">
+      <div className="topic-batch-row__header">
+        <strong>看见的点 {index + 1}</strong>
+        <button
+          className="topic-status-button"
+          type="button"
+          onClick={onRemove}
+          disabled={!canRemove}
+        >
+          移除
+        </button>
+      </div>
+      <label className="field">
+        <span className="field-label">短标题</span>
+        <input
+          className="field-input"
+          value={row.title}
+          onChange={(event) => onChange({ title: event.target.value })}
+          placeholder="例如：语言切换像缓冲"
+        />
+      </label>
+      <ChipGroup
+        label="类型"
+        options={discoveryPointKindOptions}
+        value={row.kind ?? "discovery"}
+        onChange={(kind) => onChange({ kind })}
+      />
+      <ChipGroup
+        label="主题，可不选"
+        options={discoveryPointThemeOptions}
+        value={row.theme}
+        onChange={(theme) => onChange({ theme })}
+      />
+      <label className="field">
+        <span className="field-label">一句备注，可空着</span>
+        <textarea
+          className="field-textarea"
+          value={row.note ?? ""}
+          onChange={(event) => onChange({ note: event.target.value })}
+          rows={2}
+          placeholder="它为什么被我看见了？"
+        />
+      </label>
+      <label className="field">
+        <span className="field-label">想探寻的问题，可空着</span>
+        <textarea
+          className="field-textarea"
+          value={row.exploreQuestion ?? ""}
+          onChange={(event) => onChange({ exploreQuestion: event.target.value })}
+          rows={2}
+          placeholder="例如：我在保护什么？"
+        />
+      </label>
+    </article>
   );
 }
 

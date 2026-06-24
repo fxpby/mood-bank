@@ -169,6 +169,53 @@ describe("discovery point state helpers", () => {
     ]);
   });
 
+  it("can apply source defaults to batch discovery inputs", () => {
+    const inputs = buildBatchDiscoveryPointInputs(
+      spaceId,
+      [
+        { title: "语言切换像缓冲", theme: "emotion" },
+        {
+          title: "失眠里的复盘",
+          kind: "question",
+          sourceSnippet: "夜里反复复盘",
+        },
+      ],
+      {
+        sourceType: "episode",
+        sourceId: "episode_1",
+        sourceTitle: "一次互动",
+        sourceSnippet: "对方具体回应了我的勇气",
+      },
+    );
+
+    expect(inputs).toEqual([
+      {
+        spaceId,
+        title: "语言切换像缓冲",
+        kind: "discovery",
+        theme: "emotion",
+        sourceType: "episode",
+        sourceId: "episode_1",
+        sourceTitle: "一次互动",
+        sourceSnippet: "对方具体回应了我的勇气",
+        note: undefined,
+        exploreQuestion: undefined,
+      },
+      {
+        spaceId,
+        title: "失眠里的复盘",
+        kind: "question",
+        theme: undefined,
+        sourceType: "episode",
+        sourceId: "episode_1",
+        sourceTitle: "一次互动",
+        sourceSnippet: "夜里反复复盘",
+        note: undefined,
+        exploreQuestion: undefined,
+      },
+    ]);
+  });
+
   it("batch discovery point saves do not affect derived storage jar summaries", () => {
     const stateWithEpisode: AppState = {
       ...createInitialState(),
@@ -201,10 +248,19 @@ describe("discovery point state helpers", () => {
       ],
     };
     const before = deriveAllAccountSummaries(stateWithEpisode);
-    const inputs = buildBatchDiscoveryPointInputs(spaceId, [
-      { title: "语言切换像缓冲", theme: "emotion" },
-      { title: "失眠里的复盘", kind: "question", exploreQuestion: "我在保护什么？" },
-    ]);
+    const inputs = buildBatchDiscoveryPointInputs(
+      spaceId,
+      [
+        { title: "语言切换像缓冲", theme: "emotion" },
+        { title: "失眠里的复盘", kind: "question", exploreQuestion: "我在保护什么？" },
+      ],
+      {
+        sourceType: "episode",
+        sourceId: "episode_1",
+        sourceTitle: "一次互动",
+        sourceSnippet: "对方具体回应了我的勇气",
+      },
+    );
 
     const result = addDiscoveryPointsToState(stateWithEpisode, inputs, {
       ids: ["topic_1", "topic_2"],
@@ -212,6 +268,8 @@ describe("discovery point state helpers", () => {
     });
 
     expect(result.points).toHaveLength(2);
+    expect(result.points.every((point) => point.sourceType === "episode")).toBe(true);
+    expect(result.points.every((point) => point.sourceId === "episode_1")).toBe(true);
     expect(deriveAllAccountSummaries(result.state)).toEqual(before);
   });
 
