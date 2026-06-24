@@ -1438,3 +1438,36 @@ Added Record Detail editing with episode impact recomputation, localized unsure 
 ### Next Steps
 
 - None - task complete
+
+
+## Session 37: Record detail topic capture
+
+**Date**: 2026-06-24
+**Task**: Record detail topic capture
+**Branch**: `main`
+
+### Summary
+
+Added a Record Detail entry for saving episode-linked discovery points, with source snapshots, docs updates, and regression tests.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `234a71a` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
