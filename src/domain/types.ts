@@ -285,6 +285,21 @@ export type QuickRecordInput = {
   };
 };
 
+export type EpisodeUpdateInput = {
+  id: string;
+  title: string;
+  facts: string;
+  interpretation?: string;
+  emotions?: string[];
+  bodySensations?: string[];
+  connectionLevel?: ConnectionLevel;
+  activationLevel?: ActivationLevel;
+  nextAction?: string;
+  connectionEvidence?: string;
+  selfContactEvidence?: string;
+  energyEffect?: EnergyEffect;
+};
+
 export type QuickRecordDraftData = {
   source?: EpisodeSource;
   title?: string;

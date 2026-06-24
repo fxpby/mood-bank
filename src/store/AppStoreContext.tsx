@@ -23,6 +23,7 @@ import type {
   Draft,
   DraftInput,
   Episode,
+  EpisodeUpdateInput,
   EmotionalSpace,
   PersonalExperiment,
   PersonalExperimentAttempt,
@@ -56,7 +57,7 @@ import {
   updateDiscoveryPointNoteInState,
   updateDiscoveryPointStatusInState,
 } from "../domain/topics";
-import { deleteEpisodeFromState } from "../domain/episodes";
+import { deleteEpisodeFromState, updateEpisodeInState } from "../domain/episodes";
 import {
   addExperimentAttemptToState,
   addExperimentToState,
@@ -80,6 +81,7 @@ export type AppActions = {
   updateActiveSpace(input: SpaceInput): StoreWriteResult<EmotionalSpace>;
   updateDailyMarket(input: DailyMarketInput): StoreWriteResult;
   saveQuickRecord(input: QuickRecordInput): StoreWriteResult<Episode>;
+  updateEpisode(input: EpisodeUpdateInput): StoreWriteResult<Episode>;
   saveReturnToSelfPractice(input: ReturnToSelfInput): StoreWriteResult<ReturnToSelfPractice>;
   saveTriggerCompletion(input: TriggerCompletionInput): StoreWriteResult | StoreNoWriteResult;
   saveAnchor(input: AnchorInput): StoreWriteResult<Anchor>;
@@ -335,6 +337,21 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       const result = commitState(nextState);
 
       return result.ok ? { ...result, value: draft } : result;
+    },
+    [commitState, state],
+  );
+
+  const updateEpisode = useCallback(
+    (input: EpisodeUpdateInput): StoreWriteResult<Episode> => {
+      const timestamp = nowIso();
+      const { state: nextState, episode } = updateEpisodeInState(state, input, timestamp);
+
+      if (!episode) {
+        return { ok: true, savedAt: timestamp };
+      }
+
+      const result = commitState(nextState);
+      return result.ok ? { ...result, value: episode } : result;
     },
     [commitState, state],
   );
@@ -608,6 +625,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       updateActiveSpace,
       updateDailyMarket,
       saveQuickRecord,
+      updateEpisode,
       saveReturnToSelfPractice,
       saveTriggerCompletion(input: TriggerCompletionInput): StoreNoWriteResult {
         return {
@@ -649,6 +667,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       saveDiscoveryPoints,
       updateDiscoveryPoint,
       saveQuickRecord,
+      updateEpisode,
       savePersonalExperiment,
       updatePersonalExperiment,
       updatePersonalExperimentStatus,

@@ -191,6 +191,25 @@ describe("selectAccountDetail", () => {
     expect(detail.rows[0]?.evidence).toBe("对方具体回应了我的勇气");
   });
 
+  it("localizes unsure evidence instead of exposing internal enum values", () => {
+    const state: AppState = {
+      ...createInitialState(),
+      episodes: [
+        episode("episode_1", {
+          accountImpacts: [
+            impact("impact_unsure", {
+              evidence: "not_sure",
+            }),
+          ],
+        }),
+      ],
+    };
+
+    const detail = selectAccountDetail(state, "self");
+
+    expect(detail.rows[0]?.evidence).toBe("说不清");
+  });
+
   it("ignores drafts when building account detail rows", () => {
     const state: AppState = {
       ...createInitialState(),

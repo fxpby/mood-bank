@@ -68,6 +68,7 @@ Required action behavior:
 | `updateActiveSpace` | Yes | Updates the active emotional space name/description only. Blank name falls back to the default space name. Missing/stale active space ids return no-op success. |
 | `updateDailyMarket` | Yes | Upserts today's market by date key. |
 | `saveQuickRecord` | Yes | Creates an episode and clears a matching draft id after successful state construction. May also create one source-linked discovery point when `nextAction === "save_later_topic"`; this must happen in the same `commitState` call. |
+| `updateEpisode` | Yes | Updates one saved episode and recomputes that episode's account impacts from current account rules. Unknown ids return no-op success. Must not create/delete drafts, anchors, discovery points, experiments, or direct summary rows. |
 | `deleteEpisode` | Yes | Removes one saved episode. Record Detail uses it with linked-anchor deletion enabled; linked discovery points must be preserved and later shown with missing-source copy. |
 | `saveReturnToSelfPractice` | Yes | Creates a practice and optional anchor. Never creates connection impact. |
 | `saveTriggerCompletion` | No in P0 | Returns no-write result so Trigger -> Quick Record does not double-count Self. |
@@ -83,6 +84,23 @@ Required action behavior:
 | `resetLocalData` | Yes | Resets storage only after adapter reset succeeds. |
 
 If storage save fails, return `{ ok: false, inMemoryOnly: true }` and do not update `state` as if the write were durable. UI copy must not claim the record was saved.
+
+### Episode Edit Contract
+
+Saved episode edits go through:
+
+```ts
+actions.updateEpisode(input);
+```
+
+Rules:
+
+- Editable fields are the saved episode fields that drive the record view and account-impact derivation: `title`, `facts`, `interpretation`, `emotions`, `bodySensations`, `connectionLevel`, `activationLevel`, `nextAction`, connection/self-contact evidence, and energy effect.
+- The action preserves `id`, `spaceId`, `source`, `draftId`, `returnToSelfPracticeId`, `createdAt`, linked anchors, linked discovery points, experiments, and attempts.
+- Account impacts are replaced only for the edited episode and are recomputed from `buildQuickRecordImpacts`; derived summaries then update by normal derivation.
+- Blank facts are rejected by route validation before calling the action. Blank title falls back to `一次互动`.
+- Linked discovery point `sourceTitle` / `sourceSnippet` fields are source snapshots and must not be silently rewritten by episode edit.
+- Editing must not create a new episode, draft, discovery point, anchor, experiment, account-impact row outside the episode, or persisted summary.
 
 ### Route-State Contract
 

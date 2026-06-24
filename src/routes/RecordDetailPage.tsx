@@ -1,16 +1,18 @@
-import { ArrowLeft, BookmarkPlus, NotebookPen, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, NotebookPen, Save, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { PageHeader } from "../components/PageHeader";
-import { accountCopy, getAccountEvidenceCopy } from "../copy/accounts";
+import { accountCopy, accountReasonCopy, getAccountEvidenceCopy } from "../copy/accounts";
 import { episodeSourceCopy } from "../copy/episodes";
 import {
   discoveryPointKindCopy,
   discoveryPointStatusCopy,
   discoveryPointThemeCopy,
 } from "../copy/topics";
+import { buildQuickRecordImpacts } from "../domain/accounts";
 import { selectEpisodeDetail, type AccountDetailSourceRow } from "../domain/selectors";
-import type { ConnectionLevel, Episode } from "../domain/types";
+import type { ActivationLevel, ConnectionLevel, EnergyEffect, Episode } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
 import { buildTopicRoute, getRecordRouteId, type AppRoute } from "../utils/route";
 
@@ -18,22 +20,178 @@ type RecordDetailPageProps = {
   navigate: (route: AppRoute) => void;
 };
 
+type EmotionChip =
+  | "焦虑/害怕"
+  | "委屈/难过"
+  | "羞耻/内疚"
+  | "生气/怨"
+  | "想念"
+  | "被看见/很暖"
+  | "混合"
+  | "说不清";
+type BodyChip =
+  | "胸口紧"
+  | "胃缩住"
+  | "发热"
+  | "想哭"
+  | "手心紧"
+  | "头很满"
+  | "身体麻"
+  | "没感觉"
+  | "说不清";
+type NextAction =
+  | "delay_10_min"
+  | "record_facts"
+  | "save_later_topic"
+  | "return_to_self"
+  | "reply_one_point"
+  | "no_extra_message"
+  | "not_now"
+  | "not_sure";
+
+const emotionOptions: ChipOption<EmotionChip>[] = [
+  { value: "焦虑/害怕", label: "焦虑/害怕" },
+  { value: "委屈/难过", label: "委屈/难过" },
+  { value: "羞耻/内疚", label: "羞耻/内疚" },
+  { value: "生气/怨", label: "生气/怨" },
+  { value: "想念", label: "想念" },
+  { value: "被看见/很暖", label: "被看见/很暖" },
+  { value: "混合", label: "混合" },
+  { value: "说不清", label: "说不清" },
+];
+
+const bodyOptions: ChipOption<BodyChip>[] = [
+  { value: "胸口紧", label: "胸口紧" },
+  { value: "胃缩住", label: "胃缩住" },
+  { value: "发热", label: "发热" },
+  { value: "想哭", label: "想哭" },
+  { value: "手心紧", label: "手心紧" },
+  { value: "头很满", label: "头很满" },
+  { value: "身体麻", label: "身体麻" },
+  { value: "没感觉", label: "没感觉" },
+  { value: "说不清", label: "说不清" },
+];
+
+const connectionOptions: ChipOption<string>[] = [
+  { value: "0", label: "没有" },
+  { value: "1", label: "很弱" },
+  { value: "2", label: "有一点" },
+  { value: "3", label: "比较明显" },
+  { value: "4", label: "很强" },
+  { value: "not_sure", label: "说不清" },
+];
+
+const activationOptions: ChipOption<string>[] = [
+  { value: "0", label: "平稳" },
+  { value: "1", label: "轻微" },
+  { value: "2", label: "有波动" },
+  { value: "3", label: "很强" },
+  { value: "4", label: "快被卷走" },
+  { value: "not_sure", label: "说不清" },
+];
+
+const nextActionOptions: ChipOption<NextAction>[] = [
+  { value: "no_extra_message", label: "先不补发" },
+  { value: "delay_10_min", label: "晚点再回" },
+  { value: "save_later_topic", label: "保存一个话题" },
+  { value: "return_to_self", label: "回到自己" },
+  { value: "reply_one_point", label: "只回应一个点" },
+  { value: "record_facts", label: "记录事实" },
+  { value: "not_now", label: "暂时没有" },
+  { value: "not_sure", label: "说不清" },
+];
+
+const energyOptions: ChipOption<EnergyEffect>[] = [
+  { value: "lighter", label: "轻一点" },
+  { value: "same", label: "差不多" },
+  { value: "more_tired", label: "更重" },
+  { value: "not_sure", label: "说不清" },
+];
+
 export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
   const { state, actions, status, lastError } = useAppStore();
   const episodeId = getRecordRouteId(window.location.pathname);
   const detail = useMemo(() => selectEpisodeDetail(state, episodeId), [episodeId, state]);
+  const activeSpace = detail
+    ? state.spaces.find((space) => space.id === detail.episode.spaceId)
+    : null;
   const [anchorText, setAnchorText] = useState("");
   const [anchorMessage, setAnchorMessage] = useState<string | null>(null);
   const [anchorError, setAnchorError] = useState<string | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editFacts, setEditFacts] = useState("");
+  const [editInterpretation, setEditInterpretation] = useState("");
+  const [editEmotion, setEditEmotion] = useState<EmotionChip>("说不清");
+  const [editBody, setEditBody] = useState<BodyChip>("说不清");
+  const [editConnectionLevel, setEditConnectionLevel] = useState<string>("not_sure");
+  const [editActivationLevel, setEditActivationLevel] = useState<string>("not_sure");
+  const [editNextAction, setEditNextAction] = useState<NextAction>("not_now");
+  const [editConnectionEvidence, setEditConnectionEvidence] = useState("");
+  const [editSelfContactEvidence, setEditSelfContactEvidence] = useState("");
+  const [editEnergyEffect, setEditEnergyEffect] = useState<EnergyEffect>("not_sure");
+  const [editMessage, setEditMessage] = useState<string | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
+
+  const previewImpacts = useMemo(() => {
+    if (!detail || !activeSpace || !editFacts.trim()) return [];
+
+    return buildQuickRecordImpacts(
+      {
+        spaceId: detail.episode.spaceId,
+        spaceType: activeSpace.type,
+        source: detail.episode.source,
+        title: editTitle,
+        facts: editFacts,
+        interpretation: editInterpretation,
+        emotions: [editEmotion],
+        bodySensations: [editBody],
+        connectionLevel: parseLevel(editConnectionLevel) as ConnectionLevel,
+        activationLevel: parseLevel(editActivationLevel) as ActivationLevel,
+        nextAction: editNextAction,
+        connectionEvidence: editConnectionEvidence,
+        selfContactEvidence: editSelfContactEvidence,
+        energyEffect: editEnergyEffect,
+      },
+      { sourceId: detail.episode.id, createdAt: new Date(0).toISOString() },
+    );
+  }, [
+    activeSpace,
+    detail,
+    editActivationLevel,
+    editBody,
+    editConnectionEvidence,
+    editConnectionLevel,
+    editEmotion,
+    editEnergyEffect,
+    editFacts,
+    editInterpretation,
+    editNextAction,
+    editSelfContactEvidence,
+    editTitle,
+  ]);
 
   useEffect(() => {
+    const episode = detail?.episode;
     setAnchorText(detail ? getInitialAnchorText(detail.episode, detail.linkedAnchors[0]) : "");
     setAnchorMessage(null);
     setAnchorError(null);
     setIsDeleteConfirmOpen(false);
     setDeleteError(null);
+    setEditTitle(episode?.title ?? "");
+    setEditFacts(episode?.facts ?? "");
+    setEditInterpretation(episode?.interpretation ?? "");
+    setEditEmotion(normalizeEmotion(episode?.emotions[0]));
+    setEditBody(normalizeBody(episode?.bodySensations[0]));
+    setEditConnectionLevel(episode?.connectionLevel === undefined ? "not_sure" : String(episode.connectionLevel));
+    setEditActivationLevel(episode?.activationLevel === undefined ? "not_sure" : String(episode.activationLevel));
+    setEditNextAction(normalizeNextAction(episode?.nextAction));
+    setEditConnectionEvidence(getEpisodeEvidence(detail?.episode, "connection"));
+    setEditSelfContactEvidence(getEpisodeEvidence(detail?.episode, "self_contact"));
+    setEditEnergyEffect(getEpisodeEnergyEffect(detail?.episode));
+    setEditMessage(null);
+    setEditError(null);
   }, [detail?.episode.id]);
 
   function saveRecordAnchor() {
@@ -80,6 +238,55 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
     setDeleteError(null);
     setIsDeleteConfirmOpen(false);
     navigate("/record");
+  }
+
+  function saveRecordEdit() {
+    if (!detail) return;
+
+    if (!editFacts.trim()) {
+      setEditError("至少保留一个可确认的事实。");
+      setEditMessage(null);
+      return;
+    }
+
+    const result = actions.updateEpisode({
+      id: detail.episode.id,
+      title: editTitle,
+      facts: editFacts,
+      interpretation: editInterpretation,
+      emotions: [editEmotion],
+      bodySensations: [editBody],
+      connectionLevel: parseLevel(editConnectionLevel) as ConnectionLevel,
+      activationLevel: parseLevel(editActivationLevel) as ActivationLevel,
+      nextAction: editNextAction,
+      connectionEvidence: editConnectionEvidence,
+      selfContactEvidence: editSelfContactEvidence,
+      energyEffect: editEnergyEffect,
+    });
+
+    if (!result.ok) {
+      setEditError(result.error ?? "这次还没有保存成功，记录还没有写进本机。");
+      setEditMessage(null);
+      return;
+    }
+
+    setEditTitle(result.value?.title ?? (editTitle.trim() || "一次互动"));
+    setEditFacts(result.value?.facts ?? editFacts.trim());
+    setEditInterpretation(result.value?.interpretation ?? "");
+    setEditEmotion(normalizeEmotion(result.value?.emotions[0]));
+    setEditBody(normalizeBody(result.value?.bodySensations[0]));
+    setEditConnectionLevel(
+      result.value?.connectionLevel === undefined ? "not_sure" : String(result.value.connectionLevel),
+    );
+    setEditActivationLevel(
+      result.value?.activationLevel === undefined ? "not_sure" : String(result.value.activationLevel),
+    );
+    setEditNextAction(normalizeNextAction(result.value?.nextAction));
+    setEditConnectionEvidence(getEpisodeEvidence(result.value, "connection"));
+    setEditSelfContactEvidence(getEpisodeEvidence(result.value, "self_contact"));
+    setEditEnergyEffect(getEpisodeEnergyEffect(result.value));
+    setEditError(null);
+    setEditMessage("记录已更新，这条记录带来的储蓄罐明细也已按当前内容重新计算。");
   }
 
   if (!detail) {
@@ -143,6 +350,132 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
 
       <section className="panel page-stack">
         <div className="section-heading">
+          <h2>整理这条记录</h2>
+          <p>只整理这条记录本身。储蓄罐明细会按这些字段重新计算，已保存的发现点和锚点不会被改写。</p>
+        </div>
+        <label className="field">
+          <span className="field-label">短标题</span>
+          <input
+            className="field-input"
+            value={editTitle}
+            onChange={(event) => setEditTitle(event.target.value)}
+            placeholder="一次互动"
+          />
+        </label>
+        <section className="record-form__fact-card" aria-label="编辑事实和解释">
+          <label className="field fact-field">
+            <span className="record-form__label-row">
+              <span className="field-label">可确认的事实</span>
+              <span className="meta-text">至少保留一个事实。</span>
+            </span>
+            <textarea
+              className="field-textarea"
+              value={editFacts}
+              onChange={(event) => setEditFacts(event.target.value)}
+              rows={3}
+              placeholder="例如：对方具体回应了我提到的勇气。"
+            />
+          </label>
+          <label className="field interpretation-field">
+            <span className="record-form__label-row">
+              <span className="field-label">我脑中出现的解释</span>
+              <span className="meta-text">可以空着，不需要补成结论。</span>
+            </span>
+            <textarea
+              className="field-textarea"
+              value={editInterpretation}
+              onChange={(event) => setEditInterpretation(event.target.value)}
+              rows={3}
+              placeholder="我猜它可能意味着..."
+            />
+          </label>
+        </section>
+        <ChipGroup label="情绪" options={emotionOptions} value={editEmotion} onChange={setEditEmotion} />
+        <ChipGroup label="身体" options={bodyOptions} value={editBody} onChange={setEditBody} />
+        <div className="split-controls">
+          <ChipGroup
+            label="连接感"
+            options={connectionOptions}
+            value={editConnectionLevel}
+            onChange={setEditConnectionLevel}
+            helper="连接感和激活可以同时存在。"
+          />
+          <ChipGroup
+            label="激活程度"
+            options={activationOptions}
+            value={editActivationLevel}
+            onChange={setEditActivationLevel}
+            helper="激活程度不是关系结论。"
+          />
+        </div>
+        {activeSpace?.type === "self" ? (
+          <label className="field">
+            <span className="field-label">和自己的真实接触证据</span>
+            <input
+              className="field-input"
+              value={editSelfContactEvidence}
+              onChange={(event) => setEditSelfContactEvidence(event.target.value)}
+              placeholder="例如：我看见自己其实很害怕。"
+            />
+          </label>
+        ) : (
+          <label className="field">
+            <span className="field-label">可观察的连接证据，可空着</span>
+            <input
+              className="field-input"
+              value={editConnectionEvidence}
+              onChange={(event) => setEditConnectionEvidence(event.target.value)}
+              placeholder="例如：对方具体回应了我的勇气。"
+            />
+          </label>
+        )}
+        <ChipGroup
+          label="下一步我能做什么"
+          helper="选一个由我能完成的动作。"
+          options={nextActionOptions}
+          value={editNextAction}
+          onChange={setEditNextAction}
+        />
+        <ChipGroup
+          label="这次对能量的影响"
+          options={energyOptions}
+          value={editEnergyEffect}
+          onChange={setEditEnergyEffect}
+        />
+        <section className="impact-preview" aria-label="编辑后的账户影响预览">
+          <h2>更新后可能会存进哪里</h2>
+          <PreviewRow
+            label="连接"
+            reason={
+              previewImpacts.find((impact) => impact.account === "connection")?.reason ??
+              accountReasonCopy.no_connection_evidence
+            }
+          />
+          <PreviewRow
+            label="自己"
+            reason={
+              previewImpacts.find((impact) => impact.account === "self")?.reason ??
+              "暂时没有自己的影响。"
+            }
+          />
+          <PreviewRow
+            label="能量"
+            reason={
+              previewImpacts.find((impact) => impact.account === "energy")?.reason ??
+              accountReasonCopy.energy_neutral
+            }
+          />
+        </section>
+        <button className="button button--primary" type="button" onClick={saveRecordEdit}>
+          <Save size={16} strokeWidth={1.8} />
+          {status === "saving" ? "正在保存" : "保存整理"}
+        </button>
+        {editMessage ? <p className="helper-text">{editMessage}</p> : null}
+        {editError ? <p className="form-error">{editError}</p> : null}
+      </section>
+
+      <section className="panel page-stack">
+        <div className="section-heading">
           <h2>锚点</h2>
           <p>把这条记录里能托住自己的话单独放出来，之后需要时可以直接带走。</p>
         </div>
@@ -178,7 +511,7 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
       <section className="panel page-stack">
         <div className="section-heading">
           <h2>这次让罐子怎么动了</h2>
-          <p>这里只显示当时已经存下的来源，不重新计算，也不下关系结论。</p>
+          <p>这里只显示这条记录当前对应的明细。整理记录后会同步更新，但不会改写发现点和锚点。</p>
         </div>
         {detail.accountRows.length ? (
           <div className="record-impact-list">
@@ -291,6 +624,15 @@ function RecordImpactRow({ row }: { row: AccountDetailSourceRow }) {
   );
 }
 
+function PreviewRow({ label, reason }: { label: string; reason: string }) {
+  return (
+    <div>
+      <strong>{label}</strong>
+      <span>{reason}</span>
+    </div>
+  );
+}
+
 function buildRecordRows(episode: Episode): Array<{ label: string; value: string }> {
   return [
     { label: "事实", value: episode.facts.trim() },
@@ -309,6 +651,48 @@ function formatLevel(value: ConnectionLevel): string {
   }
 
   return `${value} / 4`;
+}
+
+function parseLevel(value: string): ConnectionLevel | ActivationLevel {
+  if (value === "not_sure") {
+    return "not_sure";
+  }
+
+  const numberValue = Number(value);
+  return numberValue >= 0 && numberValue <= 4 ? (numberValue as ConnectionLevel | ActivationLevel) : "not_sure";
+}
+
+function normalizeEmotion(value: string | undefined): EmotionChip {
+  return emotionOptions.some((option) => option.value === value) ? (value as EmotionChip) : "说不清";
+}
+
+function normalizeBody(value: string | undefined): BodyChip {
+  return bodyOptions.some((option) => option.value === value) ? (value as BodyChip) : "说不清";
+}
+
+function normalizeNextAction(value: string | undefined): NextAction {
+  return nextActionOptions.some((option) => option.value === value) ? (value as NextAction) : "not_now";
+}
+
+function getEpisodeEvidence(
+  episode: Episode | undefined,
+  kind: "connection" | "self_contact",
+): string {
+  if (!episode) return "";
+
+  const reasonCode =
+    kind === "connection" ? "observable_connection_evidence" : "self_contact_evidence";
+  return episode.accountImpacts.find((impact) => impact.reasonCode === reasonCode)?.evidence ?? "";
+}
+
+function getEpisodeEnergyEffect(episode: Episode | undefined): EnergyEffect {
+  const energyImpact = episode?.accountImpacts.find((impact) => impact.account === "energy");
+
+  if (energyImpact?.evidence === "lighter" || energyImpact?.evidence === "more_tired") {
+    return energyImpact.evidence;
+  }
+
+  return "not_sure";
 }
 
 function formatSignedValue(value: number): string {
