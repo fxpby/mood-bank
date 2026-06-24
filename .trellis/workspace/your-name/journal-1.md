@@ -1471,3 +1471,41 @@ Added a Record Detail entry for saving episode-linked discovery points, with sou
 ### Next Steps
 
 - None - task complete
+
+
+## Session 38: Topics text search
+
+**Date**: 2026-06-24
+**Task**: Topics text search
+**Branch**: `main`
+
+### Summary
+
+Added lightweight local text search to Topics so saved discovery points can be found by title, note, explore question, source title, or source snippet.
+
+### Main Changes
+
+- Extended `filterDiscoveryPoints` with route-local query matching.
+- Added the `/topics` search input, clear actions, and low-pressure no-results copy.
+- Updated README, PRD status, and frontend state-management spec to preserve the local-only search boundary.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0527655` | feat: add topics text search |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test` (25 files / 202 tests)
+- [OK] `npm run build` (Vite chunk-size warning only)
+- [OK] Browser smoke on `/topics`: create temporary point, search hit, no-result empty state, clear search, delete temporary point.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
