@@ -1180,7 +1180,12 @@ Added transient high-activation route-state nudges from Draft Check, Signal Chec
 
 ### Main Changes
 
-(Add details)
+- Extended `BranchActivationSource` to accept `rich_incoming` and `quick_record`.
+- Added source-specific nudge copy for Rich Incoming and Quick Record.
+- Passed high-activation route state from Rich Incoming completion into Seeing Evidence, Healthy Love, and Repair / Understanding branch CTAs when route-local selections indicate pressure, overload, rumination, escape, or reply urgency.
+- Passed high-activation route state from Quick Record into Seeing Evidence when the saved record has high activation.
+- Added the branch activation nudge to Repair / Understanding landing so the newly routed context is visible there too.
+- Updated route helper tests, README status, and frontend route-state specs.
 
 ### Git Commits
 
@@ -1264,7 +1269,14 @@ Added a lightweight repair/understanding P2 branch that saves one relationship-l
 
 ### Testing
 
-- [OK] (Add test results)
+- [OK] `git diff --check`
+- [OK] `npm run typecheck`
+- [OK] `npm test` — 25 files / 206 tests
+- [OK] `npm run build`
+- [OK] Browser smoke: Rich Incoming -> Seeing Evidence shows Rich Incoming nudge.
+- [OK] Browser smoke: Rich Incoming -> Repair / Understanding shows Rich Incoming nudge.
+- [OK] Browser smoke: Quick Record -> Seeing Evidence shows Quick Record nudge.
+- [OK] Browser smoke: direct `/seeing-evidence` entry renders without nudge.
 
 ### Status
 
@@ -1579,6 +1591,39 @@ Added batch capture to Record Detail so one saved record can preserve multiple e
 - [OK] `npm test` (25 files / 206 tests)
 - [OK] `npm run build` (Vite chunk-size warning only)
 - [OK] Browser smoke on `/record/:id`: switched to batch mode, saved two temporary episode-linked points, verified linked list and Topic Detail source snapshot, deleted both temporary points.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 38: High Activation Routing Coverage
+
+**Date**: 2026-06-25
+**Task**: High Activation Routing Coverage
+**Branch**: `main`
+
+### Summary
+
+Extended transient high-activation branch routing to Rich Incoming and Quick Record, updated route-state specs/readme, and verified P2 nudge behavior.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `9ee56c9` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
 
 ### Status
 
