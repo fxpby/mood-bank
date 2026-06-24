@@ -541,6 +541,78 @@ describe("discovery point state helpers", () => {
     expect(deriveAllAccountSummaries(after)).toEqual(before);
     expect(before[0]?.reason).toBe(accountReasonCopy.observable_connection_evidence);
   });
+
+  it("keeps episode-linked discovery point snapshots separate from later episode edits", () => {
+    const accountImpacts = buildQuickRecordImpacts(
+      {
+        spaceId,
+        spaceType: "interpersonal",
+        facts: "对方具体回应了我的勇气",
+        nextAction: "record_facts",
+      },
+      { sourceId: "episode_1", createdAt: timestamp },
+    );
+    const episode: Episode = {
+      id: "episode_1",
+      spaceId,
+      source: "quick_record",
+      title: "收到一段很暖的邮件",
+      facts: "对方具体回应了我的勇气",
+      interpretation: "",
+      emotions: ["被看见/很暖"],
+      bodySensations: ["头很满"],
+      connectionLevel: "not_sure",
+      activationLevel: "not_sure",
+      nextAction: "record_facts",
+      accountImpacts,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    };
+    const stateWithEpisode: AppState = {
+      ...createInitialState(),
+      episodes: [episode],
+    };
+    const before = deriveAllAccountSummaries(stateWithEpisode);
+
+    const result = addDiscoveryPointToState(
+      stateWithEpisode,
+      {
+        spaceId,
+        title: "我怕被误解时会想解释很多",
+        kind: "discovery",
+        theme: "old_echo",
+        note: "先存下这个点，不需要现在想完。",
+        sourceType: "episode",
+        sourceId: episode.id,
+        sourceTitle: episode.title,
+        sourceSnippet: episode.facts,
+      },
+      { id: "topic_1", timestamp: "2026-06-18T13:00:00.000Z" },
+    );
+    const editedState: AppState = {
+      ...result.state,
+      episodes: [
+        {
+          ...episode,
+          title: "整理后的标题",
+          facts: "整理后的事实",
+          updatedAt: "2026-06-18T14:00:00.000Z",
+        },
+      ],
+    };
+
+    expect(result.point).toMatchObject({
+      sourceType: "episode",
+      sourceId: episode.id,
+      sourceTitle: "收到一段很暖的邮件",
+      sourceSnippet: "对方具体回应了我的勇气",
+    });
+    expect(deriveAllAccountSummaries(result.state)).toEqual(before);
+    expect(editedState.topics[0]).toMatchObject({
+      sourceTitle: "收到一段很暖的邮件",
+      sourceSnippet: "对方具体回应了我的勇气",
+    });
+  });
 });
 
 describe("topic filters", () => {

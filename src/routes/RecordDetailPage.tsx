@@ -1,4 +1,4 @@
-import { ArrowLeft, BookmarkPlus, NotebookPen, Save, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, NotebookPen, Plus, Save, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { ConfirmDialog } from "../components/ConfirmDialog";
@@ -12,7 +12,15 @@ import {
 } from "../copy/topics";
 import { buildQuickRecordImpacts } from "../domain/accounts";
 import { selectEpisodeDetail, type AccountDetailSourceRow } from "../domain/selectors";
-import type { ActivationLevel, ConnectionLevel, EnergyEffect, Episode } from "../domain/types";
+import type {
+  ActivationLevel,
+  ConnectionLevel,
+  DiscoveryPoint,
+  DiscoveryPointKind,
+  DiscoveryPointTheme,
+  EnergyEffect,
+  Episode,
+} from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
 import { buildTopicRoute, getRecordRouteId, type AppRoute } from "../utils/route";
 
@@ -108,6 +116,23 @@ const energyOptions: ChipOption<EnergyEffect>[] = [
   { value: "not_sure", label: "说不清" },
 ];
 
+const discoveryPointKindOptions: ChipOption<DiscoveryPointKind>[] = [
+  { value: "discovery", label: discoveryPointKindCopy.discovery },
+  { value: "topic", label: discoveryPointKindCopy.topic },
+  { value: "question", label: discoveryPointKindCopy.question },
+  { value: "action_idea", label: discoveryPointKindCopy.action_idea },
+];
+
+const discoveryPointThemeOptions: ChipOption<DiscoveryPointTheme>[] = [
+  { value: "emotion", label: discoveryPointThemeCopy.emotion },
+  { value: "boundary", label: discoveryPointThemeCopy.boundary },
+  { value: "old_echo", label: discoveryPointThemeCopy.old_echo },
+  { value: "relationship_learning", label: discoveryPointThemeCopy.relationship_learning },
+  { value: "expression", label: discoveryPointThemeCopy.expression },
+  { value: "self_care", label: discoveryPointThemeCopy.self_care },
+  { value: "action_experiment", label: discoveryPointThemeCopy.action_experiment },
+];
+
 export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
   const { state, actions, status, lastError } = useAppStore();
   const episodeId = getRecordRouteId(window.location.pathname);
@@ -133,6 +158,14 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
   const [editEnergyEffect, setEditEnergyEffect] = useState<EnergyEffect>("not_sure");
   const [editMessage, setEditMessage] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
+  const [topicTitle, setTopicTitle] = useState("");
+  const [topicKind, setTopicKind] = useState<DiscoveryPointKind>("discovery");
+  const [topicTheme, setTopicTheme] = useState<DiscoveryPointTheme | undefined>();
+  const [topicNote, setTopicNote] = useState("");
+  const [topicQuestion, setTopicQuestion] = useState("");
+  const [topicMessage, setTopicMessage] = useState<string | null>(null);
+  const [topicError, setTopicError] = useState<string | null>(null);
+  const [latestCreatedTopic, setLatestCreatedTopic] = useState<DiscoveryPoint | null>(null);
 
   const previewImpacts = useMemo(() => {
     if (!detail || !activeSpace || !editFacts.trim()) return [];
@@ -192,6 +225,14 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
     setEditEnergyEffect(getEpisodeEnergyEffect(detail?.episode));
     setEditMessage(null);
     setEditError(null);
+    setTopicTitle("");
+    setTopicKind("discovery");
+    setTopicTheme(undefined);
+    setTopicNote("");
+    setTopicQuestion("");
+    setTopicMessage(null);
+    setTopicError(null);
+    setLatestCreatedTopic(null);
   }, [detail?.episode.id]);
 
   function saveRecordAnchor() {
@@ -287,6 +328,46 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
     setEditEnergyEffect(getEpisodeEnergyEffect(result.value));
     setEditError(null);
     setEditMessage("记录已更新，这条记录带来的储蓄罐明细也已按当前内容重新计算。");
+  }
+
+  function saveRecordTopic() {
+    if (!detail) return;
+
+    if (!topicTitle.trim()) {
+      setTopicError("先给这个点一个很短的名字。");
+      setTopicMessage(null);
+      setLatestCreatedTopic(null);
+      return;
+    }
+
+    const result = actions.saveDiscoveryPoint({
+      spaceId: detail.episode.spaceId,
+      title: topicTitle,
+      kind: topicKind,
+      theme: topicTheme,
+      note: topicNote,
+      exploreQuestion: topicQuestion,
+      sourceType: "episode",
+      sourceId: detail.episode.id,
+      sourceTitle: detail.episode.title,
+      sourceSnippet: detail.episode.facts,
+    });
+
+    if (!result.ok) {
+      setTopicError(result.error ?? "这次还没有存下，发现点还没有写进本机。");
+      setTopicMessage(null);
+      setLatestCreatedTopic(null);
+      return;
+    }
+
+    setTopicTitle("");
+    setTopicKind("discovery");
+    setTopicTheme(undefined);
+    setTopicNote("");
+    setTopicQuestion("");
+    setTopicError(null);
+    setTopicMessage("已存入稍后，并和这条记录关联。之后可以慢慢回看。");
+    setLatestCreatedTopic(result.value ?? null);
   }
 
   if (!detail) {
@@ -527,8 +608,72 @@ export function RecordDetailPage({ navigate }: RecordDetailPageProps) {
       <section className="panel page-stack">
         <div className="section-heading">
           <h2>这次看见的点</h2>
-          <p>从这条记录延伸出来、适合稍后再看的内容。</p>
+          <p>从这条记录延伸出来、适合稍后再看的内容。不需要现在想完。</p>
         </div>
+        <section className="record-topic-compose" aria-label="从这条记录存一个看见的点">
+          <div className="section-heading">
+            <h3>存一个看见的点</h3>
+            <p>先留一个标题就够了，它会带着这条记录的来源一起进入稍后再看。</p>
+          </div>
+          <label className="field">
+            <span className="field-label">短标题</span>
+            <input
+              className="field-input"
+              value={topicTitle}
+              onChange={(event) => setTopicTitle(event.target.value)}
+              placeholder="例如：我想解释很多，是怕被误解"
+            />
+          </label>
+          <ChipGroup
+            label="类型"
+            options={discoveryPointKindOptions}
+            value={topicKind}
+            onChange={setTopicKind}
+          />
+          <ChipGroup
+            label="主题，可不选"
+            options={discoveryPointThemeOptions}
+            value={topicTheme}
+            onChange={setTopicTheme}
+          />
+          <label className="field">
+            <span className="field-label">一句备注，可空着</span>
+            <textarea
+              className="field-textarea"
+              value={topicNote}
+              rows={2}
+              onChange={(event) => setTopicNote(event.target.value)}
+              placeholder="它为什么被我看见了？"
+            />
+          </label>
+          <label className="field">
+            <span className="field-label">想探寻的问题，可空着</span>
+            <textarea
+              className="field-textarea"
+              value={topicQuestion}
+              rows={2}
+              onChange={(event) => setTopicQuestion(event.target.value)}
+              placeholder="例如：我在保护什么？"
+            />
+          </label>
+          <div className="inline-actions">
+            <button className="button button--secondary" type="button" onClick={saveRecordTopic}>
+              <Plus size={16} strokeWidth={1.8} />
+              {status === "saving" ? "正在存下" : "存入稍后"}
+            </button>
+            {latestCreatedTopic ? (
+              <button
+                className="button button--ghost"
+                type="button"
+                onClick={() => navigate(buildTopicRoute(latestCreatedTopic.id))}
+              >
+                打开刚存的点
+              </button>
+            ) : null}
+          </div>
+          {topicMessage ? <p className="helper-text">{topicMessage}</p> : null}
+          {topicError ? <p className="form-error">{topicError}</p> : null}
+        </section>
         {detail.linkedTopics.length ? (
           <div className="record-topic-list">
             {detail.linkedTopics.map((point) => (
