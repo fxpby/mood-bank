@@ -6,13 +6,13 @@ import { SupportBoundaryCard } from "../components/SupportBoundaryCard";
 import { getSupportBoundaryKind } from "../domain/safety";
 import type { ActivationLevel, QuickRecordPrefill } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute, RouteState } from "../utils/route";
+import { buildHighActivationBranchState, type AppRoute, type RouteState } from "../utils/route";
 
 type TriggerPageProps = {
   navigate: (route: AppRoute, state?: RouteState) => void;
 };
 
-type StepId = "fact" | "bodyEmotion" | "urge" | "nextAction" | "completion";
+type StepId = "fact" | "bodyEmotion" | "stateCheck" | "urge" | "nextAction" | "completion";
 type FactChip =
   | "no_reply"
   | "long_message"
@@ -48,6 +48,14 @@ type UrgeChip =
   | "attack"
   | "rescue"
   | "sleep_ruminate"
+  | "not_sure";
+type TriggerStateCheck =
+  | "present"
+  | "connection_alarm"
+  | "old_echo"
+  | "inner_judge"
+  | "boundary_pressure"
+  | "body_overload"
   | "not_sure";
 type OwnedAction =
   | "delay_10_min"
@@ -107,6 +115,16 @@ const urgeOptions: ChipOption<UrgeChip>[] = [
   { value: "not_sure", label: "说不清" },
 ];
 
+const triggerStateOptions: ChipOption<TriggerStateCheck>[] = [
+  { value: "present", label: "主要是当下这件事" },
+  { value: "connection_alarm", label: "连接警报响了" },
+  { value: "old_echo", label: "像旧感觉被碰到" },
+  { value: "inner_judge", label: "内部审判者很响" },
+  { value: "boundary_pressure", label: "边界/责任被压到" },
+  { value: "body_overload", label: "身体已经过载" },
+  { value: "not_sure", label: "我说不清" },
+];
+
 const actionOptions: ChipOption<OwnedAction>[] = [
   { value: "delay_10_min", label: "延迟 10 分钟" },
   { value: "save_draft_do_not_send", label: "保存草稿不发" },
@@ -122,7 +140,7 @@ const actionOptions: ChipOption<OwnedAction>[] = [
   { value: "not_sure", label: "说不清" },
 ];
 
-const stepOrder: StepId[] = ["fact", "bodyEmotion", "urge", "nextAction", "completion"];
+const stepOrder: StepId[] = ["fact", "bodyEmotion", "stateCheck", "urge", "nextAction", "completion"];
 
 export function TriggerPage({ navigate }: TriggerPageProps) {
   const { state, actions, status, lastError } = useAppStore();
@@ -132,6 +150,7 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
   const [body, setBody] = useState<BodyChip>("not_sure");
   const [emotion, setEmotion] = useState<EmotionChip>("not_sure");
   const [intensity, setIntensity] = useState<"low" | "medium" | "high">("medium");
+  const [stateCheck, setStateCheck] = useState<TriggerStateCheck>("not_sure");
   const [urge, setUrge] = useState<UrgeChip>("not_sure");
   const [nextAction, setNextAction] = useState<OwnedAction>("delay_10_min");
   const [topicSaved, setTopicSaved] = useState(false);
@@ -146,6 +165,11 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
     physicalSafetyValues: ["cut_off"],
     dissociativeValues: ["numb"],
   });
+  const branchRoute = getTriggerStateBranchRoute(stateCheck);
+  const isHighActivation = intensity === "high" || stateCheck === "body_overload" || Boolean(supportBoundaryKind);
+  const branchRouteState: RouteState | undefined = isHighActivation
+    ? buildHighActivationBranchState("trigger_support")
+    : undefined;
 
   function goNext() {
     const currentIndex = stepOrder.indexOf(step);
@@ -164,6 +188,17 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
 
   function openQuickRecord() {
     navigate("/record/new", { quickRecordPrefill: buildPrefill() });
+  }
+
+  function openStateBranch() {
+    if (stateCheck === "body_overload") {
+      navigate("/return-to-self");
+      return;
+    }
+
+    if (branchRoute) {
+      navigate(branchRoute, branchRouteState);
+    }
   }
 
   function saveLaterTopic() {
@@ -194,7 +229,7 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
   if (step === "fact") {
     return (
       <StepScreen
-        eyebrow="1/4 先抓住事实"
+        eyebrow="1/5 先抓住事实"
         title="发生了什么可确认的事？"
         helper="只写摄像头能拍到的部分，不读心。"
         primaryLabel="下一步"
@@ -220,10 +255,10 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
   if (step === "bodyEmotion") {
     return (
       <StepScreen
-        eyebrow="2/4 看见身体和情绪"
+        eyebrow="2/5 看见身体和情绪"
         title="现在身体和情绪是什么？"
         helper="粗略命名就够了，也可以说不清。"
-        primaryLabel="看见冲动"
+        primaryLabel="判断状态"
         onPrimary={goNext}
         onBack={goBack}
       >
@@ -246,7 +281,7 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
   if (step === "urge") {
     return (
       <StepScreen
-        eyebrow="3/4 看见冲动"
+        eyebrow="4/5 看见冲动"
         title="我现在最想做什么？"
         helper="冲动不是命令，只是线索。"
         primaryLabel="选择下一步"
@@ -273,10 +308,56 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
     );
   }
 
-  if (step === "nextAction") {
+  if (step === "stateCheck") {
+    const stateBranchCopy = getTriggerStateBranchCopy(stateCheck);
+
     return (
       <StepScreen
-        eyebrow="4/4 选一个下一步"
+        eyebrow="3/5 先判断状态"
+        title="我现在更像是哪一种状态？"
+        helper="这不是诊断，也不是分析我哪里有问题。只是帮我选对下一步。"
+        primaryLabel="继续看冲动"
+        onPrimary={goNext}
+        onBack={goBack}
+      >
+        <ChipGroup
+          label="此刻状态"
+          options={triggerStateOptions}
+          value={stateCheck}
+          onChange={setStateCheck}
+        />
+        {stateBranchCopy ? (
+          <section className="recommend-card">
+            <span>可以先走这条路</span>
+            <strong>{stateBranchCopy.title}</strong>
+            <p>{stateBranchCopy.body}</p>
+            <button className="button button--secondary" type="button" onClick={openStateBranch}>
+              {stateBranchCopy.actionLabel}
+            </button>
+          </section>
+        ) : (
+          <section className="recommend-card">
+            <span>说不清也可以</span>
+            <strong>先继续看冲动</strong>
+            <p>不用急着判断原因。先把身体、冲动和一个能做的小动作分开。</p>
+          </section>
+        )}
+        {supportBoundaryKind ? (
+          <SupportBoundaryCard
+            kind={supportBoundaryKind}
+            onReturnToSelf={() => navigate("/return-to-self")}
+          />
+        ) : null}
+      </StepScreen>
+    );
+  }
+
+  if (step === "nextAction") {
+    const recommendedAction = recommendAction(urge, stateCheck);
+
+    return (
+      <StepScreen
+        eyebrow="5/5 选一个下一步"
         title="我选择一个能由我完成的下一步"
         helper="这一步不需要解决关系，只需要减少失控。"
         primaryLabel="就这个"
@@ -287,12 +368,12 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
       >
         <section className="recommend-card">
           <span>建议先选轻动作</span>
-          <strong>{getActionLabel(recommendAction(urge))}</strong>
+          <strong>{getActionLabel(recommendedAction)}</strong>
           <p>先让冲动慢一点，再决定要不要表达。</p>
           <button
             className="button button--secondary"
             type="button"
-            onClick={() => setNextAction(recommendAction(urge))}
+            onClick={() => setNextAction(recommendedAction)}
           >
             选这个
           </button>
@@ -320,6 +401,7 @@ export function TriggerPage({ navigate }: TriggerPageProps) {
         body="你没有让冲动直接开车。还没变轻也没关系，先别继续加重它。"
         rows={[
           { label: "事实", value: buildFactText(factChip, factText) },
+          { label: "状态", value: getTriggerStateLabel(stateCheck) },
           { label: "冲动", value: getUrgeLabel(urge) },
           { label: "下一步", value: getActionLabel(nextAction) },
         ]}
@@ -400,7 +482,9 @@ function mapIntensity(value: "low" | "medium" | "high"): ActivationLevel {
   return 2;
 }
 
-function recommendAction(urge: UrgeChip): OwnedAction {
+function recommendAction(urge: UrgeChip, stateCheck: TriggerStateCheck): OwnedAction {
+  if (stateCheck === "body_overload") return "return_to_self";
+  if (stateCheck === "not_sure") return "drink_water_wash_hands";
   if (urge === "over_explain") return "save_draft_do_not_send";
   if (urge === "reread") return "record_facts";
   if (urge === "attack" || urge === "cut_off") return "return_to_self";
@@ -408,8 +492,68 @@ function recommendAction(urge: UrgeChip): OwnedAction {
   return "delay_10_min";
 }
 
+function getTriggerStateBranchRoute(value: TriggerStateCheck): AppRoute | null {
+  if (value === "connection_alarm") return "/connection-continuity";
+  if (value === "old_echo") return "/old-echo";
+  if (value === "inner_judge") return "/self-compassion";
+  if (value === "boundary_pressure") return "/boundary-clarity";
+  return null;
+}
+
+function getTriggerStateBranchCopy(value: TriggerStateCheck): {
+  title: string;
+  body: string;
+  actionLabel: string;
+} | null {
+  if (value === "connection_alarm") {
+    return {
+      title: "连接感可能在变远，不一定是连接本身消失",
+      body: "可以先看已经发生过的证据和现在不能证明的结论。",
+      actionLabel: "看看连接还在吗",
+    };
+  }
+
+  if (value === "old_echo") {
+    return {
+      title: "旧感觉可能被碰到",
+      body: "不用讲童年细节，只把今天的小事和更大的需要分开一点。",
+      actionLabel: "看看旧感觉",
+    };
+  }
+
+  if (value === "inner_judge") {
+    return {
+      title: "内部审判者可能太响",
+      body: "可以先给自己一句不攻击的话，再决定要不要继续处理这件事。",
+      actionLabel: "自我关怀一下",
+    };
+  }
+
+  if (value === "boundary_pressure") {
+    return {
+      title: "边界或责任可能被压到了",
+      body: "先分清什么是我的，什么不是我的，再选一个由我完成的限度。",
+      actionLabel: "看看边界",
+    };
+  }
+
+  if (value === "body_overload") {
+    return {
+      title: "身体已经过载",
+      body: "现在不适合继续分析。先让身体落地，比想明白更优先。",
+      actionLabel: "先回到自己",
+    };
+  }
+
+  return null;
+}
+
 function getFactLabel(value: FactChip): string {
   return factOptions.find((option) => option.value === value)?.label ?? "说不清";
+}
+
+function getTriggerStateLabel(value: TriggerStateCheck): string {
+  return triggerStateOptions.find((option) => option.value === value)?.label ?? "说不清";
 }
 
 function getBodyLabel(value: BodyChip): string {

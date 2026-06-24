@@ -39,7 +39,8 @@ export type BranchActivationSource =
   | "signal_check"
   | "emotion_calibration"
   | "rich_incoming"
-  | "quick_record";
+  | "quick_record"
+  | "trigger_support";
 
 export type BranchActivationContext = {
   kind: "high_activation";
@@ -173,6 +174,7 @@ function isBranchActivationSource(value: unknown): value is BranchActivationSour
     value === "signal_check" ||
     value === "emotion_calibration" ||
     value === "rich_incoming" ||
-    value === "quick_record"
+    value === "quick_record" ||
+    value === "trigger_support"
   );
 }

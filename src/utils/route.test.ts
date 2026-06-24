@@ -124,6 +124,7 @@ describe("route helpers", () => {
       "emotion_calibration",
       "rich_incoming",
       "quick_record",
+      "trigger_support",
     ] as const;
 
     for (const source of sources) {

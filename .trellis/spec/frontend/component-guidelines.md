@@ -60,7 +60,8 @@ type BranchActivationContext = {
     | "signal_check"
     | "emotion_calibration"
     | "rich_incoming"
-    | "quick_record";
+    | "quick_record"
+    | "trigger_support";
 };
 
 type RouteState = {
