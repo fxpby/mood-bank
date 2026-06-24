@@ -1509,3 +1509,41 @@ Added lightweight local text search to Topics so saved discovery points can be f
 ### Next Steps
 
 - None - task complete
+
+
+## Session 39: Topics batch discovery capture
+
+**Date**: 2026-06-24
+**Task**: Topics batch discovery capture
+**Branch**: `main`
+
+### Summary
+
+Added a lightweight 1-8 row batch capture mode to Topics so dense moments can be saved before they are forgotten.
+
+### Main Changes
+
+- Added route-local batch rows on `/topics` with add/remove, blank-title validation, optional source snippet, note, explore question, kind, and theme.
+- Added `buildBatchDiscoveryPointInputs(...)` to clean batch drafts, ignore blank rows, cap at eight, and feed one `saveDiscoveryPoints(...)` call.
+- Updated README, PRD status, and frontend state-management spec to preserve the manual/local/no-account-impact boundary.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `4c281c6` | feat: add topics batch discovery capture |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test` (25 files / 205 tests)
+- [OK] `npm run build` (Vite chunk-size warning only)
+- [OK] Browser smoke on `/topics`: empty-title guard, add second row, save two temporary points, verify both appear, delete both temporary points.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
