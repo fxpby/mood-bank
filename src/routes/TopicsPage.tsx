@@ -9,7 +9,10 @@ import {
   discoveryPointThemeCopy,
 } from "../copy/topics";
 import {
+  buildBatchDiscoveryPointInputs,
   filterDiscoveryPoints,
+  MAX_BATCH_DISCOVERY_POINTS,
+  type BatchDiscoveryPointDraft,
   type TopicFilters,
   type TopicKindFilter,
   type TopicSourceFilter,
@@ -93,6 +96,24 @@ const rowStatusActions: Array<{ status: DiscoveryPointStatus; label: string }> =
   { status: "no_longer_needed", label: "不用了" },
 ];
 
+type CreateMode = "single" | "batch";
+
+type BatchRow = BatchDiscoveryPointDraft & {
+  id: string;
+};
+
+function createBatchRow(): BatchRow {
+  return {
+    id: `batch_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    title: "",
+    kind: "discovery",
+    theme: undefined,
+    note: "",
+    exploreQuestion: "",
+    sourceSnippet: "",
+  };
+}
+
 export function TopicsPage({ navigate }: TopicsPageProps) {
   const { state, actions, status, lastError } = useAppStore();
   const activeSpace = selectActiveSpace(state);
@@ -104,11 +125,13 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
     query: "",
   });
   const [isCreating, setIsCreating] = useState(false);
+  const [createMode, setCreateMode] = useState<CreateMode>("single");
   const [title, setTitle] = useState("");
   const [kind, setKind] = useState<DiscoveryPointKind>("discovery");
   const [theme, setTheme] = useState<DiscoveryPointTheme | undefined>();
   const [note, setNote] = useState("");
   const [exploreQuestion, setExploreQuestion] = useState("");
+  const [batchRows, setBatchRows] = useState<BatchRow[]>(() => [createBatchRow()]);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [latestCreatedPoint, setLatestCreatedPoint] = useState<DiscoveryPoint | null>(null);
@@ -162,6 +185,54 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
     setIsCreating(false);
   }
 
+  function addBatchRow() {
+    setBatchRows((rows) =>
+      rows.length >= MAX_BATCH_DISCOVERY_POINTS ? rows : [...rows, createBatchRow()],
+    );
+  }
+
+  function updateBatchRow(id: string, fields: Partial<BatchRow>) {
+    setBatchRows((rows) => rows.map((row) => (row.id === id ? { ...row, ...fields } : row)));
+  }
+
+  function removeBatchRow(id: string) {
+    setBatchRows((rows) => {
+      const nextRows = rows.filter((row) => row.id !== id);
+      return nextRows.length ? nextRows : [createBatchRow()];
+    });
+  }
+
+  function saveBatch() {
+    if (!activeSpace) {
+      setError("还没有可以保存的空间。");
+      return;
+    }
+
+    const inputs = buildBatchDiscoveryPointInputs(activeSpace.id, batchRows);
+
+    if (!inputs.length) {
+      setError("至少给一个发现点写下短标题。");
+      setMessage(null);
+      setLatestCreatedPoint(null);
+      return;
+    }
+
+    const result = actions.saveDiscoveryPoints(inputs);
+
+    if (!result.ok) {
+      setError(result.error ?? "这次还没有存下。");
+      setMessage(null);
+      setLatestCreatedPoint(null);
+      return;
+    }
+
+    setBatchRows([createBatchRow()]);
+    setError(null);
+    setMessage(`已存入稍后 ${result.value?.length ?? inputs.length} 个点，不会变成待办。`);
+    setLatestCreatedPoint(result.value?.[0] ?? null);
+    setIsCreating(false);
+  }
+
   function updateStatus(point: DiscoveryPoint, nextStatus: DiscoveryPointStatus) {
     const result = actions.updateDiscoveryPointStatus({ id: point.id, status: nextStatus });
 
@@ -192,6 +263,9 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
             setError(null);
             setMessage(null);
             setLatestCreatedPoint(null);
+            if (!isCreating) {
+              setCreateMode("single");
+            }
           }}
         >
           {isCreating ? <RotateCcw size={17} strokeWidth={1.8} /> : <Plus size={17} strokeWidth={1.8} />}
@@ -205,45 +279,106 @@ export function TopicsPage({ navigate }: TopicsPageProps) {
             <h2>这次看见了什么</h2>
             <p>只写一个点也可以，不需要现在分析完整。</p>
           </div>
-          <label className="field">
-            <span className="field-label">短标题</span>
-            <input
-              className="field-input"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="例如：语言切换像缓冲"
-            />
-          </label>
-          <ChipGroup label="类型" options={kindOptions} value={kind} onChange={setKind} />
-          <ChipGroup
-            label="主题，可不选"
-            options={themeOptions}
-            value={theme}
-            onChange={setTheme}
-          />
-          <label className="field">
-            <span className="field-label">一句备注，可空着</span>
-            <textarea
-              className="field-textarea"
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              rows={2}
-              placeholder="它为什么被我看见了？"
-            />
-          </label>
-          <label className="field">
-            <span className="field-label">想探寻的问题，可空着</span>
-            <textarea
-              className="field-textarea"
-              value={exploreQuestion}
-              onChange={(event) => setExploreQuestion(event.target.value)}
-              rows={2}
-              placeholder="例如：我在夜里反复想保护什么？"
-            />
-          </label>
-          <button className="button button--primary" type="button" onClick={savePoint}>
-            {status === "saving" ? "正在存下" : "存入稍后"}
-          </button>
+          <div className="topic-create-mode" role="group" aria-label="保存方式">
+            <button
+              className="topic-status-button"
+              type="button"
+              aria-pressed={createMode === "single"}
+              onClick={() => {
+                setCreateMode("single");
+                setError(null);
+              }}
+            >
+              存一个
+            </button>
+            <button
+              className="topic-status-button"
+              type="button"
+              aria-pressed={createMode === "batch"}
+              onClick={() => {
+                setCreateMode("batch");
+                setError(null);
+              }}
+            >
+              批量保存
+            </button>
+          </div>
+          {createMode === "single" ? (
+            <>
+              <label className="field">
+                <span className="field-label">短标题</span>
+                <input
+                  className="field-input"
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="例如：语言切换像缓冲"
+                />
+              </label>
+              <ChipGroup label="类型" options={kindOptions} value={kind} onChange={setKind} />
+              <ChipGroup
+                label="主题，可不选"
+                options={themeOptions}
+                value={theme}
+                onChange={setTheme}
+              />
+              <label className="field">
+                <span className="field-label">一句备注，可空着</span>
+                <textarea
+                  className="field-textarea"
+                  value={note}
+                  onChange={(event) => setNote(event.target.value)}
+                  rows={2}
+                  placeholder="它为什么被我看见了？"
+                />
+              </label>
+              <label className="field">
+                <span className="field-label">想探寻的问题，可空着</span>
+                <textarea
+                  className="field-textarea"
+                  value={exploreQuestion}
+                  onChange={(event) => setExploreQuestion(event.target.value)}
+                  rows={2}
+                  placeholder="例如：我在夜里反复想保护什么？"
+                />
+              </label>
+              <button className="button button--primary" type="button" onClick={savePoint}>
+                {status === "saving" ? "正在存下" : "存入稍后"}
+              </button>
+            </>
+          ) : (
+            <div className="topic-batch page-stack">
+              <p className="helper-text">
+                一次最多存 {MAX_BATCH_DISCOVERY_POINTS} 个。先写标题就够了，空白行不会保存。
+              </p>
+              {batchRows.length > 3 ? <p className="helper-text">先存住就好，之后可以慢慢看。</p> : null}
+              <div className="topic-batch__rows">
+                {batchRows.map((row, index) => (
+                  <BatchDiscoveryRow
+                    key={row.id}
+                    index={index}
+                    row={row}
+                    canRemove={batchRows.length > 1}
+                    onChange={(fields) => updateBatchRow(row.id, fields)}
+                    onRemove={() => removeBatchRow(row.id)}
+                  />
+                ))}
+              </div>
+              <div className="inline-actions">
+                <button
+                  className="button button--secondary"
+                  type="button"
+                  onClick={addBatchRow}
+                  disabled={batchRows.length >= MAX_BATCH_DISCOVERY_POINTS}
+                >
+                  <Plus size={16} strokeWidth={1.8} />
+                  再加一个
+                </button>
+                <button className="button button--primary" type="button" onClick={saveBatch}>
+                  {status === "saving" ? "正在存下" : "批量存入稍后"}
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       ) : null}
 
@@ -390,6 +525,87 @@ function getEmptyDescription(topicCount: number, hasSearchQuery: boolean): strin
   }
 
   return "可以换一个筛选组合，或先让这些点继续安静放着。";
+}
+
+function BatchDiscoveryRow({
+  index,
+  row,
+  canRemove,
+  onChange,
+  onRemove,
+}: {
+  index: number;
+  row: BatchRow;
+  canRemove: boolean;
+  onChange: (fields: Partial<BatchRow>) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <article className="topic-batch-row">
+      <div className="topic-batch-row__header">
+        <strong>发现点 {index + 1}</strong>
+        <button
+          className="topic-status-button"
+          type="button"
+          onClick={onRemove}
+          disabled={!canRemove}
+        >
+          移除
+        </button>
+      </div>
+      <label className="field">
+        <span className="field-label">短标题</span>
+        <input
+          className="field-input"
+          value={row.title}
+          onChange={(event) => onChange({ title: event.target.value })}
+          placeholder="例如：失眠里的复盘"
+        />
+      </label>
+      <ChipGroup
+        label="类型"
+        options={kindOptions}
+        value={row.kind ?? "discovery"}
+        onChange={(kind) => onChange({ kind })}
+      />
+      <ChipGroup
+        label="主题，可不选"
+        options={themeOptions}
+        value={row.theme}
+        onChange={(theme) => onChange({ theme })}
+      />
+      <label className="field">
+        <span className="field-label">来源片段，可空着</span>
+        <textarea
+          className="field-textarea"
+          value={row.sourceSnippet ?? ""}
+          onChange={(event) => onChange({ sourceSnippet: event.target.value })}
+          rows={2}
+          placeholder="比如当时那句话、事实片段或身体线索"
+        />
+      </label>
+      <label className="field">
+        <span className="field-label">一句备注，可空着</span>
+        <textarea
+          className="field-textarea"
+          value={row.note ?? ""}
+          onChange={(event) => onChange({ note: event.target.value })}
+          rows={2}
+          placeholder="它为什么被我看见了？"
+        />
+      </label>
+      <label className="field">
+        <span className="field-label">想探寻的问题，可空着</span>
+        <textarea
+          className="field-textarea"
+          value={row.exploreQuestion ?? ""}
+          onChange={(event) => onChange({ exploreQuestion: event.target.value })}
+          rows={2}
+          placeholder="例如：我在保护什么？"
+        />
+      </label>
+    </article>
+  );
 }
 
 function DiscoveryPointRow({

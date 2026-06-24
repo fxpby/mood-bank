@@ -35,6 +35,17 @@ export type TopicFilters = {
   query?: string;
 };
 
+export type BatchDiscoveryPointDraft = {
+  title: string;
+  kind?: DiscoveryPointKind;
+  theme?: DiscoveryPointTheme;
+  note?: string;
+  exploreQuestion?: string;
+  sourceSnippet?: string;
+};
+
+export const MAX_BATCH_DISCOVERY_POINTS = 8;
+
 export function addDiscoveryPointToState(
   state: AppState,
   input: DiscoveryPointInput,
@@ -70,6 +81,34 @@ export function addDiscoveryPointsToState(
       topics: [...points, ...state.topics],
     },
   };
+}
+
+export function buildBatchDiscoveryPointInputs(
+  spaceId: string,
+  drafts: BatchDiscoveryPointDraft[],
+): DiscoveryPointInput[] {
+  return drafts.slice(0, MAX_BATCH_DISCOVERY_POINTS).reduce<DiscoveryPointInput[]>(
+    (inputs, draft) => {
+      const title = draft.title.trim();
+
+      if (!title) {
+        return inputs;
+      }
+
+      inputs.push({
+        spaceId,
+        title,
+        kind: draft.kind ?? "discovery",
+        theme: draft.theme,
+        note: cleanOptional(draft.note),
+        exploreQuestion: cleanOptional(draft.exploreQuestion),
+        sourceSnippet: cleanOptional(draft.sourceSnippet),
+      });
+
+      return inputs;
+    },
+    [],
+  );
 }
 
 export function filterDiscoveryPoints(

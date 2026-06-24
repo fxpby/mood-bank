@@ -190,6 +190,7 @@ const result = actions.saveQuickRecord(input);
 
 ```ts
 actions.saveDiscoveryPoint(input);
+actions.saveDiscoveryPoints(input[]);
 actions.updateDiscoveryPointStatus({ id, status });
 actions.updateDiscoveryPointReviewNote({ id, note });
 actions.updateDiscoveryPoint({ id, title, kind, theme, note, exploreQuestion });
@@ -203,6 +204,8 @@ Editing a discovery point may change only user-editable topic fields: `title`, `
 Deleting a discovery point removes only that item from `state.topics`. It must not delete source episodes, return-to-self practices, anchors, drafts, personal experiments, experiment attempts, or account impacts. Unknown ids return no-op success.
 
 Topics list search is route-local derived state. `TopicFilters.query` may be passed into `filterDiscoveryPoints(...)` to match visible point text (`title`, `note`, `exploreQuestion`, `sourceTitle`, `sourceSnippet`), but the query must not be written to `AppState`, storage, discovery points, account impacts, telemetry, or search history. It is simple local text matching, not AI analysis, semantic ranking, automatic theme inference, or relationship insight generation.
+
+Topics batch capture is also route-local until the user explicitly saves. Use `buildBatchDiscoveryPointInputs(spaceId, drafts)` to trim row text, ignore blank-title rows, default missing row kind to `discovery`, and cap the batch at `MAX_BATCH_DISCOVERY_POINTS` before calling `actions.saveDiscoveryPoints(...)`. The route must call the multi-point action once rather than looping over `saveDiscoveryPoint(...)`, so storage success/failure copy describes one atomic user action. Batch capture must not create account impacts, due dates, reminders, inferred themes, AI extraction, or search history.
 
 ### P2 Branch Output Contract
 

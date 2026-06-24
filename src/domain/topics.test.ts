@@ -5,6 +5,7 @@ import { createInitialState } from "./defaults";
 import {
   addDiscoveryPointToState,
   addDiscoveryPointsToState,
+  buildBatchDiscoveryPointInputs,
   buildDiscoveryPoint,
   deleteDiscoveryPointFromState,
   filterDiscoveryPoints,
@@ -104,6 +105,114 @@ describe("discovery point state helpers", () => {
       "已经存在的点",
     ]);
     expect(result.state.topics.every((point) => point.status === "stored_for_later")).toBe(true);
+  });
+
+  it("builds batch discovery inputs from titled rows and ignores blank rows", () => {
+    const inputs = buildBatchDiscoveryPointInputs(spaceId, [
+      {
+        title: "  语言切换像缓冲  ",
+        kind: "discovery",
+        theme: "emotion",
+        sourceSnippet: "  英文像一层缓冲  ",
+        note: "  不需要现在解释完  ",
+        exploreQuestion: "  我在保护什么？  ",
+      },
+      {
+        title: "   ",
+        kind: "question",
+        note: "没有标题不保存",
+      },
+      {
+        title: "边界提醒",
+      },
+    ]);
+
+    expect(inputs).toEqual([
+      {
+        spaceId,
+        title: "语言切换像缓冲",
+        kind: "discovery",
+        theme: "emotion",
+        sourceSnippet: "英文像一层缓冲",
+        note: "不需要现在解释完",
+        exploreQuestion: "我在保护什么？",
+      },
+      {
+        spaceId,
+        title: "边界提醒",
+        kind: "discovery",
+        theme: undefined,
+        note: undefined,
+        exploreQuestion: undefined,
+        sourceSnippet: undefined,
+      },
+    ]);
+  });
+
+  it("limits batch discovery inputs to the first eight titled rows", () => {
+    const inputs = buildBatchDiscoveryPointInputs(
+      spaceId,
+      Array.from({ length: 10 }, (_, index) => ({
+        title: `发现点 ${index + 1}`,
+      })),
+    );
+
+    expect(inputs.map((input) => input.title)).toEqual([
+      "发现点 1",
+      "发现点 2",
+      "发现点 3",
+      "发现点 4",
+      "发现点 5",
+      "发现点 6",
+      "发现点 7",
+      "发现点 8",
+    ]);
+  });
+
+  it("batch discovery point saves do not affect derived storage jar summaries", () => {
+    const stateWithEpisode: AppState = {
+      ...createInitialState(),
+      episodes: [
+        {
+          id: "episode_1",
+          spaceId,
+          source: "quick_record",
+          title: "一次互动",
+          facts: "对方具体回应了我的勇气",
+          interpretation: "",
+          emotions: [],
+          bodySensations: [],
+          connectionLevel: "not_sure",
+          activationLevel: "not_sure",
+          nextAction: "record_facts",
+          accountImpacts: buildQuickRecordImpacts(
+            {
+              spaceId,
+              spaceType: "interpersonal",
+              facts: "对方具体回应了我的勇气",
+              connectionEvidence: "对方具体回应了我的勇气",
+              nextAction: "record_facts",
+            },
+            { sourceId: "episode_1", createdAt: timestamp },
+          ),
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+      ],
+    };
+    const before = deriveAllAccountSummaries(stateWithEpisode);
+    const inputs = buildBatchDiscoveryPointInputs(spaceId, [
+      { title: "语言切换像缓冲", theme: "emotion" },
+      { title: "失眠里的复盘", kind: "question", exploreQuestion: "我在保护什么？" },
+    ]);
+
+    const result = addDiscoveryPointsToState(stateWithEpisode, inputs, {
+      ids: ["topic_1", "topic_2"],
+      timestamp: "2026-06-18T13:00:00.000Z",
+    });
+
+    expect(result.points).toHaveLength(2);
+    expect(deriveAllAccountSummaries(result.state)).toEqual(before);
   });
 
   it("updates only the selected discovery point status", () => {
