@@ -117,18 +117,29 @@ describe("route helpers", () => {
     expect(normalizeRoute("/not-real")).toBe("/");
   });
 
-  it("builds and reads high activation branch route state", () => {
-    const routeState = buildHighActivationBranchState("draft_check");
+  it("builds and reads high activation branch route state for supported sources", () => {
+    const sources = [
+      "draft_check",
+      "signal_check",
+      "emotion_calibration",
+      "rich_incoming",
+      "quick_record",
+    ] as const;
 
-    expect(getBranchActivationContext(routeState)).toEqual({
-      kind: "high_activation",
-      source: "draft_check",
-    });
+    for (const source of sources) {
+      const routeState = buildHighActivationBranchState(source);
+
+      expect(getBranchActivationContext(routeState)).toEqual({
+        kind: "high_activation",
+        source,
+      });
+    }
   });
 
   it("ignores malformed branch route state", () => {
     expect(getBranchActivationContext({ branchActivation: { kind: "high_activation" } })).toBeNull();
     expect(getBranchActivationContext({ branchActivation: { kind: "other", source: "draft_check" } })).toBeNull();
+    expect(getBranchActivationContext({ branchActivation: { kind: "high_activation", source: "other" } })).toBeNull();
     expect(getBranchActivationContext(null)).toBeNull();
   });
 });

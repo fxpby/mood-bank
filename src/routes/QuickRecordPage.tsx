@@ -13,7 +13,12 @@ import type {
   QuickRecordPrefill,
 } from "../domain/types";
 import { useAppStore } from "../store/AppStoreContext";
-import { buildRecordRoute, type AppRoute, type RouteState } from "../utils/route";
+import {
+  buildHighActivationBranchState,
+  buildRecordRoute,
+  type AppRoute,
+  type RouteState,
+} from "../utils/route";
 
 type QuickRecordPageProps = {
   navigate: (route: AppRoute, state?: RouteState) => void;
@@ -359,6 +364,9 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
     const returnToSelfState: RouteState = {
       returnToSelfAnchor: "这次记录先到这里。我可以晚点再回来，不用现在想完。",
     };
+    const branchRouteState: RouteState | undefined = highActivation
+      ? buildHighActivationBranchState("quick_record")
+      : undefined;
 
     return (
       <section className="quick-record-page page-stack">
@@ -417,7 +425,7 @@ export function QuickRecordPage({ navigate }: QuickRecordPageProps) {
               <button
                 className="button button--secondary"
                 type="button"
-                onClick={() => navigate("/seeing-evidence")}
+                onClick={() => navigate("/seeing-evidence", branchRouteState)}
               >
                 <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
                 看见这份温暖

@@ -34,7 +34,12 @@ export type RouteState = {
   branchActivation?: BranchActivationContext;
 };
 
-export type BranchActivationSource = "draft_check" | "signal_check" | "emotion_calibration";
+export type BranchActivationSource =
+  | "draft_check"
+  | "signal_check"
+  | "emotion_calibration"
+  | "rich_incoming"
+  | "quick_record";
 
 export type BranchActivationContext = {
   kind: "high_activation";
@@ -163,5 +168,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isBranchActivationSource(value: unknown): value is BranchActivationSource {
-  return value === "draft_check" || value === "signal_check" || value === "emotion_calibration";
+  return (
+    value === "draft_check" ||
+    value === "signal_check" ||
+    value === "emotion_calibration" ||
+    value === "rich_incoming" ||
+    value === "quick_record"
+  );
 }

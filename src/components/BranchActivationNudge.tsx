@@ -14,6 +14,8 @@ const sourceCopy: Record<BranchActivationContext["source"], string> = {
   draft_check: "刚才的自检里，波动已经有点高。",
   signal_check: "刚才的信号检查里，确认冲动已经有点响。",
   emotion_calibration: "刚才的情绪校准里，情绪推力已经有点强。",
+  rich_incoming: "刚才整理长消息时，心里已经接住了很多东西。",
+  quick_record: "刚才这条记录里，激活程度已经有点高。",
 };
 
 export function BranchActivationNudge({

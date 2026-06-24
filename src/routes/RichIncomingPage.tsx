@@ -21,10 +21,10 @@ import {
 } from "../domain/richIncoming";
 import { selectActiveSpace } from "../domain/selectors";
 import { useAppStore } from "../store/AppStoreContext";
-import type { AppRoute } from "../utils/route";
+import { buildHighActivationBranchState, type AppRoute, type RouteState } from "../utils/route";
 
 type RichIncomingPageProps = {
-  navigate: (route: AppRoute) => void;
+  navigate: (route: AppRoute, state?: RouteState) => void;
 };
 
 type StepId = "landing" | "threads" | "emotions" | "handling" | "direction" | "completion";
@@ -169,6 +169,21 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
     direction === "ask_open_question" ||
     direction === "reflect_key_point" ||
     direction === "express_gratitude";
+  const isHighActivationRichIncoming =
+    shapes.includes("pressure") ||
+    shapes.includes("fear_missing") ||
+    shapes.includes("want_careful_reply") ||
+    selectedThreads.includes("rumination_sleep") ||
+    emotions.includes("fear_reply_badly") ||
+    emotions.includes("pressure") ||
+    emotions.includes("overloaded") ||
+    emotions.includes("want_reply_now") ||
+    emotions.includes("want_escape") ||
+    emotions.includes("ruminate_sleep") ||
+    direction === "return_to_self";
+  const branchRouteState: RouteState | undefined = isHighActivationRichIncoming
+    ? buildHighActivationBranchState("rich_incoming")
+    : undefined;
 
   function goBack() {
     setMessage(null);
@@ -485,16 +500,28 @@ export function RichIncomingPage({ navigate }: RichIncomingPageProps) {
               进入草稿自检
             </button>
             {shouldOfferSeeingEvidence ? (
-              <button className="button button--secondary" type="button" onClick={() => navigate("/seeing-evidence")}>
+              <button
+                className="button button--secondary"
+                type="button"
+                onClick={() => navigate("/seeing-evidence", branchRouteState)}
+              >
                 看见被看见的证据
               </button>
             ) : null}
             {shouldOfferHealthyLove ? (
-              <button className="button button--secondary" type="button" onClick={() => navigate("/healthy-love")}>
+              <button
+                className="button button--secondary"
+                type="button"
+                onClick={() => navigate("/healthy-love", branchRouteState)}
+              >
                 学习怎么爱/被爱
               </button>
             ) : null}
-            <button className="button button--secondary" type="button" onClick={() => navigate("/repair-understanding")}>
+            <button
+              className="button button--secondary"
+              type="button"
+              onClick={() => navigate("/repair-understanding", branchRouteState)}
+            >
               修复/理解一下
             </button>
             <button className="button button--secondary" type="button" onClick={() => navigate("/return-to-self")}>

@@ -114,7 +114,12 @@ type RouteState = {
   returnToSelfAnchor?: string;
   branchActivation?: {
     kind: "high_activation";
-    source: "draft_check" | "signal_check" | "emotion_calibration";
+    source:
+      | "draft_check"
+      | "signal_check"
+      | "emotion_calibration"
+      | "rich_incoming"
+      | "quick_record";
   };
 };
 ```

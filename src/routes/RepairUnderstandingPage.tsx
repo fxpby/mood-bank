@@ -1,5 +1,6 @@
 import { HeartHandshake, NotebookPen, Save, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
+import { BranchActivationNudge } from "../components/BranchActivationNudge";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { CompletionCard } from "../components/CompletionCard";
 import { PageHeader } from "../components/PageHeader";
@@ -160,6 +161,11 @@ export function RepairUnderstandingPage({ navigate }: RepairUnderstandingPagePro
           onBack={goBack}
         />
         <section className="repair-understanding-landing panel page-stack">
+          <BranchActivationNudge
+            onReturnToSelf={() => navigate("/return-to-self")}
+            onContinue={() => setStep("wantUnderstood")}
+            continueLabel="继续看修复"
+          />
           <Sparkles size={26} strokeWidth={1.8} />
           <div className="section-heading">
             <h2>修复不是赢，也不是自我消失</h2>

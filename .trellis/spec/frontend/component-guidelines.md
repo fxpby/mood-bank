@@ -55,7 +55,12 @@ Prefer explicit unions over loose strings for product values. Reuse domain types
 ```ts
 type BranchActivationContext = {
   kind: "high_activation";
-  source: "draft_check" | "signal_check" | "emotion_calibration";
+  source:
+    | "draft_check"
+    | "signal_check"
+    | "emotion_calibration"
+    | "rich_incoming"
+    | "quick_record";
 };
 
 type RouteState = {
