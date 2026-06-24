@@ -1547,3 +1547,43 @@ Added a lightweight 1-8 row batch capture mode to Topics so dense moments can be
 ### Next Steps
 
 - None - task complete
+
+
+## Session 40: Record detail batch discovery capture
+
+**Date**: 2026-06-25
+**Task**: Record detail batch discovery capture
+**Branch**: `main`
+
+### Summary
+
+Added batch capture to Record Detail so one saved record can preserve multiple episode-linked "看见的点" at once.
+
+### Main Changes
+
+- Added `存一个 / 批量保存` mode inside Record Detail's `这次看见的点` section.
+- Extended `buildBatchDiscoveryPointInputs(...)` with optional source defaults so batch-created points can preserve episode source metadata.
+- Kept Record Detail batch rows local and simple: title, kind, theme, note, and explore question only.
+- Updated README and frontend state-management spec with the Record Detail batch source-linking contract.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `32b1f4e` | feat: add record detail batch discovery capture |
+| `0498ec1` | chore(task): archive record detail batch discovery capture |
+
+### Testing
+
+- [OK] `npm run typecheck`
+- [OK] `npm test` (25 files / 206 tests)
+- [OK] `npm run build` (Vite chunk-size warning only)
+- [OK] Browser smoke on `/record/:id`: switched to batch mode, saved two temporary episode-linked points, verified linked list and Topic Detail source snapshot, deleted both temporary points.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
