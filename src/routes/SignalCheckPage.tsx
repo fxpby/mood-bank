@@ -2,6 +2,7 @@ import { ArrowLeft, CheckCircle2, FileSearch, HeartHandshake, Save } from "lucid
 import { useState } from "react";
 import { ChipGroup, type ChipOption } from "../components/ChipGroup";
 import { PageHeader } from "../components/PageHeader";
+import { StepProgress } from "../components/StepProgress";
 import {
   absentSignalReactionCopy,
   buildSignalCheckDiscoveryPointInput,
@@ -390,9 +391,7 @@ function SignalStep({
   return (
     <section className="step-screen">
       <div className="step-screen__header">
-        <div className="step-screen__top">
-          <span>{progress}</span>
-        </div>
+        <StepProgress value={progress} />
         <h1>{title}</h1>
         <p>{helper}</p>
       </div>

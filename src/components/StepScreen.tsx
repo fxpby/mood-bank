@@ -1,4 +1,5 @@
 import { ArrowLeft } from "lucide-react";
+import { StepProgress } from "./StepProgress";
 
 type StepScreenProps = {
   eyebrow: string;
@@ -36,7 +37,7 @@ export function StepScreen({
               <ArrowLeft size={20} strokeWidth={1.8} />
             </button>
           ) : null}
-          <span>{eyebrow}</span>
+          <StepProgress value={eyebrow} />
         </div>
         <h1>{title}</h1>
         <p>{helper}</p>
